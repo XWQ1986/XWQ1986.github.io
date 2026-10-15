@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
@@ -1057,6 +1057,19 @@ function observeReveal() {
 }
 
 init();
+</script>
+<script>
+/* 滚动显现（补齐） */
+(function(){
+  function show(el){ el.classList.add('is-visible'); }
+  var els = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ show(en.target); io.unobserve(en.target); } }); }, { threshold: 0.08 });
+    els.forEach(function(el){ io.observe(el); });
+  } else {
+    els.forEach(show);
+  }
+})();
 </script>
 </body>
 </html>
