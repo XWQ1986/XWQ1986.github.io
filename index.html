@@ -599,7 +599,7 @@ function renderGallery() {
   document.getElementById('emptyState').classList.toggle('hidden', viewList.length > 0);
   gallery.querySelectorAll('[data-card]').forEach(btn => btn.addEventListener('click', () => {
     const w = viewList[+btn.dataset.card];
-    if (w && w.type === 'pano' && w.url) { const nb = window.open(w.url, '_blank'); if (nb) { nb.opener = null; } else { location.href = w.url; } return; }
+    if (w && w.type === 'pano' && w.url) { if (/micromessenger/i.test(navigator.userAgent)) { location.href = w.url; } else { const nb = window.open(w.url, '_blank'); if (nb) { nb.opener = null; } } return; }
     openLightbox(+btn.dataset.card);
   }));
   gallery.querySelectorAll('[data-replace-cover]').forEach(btn => btn.addEventListener('click', async e => {
