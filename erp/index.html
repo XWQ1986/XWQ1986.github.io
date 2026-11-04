@@ -1751,6 +1751,13 @@ function renderDrawer(id) {
         + '<input class="input" style="flex:1;padding:5px 8px;font-size:12px" type="' + inputType + '" value="' + esc(String(v == null ? '' : v)) + '"'
         + ' onchange="setGateField(this,\'' + c.id + '\',\'' + n[0] + '\')" placeholder="点击填写' + esc(n[1]) + '"></div>';
     });
+    /* 合同附件上传（跟在门禁字段下方，如 S7 即「合同金额」下面） */
+    html += '<div style="border-top:1px dashed var(--line);margin:8px 0 4px;padding-top:8px">'
+      + fileField('discountContent', '优惠内容')
+      + fileField('mainMaterial', '主材选材')
+      + fileField('frameworkTable', '构架表')
+      + fileField('constructionDrawings', '施工图纸')
+      + '</div>';
   }
   html += '<div class="flex gap-2 mt-2 flex-wrap"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
     + '<button class="btn btn-sm" data-action="force-advance" data-id="' + c.id + '">强制推进</button>'
@@ -1775,14 +1782,6 @@ function renderDrawer(id) {
     + kv('定金', money(c.depositAmount) + ' · ' + (c.depositDate || ''))
     + kv('设计合同', c.designContractDate) + kv('施工合同', c.buildContractDate)
     + kv('合同金额', c.contractAmount ? money(c.contractAmount) : '')
-    + '</div>'
-    + '<div style="border-top:1px dashed var(--line);margin:8px 0;padding-top:8px">'
-    + fileField('discountContent', '优惠内容')
-    + fileField('mainMaterial', '主材选材')
-    + fileField('frameworkTable', '构架表')
-    + fileField('constructionDrawings', '施工图纸')
-    + '</div>'
-    + '<div class="kv">'
     + kv('开工日期', c.startDate) + kv('拆除交底', c.demolitionBriefDate)
     + kv('水电交底', c.briefElectric) + kv('木工交底', c.briefWood)
     + kv('瓦工交底', c.briefMason) + kv('油工交底', c.briefPaint)
