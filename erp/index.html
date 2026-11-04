@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>恒彩 · 客户跟进与交付系统 V1.0.0</title>
+<style>
+/* ============ 设计令牌 ============ */
+:root{
+  --bg:#f3f6f4; --card:#fff; --line:#e2e8e4; --ink:#1b2724; --muted:#6d7b76;
+  --primary:#0f3d33; --primary-2:#1a5c4b; --primary-soft:#e7f2ee;
+  --danger:#b9382c; --danger-soft:#fdecea; --warn:#a3701c; --warn-soft:#fff4df;
+  --ok:#1c7355; --ok-soft:#e5f5ee;
+  --shadow:0 1px 2px rgba(16,40,34,.06),0 8px 24px rgba(16,40,34,.05);
+  --r:12px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
+  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--primary-2);text-decoration:none}
+
+/* ============ Tailwind 风格工具类（已编译内联，离线可用） ============ */
+.flex{display:flex}.grid{display:grid}.block{display:block}.hidden{display:none}
+.relative{position:relative}.absolute{position:absolute}
+.items-center{align-items:center}.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}.justify-center{justify-content:center}
+.flex-col{flex-direction:column}.flex-1{flex:1 1 0%;min-width:0}.flex-wrap{flex-wrap:wrap}
+.gap-1{gap:4px}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}.gap-6{gap:24px}
+.p-2{padding:8px}.p-3{padding:12px}.p-4{padding:16px}.p-5{padding:20px}
+.px-3{padding-left:12px;padding-right:12px}.px-4{padding-left:16px;padding-right:16px}
+.py-2{padding-top:8px;padding-bottom:8px}.py-3{padding-top:12px;padding-bottom:12px}
+.py-4{padding-top:16px;padding-bottom:16px}
+.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mt-6{margin-top:24px}
+.mb-1{margin-bottom:4px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}
+.mb-6{margin-bottom:24px}
+.w-full{width:100%}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.text-center{text-align:center}.text-right{text-align:right}
+.text-xs{font-size:12px}.text-sm{font-size:13px}.text-base{font-size:14px}
+.text-lg{font-size:18px}.text-xl{font-size:22px}.text-2xl{font-size:26px}
+.font-medium{font-weight:500}.font-semibold{font-weight:600}.font-bold{font-weight:700}
+.rounded{border-radius:8px}.rounded-lg{border-radius:12px}.rounded-xl{border-radius:16px}
+.border{border:1px solid var(--line)}.shadow{box-shadow:var(--shadow)}
+.cursor-pointer{cursor:pointer}.overflow-hidden{overflow:hidden}.overflow-auto{overflow:auto}
+.whitespace-pre-wrap{white-space:pre-wrap;word-break:break-word}
+.text-muted{color:var(--muted)}.text-main{color:var(--ink)}
+.text-danger{color:var(--danger)}.text-warn{color:var(--warn)}.text-ok{color:var(--ok)}
+.text-primary{color:var(--primary-2)}.text-white{color:#fff}
+.bg-card{background:var(--card)}.bg-page{background:var(--bg)}
+.bg-danger-soft{background:var(--danger-soft)}.bg-warn-soft{background:var(--warn-soft)}
+.bg-ok-soft{background:var(--ok-soft)}.bg-primary-soft{background:var(--primary-soft)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ============ 布局 ============ */
+.app{display:block;min-height:100vh}
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:236px;z-index:40;
+  background:linear-gradient(170deg,#0e3a30,#0b2f27 60%,#0a2a23);
+  color:#e8f1ee;display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .22s ease;
+}
+body.nav-open .sidebar{transform:translateX(0)}
+.brand{display:flex;gap:10px;align-items:center;padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-logo{
+  width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  font-size:16px;font-weight:700;letter-spacing:1px;color:#fff;
+}
+.brand-name{font-size:13px;font-weight:600;line-height:1.3;color:#fff}
+.brand-sub{font-size:11px;color:#9fc4b8;margin-top:2px}
+.nav{flex:1;overflow-y:auto;padding:10px 10px 16px}
+.nav-group{margin-top:12px}
+.nav-group-t{font-size:11px;color:#87ab9f;padding:6px 10px;letter-spacing:.5px}
+.nav-item{
+  display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;
+  color:#cfe2db;padding:9px 10px;border-radius:9px;font-size:13px;cursor:pointer;
+  text-align:left;transition:background .15s,color .15s;
+}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.15);color:#fff;font-weight:600}
+.nav-item .ico{width:18px;text-align:center;flex:none;opacity:.85;font-size:14px}
+.nav-item .cnt{
+  margin-left:auto;font-size:11px;color:#a9c8bd;background:rgba(255,255,255,.1);
+  border-radius:20px;padding:0 7px;min-width:20px;text-align:center;line-height:18px;
+}
+.nav-item.active .cnt{background:rgba(255,255,255,.22);color:#fff}
+.side-foot{padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#9fc4b8}
+.side-foot-t{font-weight:600;color:#fff;font-size:12px;margin-bottom:6px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#35d39a;margin-right:6px;box-shadow:0 0 0 3px rgba(53,211,154,.14)}
+.main{min-height:100vh;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-title{font-size:15px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.search{
+  width:150px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;
+  background:#fff;font-size:12px;outline:none;
+}
+.search:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(26,92,75,.1)}
+.icon-btn{
+  border:1px solid var(--line);background:#fff;border-radius:9px;width:36px;height:34px;
+  display:none;place-items:center;cursor:pointer;font-size:16px;
+}
+.view{padding:14px;flex:1}
+@media (min-width:900px){
+  body.nav-open .sidebar{transform:none}
+  .sidebar{transform:none;width:240px}
+  .main{margin-left:240px}
+  .icon-btn.mobile-only{display:none!important}
+  .view{padding:20px 24px 40px;max-width:1180px}
+  .search{width:220px}
+}
+@media (max-width:899px){
+  .icon-btn.mobile-only{display:grid}
+  .topbar-right .search{width:110px}
+  .topbar-right .btn-primary{padding:7px 10px;font-size:12px}
+}
+
+/* ============ 组件 ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.card-title{font-size:14px;font-weight:600}
+.card-sub{font-size:12px;color:var(--muted)}
+.card-body{padding:14px 16px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 14px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);font-size:13px;cursor:pointer;
+  transition:background .15s,border-color .15s,transform .06s;white-space:nowrap;
+}
+.btn:active{transform:translateY(1px)}
+.btn:hover{background:#f7faf9}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-2)}
+.btn-ghost{background:transparent;border-color:rgba(255,255,255,.25);color:#dfeee9}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:20px;
+  font-size:11px;line-height:19px;white-space:nowrap;
+}
+.badge-primary{background:var(--primary-soft);color:var(--primary-2)}
+.badge-danger{background:var(--danger-soft);color:var(--danger)}
+.badge-warn{background:var(--warn-soft);color:var(--warn)}
+.badge-ok{background:var(--ok-soft);color:var(--ok)}
+.badge-grey{background:#eef1f0;color:#5d6b66}
+.stat{padding:14px 16px;border-radius:var(--r);background:#fff;border:1px solid var(--line)}
+.stat .lab{font-size:12px;color:var(--muted)}
+.stat .num{font-size:24px;font-weight:700;line-height:1.25;margin-top:2px}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:2px}
+.stat.hot{background:linear-gradient(160deg,#0f3d33,#1a5c4b);border-color:transparent;color:#fff}
+.stat.hot .lab,.stat.hot .sub{color:#a9cbbf}
+.stat.danger .num{color:var(--danger)}
+.stat.warn .num{color:var(--warn)}
+.row{
+  display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);
+  cursor:pointer;transition:background .13s;
+}
+.row:last-child{border-bottom:0}
+.row:hover{background:#f8fbfa}
+.row-main{flex:1;min-width:0}
+.row-t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-created{font-size:10.5px;color:#b0b0b0;margin-bottom:1px;letter-spacing:.3px}
+.row-s{font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-right{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.empty{padding:44px 16px;text-align:center;color:var(--muted);font-size:13px}
+.section-t{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:14px;font-weight:600}
+.grid-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid-stats4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:700px){.grid-stats{grid-template-columns:repeat(4,1fr)}.grid-stats4{grid-template-columns:repeat(4,1fr)}}
+.stagebar{display:flex;gap:4px;flex-wrap:wrap}
+.stagechip{
+  flex:1;min-width:56px;text-align:center;padding:7px 6px;border-radius:8px;
+  background:#f1f5f3;border:1px solid var(--line);font-size:11px;
+}
+.stagechip b{display:block;font-size:13px;color:var(--primary-2)}
+.stagechip.cur{background:var(--primary);border-color:var(--primary);color:#fff}
+.stagechip.cur b{color:#fff}
+
+/* 提醒卡 */
+.morning{
+  border-radius:var(--r);border:1px solid #f1dcb8;
+  background:linear-gradient(160deg,#fff9ef,#fff3e2);padding:14px 16px;
+}
+.morning-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.clock{
+  background:#fff;border:1px solid #f0d9b4;border-radius:9px;padding:3px 10px;
+  font-size:16px;font-weight:700;color:#8a5a10;font-variant-numeric:tabular-nums;
+}
+.morning-item{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #f0e0c4;font-size:12.5px}
+.morning-item:last-child{border-bottom:0}
+.morning-item .t{flex:none;color:#8a5a10;font-weight:600;font-size:11.5px;min-width:42px}
+.morning-item .d{flex:1;min-width:0;color:#4a3a22}
+
+/* 抽屉 */
+.drawer{
+  position:fixed;inset:0;z-index:60;display:none;
+  background:rgba(10,24,20,.36);
+}
+.drawer.open{display:block}
+.drawer-panel{
+  position:absolute;right:0;top:0;bottom:0;width:100%;max-width:520px;
+  background:#fff;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.12);
+}
+@media (min-width:700px){.drawer-panel{border-radius:16px 0 0 16px}}
+.drawer-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.drawer-body{flex:1;overflow:auto;padding:14px 16px 40px}
+.kv{display:grid;grid-template-columns:92px 1fr;gap:6px 10px;font-size:12.5px}
+.kv .k{color:var(--muted)}
+.kv .v{min-width:0;word-break:break-word}
+.grp-t{font-size:12px;font-weight:600;color:var(--primary-2);margin:16px 0 8px;padding-left:8px;border-left:3px solid var(--primary-2)}
+.sub-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fbfdfc}
+.modal{position:fixed;inset:0;z-index:70;display:none;background:rgba(10,24,20,.4);padding:16px;overflow:auto}
+.modal.open{display:block}
+.modal-panel{max-width:560px;margin:24px auto;background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.input,.select,.textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+  background:#fff;font-size:13px;outline:none;
+}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(26,92,75,.1)}
+.textarea{min-height:120px;resize:vertical;line-height:1.6}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:90;
+  background:#123a31;color:#fff;padding:9px 16px;border-radius:22px;font-size:12.5px;
+  opacity:0;pointer-events:none;transition:.2s;box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);background:#fff;
+  font-size:12.5px;cursor:pointer;
+}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.out{
+  background:#0f2721;color:#d8efe7;border-radius:10px;padding:12px;font-size:12.5px;
+  white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;line-height:1.7;
+}
+.pathbox{
+  background:#f5f8f7;border:1px dashed #cfdcd6;border-radius:9px;padding:10px;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;white-space:pre-wrap;
+  color:#3c4d47;line-height:1.7;
+}
+.crumb{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.hr{height:1px;background:var(--line);margin:14px 0}
+.copy-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mini{font-size:11px;color:var(--muted)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">恒</div>
+      <div class="flex-1">
+        <div class="brand-name">客户跟进与交付</div>
+        <div class="brand-sub">恒彩设计部 · V1.0.0</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="side-foot-t">自动提醒</div>
+      <div class="side-foot-s"><span class="dot"></span>每日 09:10 晨间汇总</div>
+      <div class="side-foot-s text-muted mt-1">各设计师负责自己的客户 · 无公海池</div>
+      <button class="btn btn-ghost btn-sm mt-3" data-action="reset">重置演示数据</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn mobile-only" data-action="toggle-nav">☰</button>
+      <div class="topbar-title" id="topTitle">今日工作台</div>
+      <div class="topbar-right">
+        <input id="search" class="search" placeholder="搜索客户 / 小区">
+        <button class="btn btn-primary btn-sm" data-action="voice-entry" title="语音录入跟进">🎤 语音</button>
+        <button class="btn btn-sm" data-action="export-json" title="导出 data.json">⬇ 导出</button>
+        <button class="btn btn-sm" data-action="logout" title="锁定并退出">🔒 锁定</button>
+        <button class="btn btn-primary btn-sm" data-action="new-customer">+ 客户</button>
+      </div>
+    </header>
+    <section id="view" class="view"></section>
+  </main>
+</div>
+
+<div id="drawer" class="drawer"></div>
+<div id="modal" class="modal"></div>
+<div id="toast" class="toast"></div>
+<script src="config.js"></script>
+
+<script>
+/* ---------- 0. 登录门禁 ----------
+ * 未登录直接跳 login.html（线上 http/https 生效；本地 file:// 自用不拦）
+ * 登录态存在 hc_session；云端模式再由 Supabase 校验会话有效性。
+ */
+(function () {
+  try {
+    var isHttp = /^http/.test(location.protocol);
+    if (!isHttp) return;
+    var raw = localStorage.getItem('hc_session');
+    var s = raw ? JSON.parse(raw) : null;
+    if (!s || !s.u) { location.replace('login.html'); }
+  } catch (e) { /* 存储不可用时放行，避免白屏 */ }
+})();
+</script>
+<script>
+/* =====================================================================
+ * 恒彩客户跟进与交付系统 V1.0.0
+ * 单文件可运行：HTML + 内联 Tailwind 子集 + 原生 JS
+ * 数据：本地 Mock / 飞书多维表格导出 JSON（见 02_部署说明）
+ * ===================================================================== */
+
+/* ---------- 1. 基础工具 ---------- */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.prototype.slice.call(document.querySelectorAll(s));
+
+const TODAY_D = new Date();
+TODAY_D.setHours(0, 0, 0, 0);
+const TODAY = fmtD(TODAY_D);
+
+function fmtD(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
+}
+function shift(n, base) {
+  const d = new Date(base || TODAY_D);
+  d.setDate(d.getDate() + n);
+  return fmtD(d);
+}
+function diffDays(a, b) { // a - b，正数表示 a 在 b 之后
+  if (!a || !b) return null;
+  return Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
+function money(n) {
+  if (n == null || n === '') return '—';
+  if (n >= 10000) return (n / 10000).toFixed(n % 10000 === 0 ? 0 : 1) + ' 万';
+  return n.toLocaleString('zh-CN');
+}
+function sum(arr, key) {
+  return arr.reduce((a, b) => a + (Number(b[key]) || 0), 0);
+}
+
+/* ---------- 2. 业务元数据 ---------- */
+const STAGES = [
+  { code: 'S0', name: '线索进线' },
+  { code: 'S1', name: '邀约确认' },
+  { code: 'S2', name: '上门量房' },
+  { code: 'S3', name: '需求报告' },
+  { code: 'S4', name: '方案迭代' },
+  { code: 'S5', name: '报价核对' },
+  { code: 'S6', name: '定金阶段' },
+  { code: 'S7', name: '合同签订' },
+  { code: 'S8', name: '开工筹备' },
+  { code: 'S9', name: '施工管控' },
+  { code: 'S10', name: '竣工售后' }
+];
+const STAGE_IDX = {};
+STAGES.forEach((s, i) => { STAGE_IDX[s.code] = i; });
+
+const STAGE_MAP = {};
+STAGES.forEach((s) => { STAGE_MAP[s.code] = s.name; });
+
+/* 阶段门禁：上一阶段必须齐备的字段，不齐不得流转 */
+const GATES = [
+  { from: 'S0', to: 'S1', need: [['source', '线索来源'], ['firstContact', '初次沟通记录']] },
+  { from: 'S1', to: 'S2', need: [['visitApptDate', '邀约量房时间'], ['attendees', '到场人员']] },
+  { from: 'S2', to: 'S3', need: [['measureDate', '量房日期'], ['siteLink', '现场资料链接']] },
+  { from: 'S3', to: 'S4', need: [['reportDeliverDate', '量房报告交付日期'], ['clientFeedback', '客户反馈']] },
+  { from: 'S4', to: 'S5', need: [['planVersion', '当前方案版本号'], ['planDeliverDate', '方案交付日期']] },
+  { from: 'S5', to: 'S6', need: [['quoteVersion', '报价单版本'], ['budgetAgreed', '预算共识确认']] },
+  { from: 'S6', to: 'S7', need: [['depositDate', '定金日期'], ['designAgreementLink', '设计协议链接']] },
+  { from: 'S7', to: 'S8', need: [['designContractDate', '设计合同日期'], ['buildContractDate', '施工合同日期'], ['contractAmount', '合同金额']] },
+  { from: 'S8', to: 'S9', need: [['startDate', '开工日期'], ['demolitionBriefDate', '拆除交底日期']] },
+  { from: 'S9', to: 'S10', need: [['finishDate', '竣工日期'], ['warrantyEnd', '维保到期日']] }
+];
+
+const SUB_TABLES = [
+  { id: 'followUps', name: '跟进记录' },
+  { id: 'versions', name: '方案版本' },
+  { id: 'briefings', name: '交底记录' },
+  { id: 'changes', name: '变更增项' },
+  { id: 'materials', name: '主材确认' }
+];
+
+/* ---------- 3. 话术库（14 套节点话术） ---------- */
+const SCRIPTS = [
+  {
+    id: 'T01', node: 'S0', title: '首次触达 / 邀约量房', scene: '线索进来 2 小时内首次联系',
+    text: '您好，我是恒彩装饰的设计师{称呼}。看到您在{小区}的房子{面积}平，我们在这个小区做过同户型，业主当时主要纠结的是{关注点}。\n想跟您约个时间上门量个房，我现场看一下承重和采光，回来给您出一版平面方案，不收费、也不占用您太多时间，大概 40 分钟。您这周哪天方便？'
+  },
+  {
+    id: 'T02', node: 'S1', title: '量房确认与到场提醒', scene: '量房前一天 18:00 前',
+    text: '{称呼}您好，明天{时间}我准时到{小区}，麻烦您确认下这几件事：\n1）房子能不能进，钥匙或门禁卡是否方便；\n2）您和家里人都到场最好，尤其是最终拍板的那位；\n3）如果有户型图、购房合同附页，带上会更准；\n4）您最在意的三个点先告诉我，我量房时重点看。\n我这边会带激光测距和相机，量完 3 天内给您出平面初稿。'
+  },
+  {
+    id: 'T03', node: 'S3', title: '量房后需求确认', scene: '量房当天晚上或次日',
+    text: '{称呼}，今天量完我把几个关键点记下来了：{现场问题}。\n按您说的{核心诉求}，我打算这样处理：{解决思路}。\n有两个地方想再确认一下：一是{疑问1}，二是{疑问2}。您回我一句就行，我好定方案方向，免得白改。'
+  },
+  {
+    id: 'T04', node: 'S4', title: '方案首次发送', scene: '初稿完成、发送前',
+    text: '{称呼}，方案 v{版本} 做好了，一共两版思路：\nA 版偏{风格A}，重点是{亮点A}；\nB 版偏{风格B}，重点是{亮点B}。\n我不建议您在微信上直接看，平面图在手机上看不出尺度。您方便的话我当面讲 20 分钟，或者约个视频，我把每个空间的取舍讲清楚，您再判断。您哪天方便？'
+  },
+  {
+    id: 'T05', node: 'S4', title: '方案讲解邀约', scene: '发送方案后 48 小时未回复',
+    text: '{称呼}，前两天发的方案不知道您看了没有。我不催您，只是有个点想当面说清楚：{关键取舍点}，这个在图上不太看得出来，但会直接影响您以后住得舒不舒服。\n要不这样，您周末过来一趟，我 20 分钟讲完，您不满意我当场改。'
+  },
+  {
+    id: 'T06', node: 'S4', title: '方案修改沟通', scene: '客户提出修改意见',
+    text: '收到，您说的{修改点}我理解了，改成{调整方案}。\n有一点我先跟您说明：{影响说明}，如果坚持按您的想法做，后面可能会{副作用}，我建议{替代方案}。\n这版我{时间}前给您，算 v{版本}。'
+  },
+  {
+    id: 'T07', node: 'S5', title: '报价说明', scene: '首次发报价单',
+    text: '{称呼}，报价 v{版本} 发您了，我先说三句关键的：\n1）这个价是{口径}，包含{包含项}，不包含{不含项}，不含的部分我单列了，不会施工中突然加；\n2）里面{占比}是主材，主材您也可以自己买，我只收管理费；\n3）您要是觉得哪一项高了，我们逐项对，别整体砍。\n您先看，看不懂的地方直接问我，我给您标出来。'
+  },
+  {
+    id: 'T08', node: 'S5', title: '价格异议处理', scene: '客户说"太贵了"',
+    text: '{称呼}，您说贵，我不反驳，咱们把它拆开看。\n您现在比的可能是总价，我更关心的是：{同价位差异点}。比如同样 20 万，我们的水电是{标准}，别家可能在这块省；这块省下来的钱，三五年后是您自己掏。\n如果预算是硬约束，我们有两个办法：一是{降配方案}，二是我把{非必要项}先拿掉，先把硬装做扎实。您倾向哪种？'
+  },
+  {
+    id: 'T09', node: 'S5', title: '比价应对', scene: '客户说"别家更便宜"',
+    text: '正常，比价是对的。我只提醒您三件事，您拿去问对方：\n1）报价里水电是预收还是实测实量，超出部分怎么算；\n2）增项有没有上限，写不写进合同；\n3）项目经理同时管几个工地。\n这三条一问，价格差在哪您就清楚了。您问完把对方报价发我，我帮您逐项对，不收钱。'
+  },
+  {
+    id: 'T10', node: 'S6', title: '定金促成', scene: '客户已认可方案、在犹豫',
+    text: '{称呼}，方案和预算您都过了，我建议先把定金交了，把档期锁住。\n原因很实际：我们每个设计师手上同时只带{数量}个工地，您这个开工时间往前推，我得提前排。定金{金额}，可退规则是{规则}，您不用担心被套住。\n交完我这边 3 天内出施工图清单，咱们把节奏定下来。'
+  },
+  {
+    id: 'T11', node: 'S7', title: '设计合同签订', scene: '定金已交、转设计合同',
+    text: '{称呼}，设计合同我准备好了，重点三条您看一下：\n1）设计费{金额}，包含{出图清单}，交付节点是{节点}；\n2）改稿{次数}次以内不另收费，超出按{标准}；\n3）施工如果由我们做，设计费{抵扣规则}。\n您签完我当天建档，把您拉进项目群，后面所有沟通都在群里留痕，您随时能翻。'
+  },
+  {
+    id: 'T12', node: 'S8', title: '开工交底通知', scene: '开工前 3 天',
+    text: '{称呼}，{日期}开工，提前跟您对一下：\n1）当天上午 9 点现场交底，需要到的人：您、项目经理、水电工、橱柜和中央空调的厂家；\n2）图纸我会带 v{版本} 终稿，现场逐条对，确认后签字，后面按这版施工；\n3）开工前请您把{前置事项}处理好。\n交底记录我当天整理发群里，谁都别凭记忆干。'
+  },
+  {
+    id: 'T13', node: 'S9', title: '施工进度同步', scene: '每周一次固定同步',
+    text: '{称呼}，本周进度：{当前节点}，已完成{完成项}，下周计划{下周项}。\n现场照片我发群里了。有两件事需要您定：{待决策1}、{待决策2}，这两个会卡后面的工期，麻烦您{截止时间}前回复。\n另外提醒：{主材下单截止}前要下单，晚了会拖工期，这个我不替您兜。'
+  },
+  {
+    id: 'T14', node: 'S10', title: '竣工回访与转介绍', scene: '竣工 7 天 / 3 个月 / 1 年',
+    text: '{称呼}，房子住了一周，感觉怎么样？有没有哪里用着不顺手，您直接说，保修期内我让师傅上门调。\n另外跟您说个事：我们最近在做老客户回访，您身边如果有朋友要装修，可以直接推给我，我按老客户的标准给他做，您也不用欠人情。\n最后，方便的话帮我拍几张入住后的照片，我做个案例存档，只内部用，不外发。'
+  }
+];
+
+/* ---------- 4. Mock 数据（日期全部相对今天生成，保证演示永不过期） ---------- */
+function buildMock() {
+  const c = (o) => Object.assign({
+    id: '', name: '', phone: '', community: '', area: 0, layout: '3室2厅',
+    houseStatus: '现房', source: '', intent: '中', decider: '', budgetMin: 0, budgetMax: 0,
+    createdDate: TODAY, stageEnterDate: TODAY, designer: '本人', stage: 'S0',
+    sourceNote: '', firstContact: '', visitApptDate: null, attendees: '',
+    measureDate: null, siteLink: '', reportDeliverDate: null, clientFeedback: '',
+    planVersion: '', planDeliverDate: null, revisionNote: '',
+    quoteVersion: '', budgetAgreed: '', depositDate: null, depositAmount: 0,
+    designAgreementLink: '', designContractDate: null, buildContractDate: null,
+    contractAmount: 0, drawingsSigned: '', startDate: null, demolitionBriefDate: null,
+    contacts: '', briefElectric: null, briefWood: null, briefMason: null, briefPaint: null,
+    materialDeadline: null, finishDate: null, warrantyEnd: null, revisitPlan: '',
+    concerns: '', competitor: '', obsidianPath: '', feishuLink: '',
+    status: '正常', nextFollowDate: null, lastFollowDate: null
+  }, o);
+
+  const customers = [
+    c({
+      id: 'C001', name: '马先生', phone: '138****6621', community: '碧桂园', area: 198,
+      layout: '4室2厅', houseStatus: '现房', source: '老客转介', intent: '高',
+      decider: '马先生（本人）', budgetMin: 450000, budgetMax: 550000,
+      createdDate: shift(-95), stageEnterDate: shift(-40), stage: 'S9',
+      sourceNote: '老客户张女士介绍', firstContact: '首次沟通已完成，关注收纳与老人房',
+      visitApptDate: shift(-78), attendees: '马先生夫妇',
+      measureDate: shift(-74), siteLink: 'Obsidian://03_量房资料',
+      reportDeliverDate: shift(-70), clientFeedback: '认可动线，要求厨房加大',
+      planVersion: 'v3（定稿）', planDeliverDate: shift(-60), revisionNote: '三轮修改，厨房+阳台调整',
+      quoteVersion: 'Q2（整装 48 万）', budgetAgreed: '已确认 48 万整装',
+      depositDate: shift(-55), depositAmount: 20000, designAgreementLink: 'feishu://doc/design-agree',
+      designContractDate: shift(-52), buildContractDate: shift(-44), contractAmount: 486000,
+      drawingsSigned: '已签收 v3 施工图',
+      startDate: shift(-40), demolitionBriefDate: shift(-39),
+      contacts: '项目经理 王工 / 橱柜 张经理 / 空调 李工',
+      briefElectric: shift(-32), briefWood: shift(-20), briefMason: shift(-12), briefPaint: null,
+      materialDeadline: shift(-5),
+      finishDate: shift(10), warrantyEnd: shift(375), revisitPlan: '竣工 7 天 / 3 个月 / 1 年',
+      concerns: '担心增项、在意老人房防滑',
+      competitor: '同小区另一家装公司报 43 万',
+      obsidianPath: '恒彩客户库/马先生-碧桂园-198㎡',
+      feishuLink: 'feishu://bitable/C001',
+      nextFollowDate: TODAY, lastFollowDate: shift(-3),
+      status: '正常'
+    }),
+    c({
+      id: 'C002', name: '刘女士', phone: '139****3308', community: '领秀城檀樾', area: 187,
+      layout: '4室2厅', houseStatus: '现房', source: '线上咨询', intent: '中',
+      decider: '刘女士 + 先生（先生拍板）', budgetMin: 380000, budgetMax: 450000,
+      createdDate: shift(-31), stageEnterDate: shift(-9), stage: 'S4',
+      sourceNote: '小红书私信', firstContact: '关注儿童房与收纳',
+      visitApptDate: shift(-18), attendees: '刘女士',
+      measureDate: shift(-14), siteLink: 'Obsidian://03_量房资料',
+      reportDeliverDate: shift(-11), clientFeedback: '基本认可，要求增加储物',
+      planVersion: 'v2', planDeliverDate: shift(-2), revisionNote: 'v1 客厅过道太窄，v2 已调整',
+      concerns: '预算紧，怕超支', competitor: '朋友推荐的设计工作室',
+      obsidianPath: '恒彩客户库/刘女士-领秀城檀樾-187㎡',
+      feishuLink: 'feishu://bitable/C002',
+      nextFollowDate: shift(-1), lastFollowDate: shift(-5), status: '正常'
+    }),
+    c({
+      id: 'C003', name: '张先生', phone: '151****9915', community: '万科城', area: 143,
+      layout: '3室2厅', houseStatus: '期房', source: '门店到访', intent: '高',
+      decider: '张先生', budgetMin: 220000, budgetMax: 280000,
+      createdDate: shift(-6), stageEnterDate: shift(-4), stage: 'S1',
+      sourceNote: '门店自然到访，留了电话', firstContact: '期房 12 月交房，想提前定方案',
+      visitApptDate: shift(1), attendees: '张先生 + 太太',
+      measureDate: shift(1), siteLink: '',
+      concerns: '期房不确定交房时间', obsidianPath: '恒彩客户库/张先生-万科城-143㎡',
+      feishuLink: 'feishu://bitable/C003',
+      nextFollowDate: TODAY, lastFollowDate: shift(-4), status: '正常'
+    }),
+    c({
+      id: 'C004', name: '王女士', phone: '186****2244', community: '中海寰宇', area: 168,
+      layout: '4室2厅', houseStatus: '二手房', source: '老客转介', intent: '高',
+      decider: '王女士', budgetMin: 300000, budgetMax: 360000,
+      createdDate: shift(-45), stageEnterDate: shift(-6), stage: 'S6',
+      measureDate: shift(-24), siteLink: 'Obsidian://03_量房资料',
+      reportDeliverDate: shift(-20), clientFeedback: '认可',
+      planVersion: 'v2（客户已确认）', planDeliverDate: shift(-15),
+      quoteVersion: 'Q1（整装 33 万）', budgetAgreed: '已确认',
+      depositDate: shift(-6), depositAmount: 10000,
+      designAgreementLink: 'feishu://doc/w-design',
+      concerns: '二手房拆改担心结构安全',
+      obsidianPath: '恒彩客户库/王女士-中海寰宇-168㎡',
+      feishuLink: 'feishu://bitable/C004',
+      nextFollowDate: shift(-2), lastFollowDate: shift(-6), status: '正常'
+    }),
+    c({
+      id: 'C005', name: '李先生', phone: '135****7788', community: '保利天悦', area: 220,
+      layout: '4室2厅', houseStatus: '现房', source: '线上咨询', intent: '高',
+      decider: '李先生', budgetMin: 600000, budgetMax: 750000,
+      createdDate: shift(-120), stageEnterDate: shift(-21), stage: 'S7',
+      measureDate: shift(-92), siteLink: 'Obsidian://03_量房资料',
+      reportDeliverDate: shift(-88), clientFeedback: '认可',
+      planVersion: 'v4（定稿）', planDeliverDate: shift(-70),
+      quoteVersion: 'Q3（整装 72 万）', budgetAgreed: '已确认',
+      depositDate: shift(-55), depositAmount: 30000, designAgreementLink: 'feishu://doc/l-design',
+      designContractDate: shift(-50), buildContractDate: shift(-3), contractAmount: 728000,
+      drawingsSigned: '待签收',
+      obsidianPath: '恒彩客户库/李先生-保利天悦-220㎡',
+      feishuLink: 'feishu://bitable/C005',
+      nextFollowDate: shift(2), lastFollowDate: shift(-3), status: '正常'
+    }),
+    c({
+      id: 'C006', name: '陈先生', phone: '137****5566', community: '龙湖春江', area: 130,
+      layout: '3室2厅', houseStatus: '现房', source: '门店到访', intent: '中',
+      decider: '陈先生', budgetMin: 200000, budgetMax: 240000,
+      createdDate: shift(-200), stageEnterDate: shift(-7), stage: 'S10',
+      measureDate: shift(-160), reportDeliverDate: shift(-155),
+      planVersion: 'v2（定稿）', planDeliverDate: shift(-140),
+      quoteVersion: 'Q2', budgetAgreed: '已确认',
+      depositDate: shift(-130), depositAmount: 10000,
+      designContractDate: shift(-125), buildContractDate: shift(-110), contractAmount: 226000,
+      startDate: shift(-100), demolitionBriefDate: shift(-99),
+      briefElectric: shift(-88), briefWood: shift(-76), briefMason: shift(-62), briefPaint: shift(-50),
+      finishDate: shift(-7), warrantyEnd: shift(358), revisitPlan: '7 天 / 3 个月 / 1 年',
+      obsidianPath: '恒彩客户库/陈先生-龙湖春江-130㎡',
+      feishuLink: 'feishu://bitable/C006',
+      nextFollowDate: shift(7), lastFollowDate: shift(-7), status: '竣工归档'
+    }),
+    c({
+      id: 'C007', name: '周女士', phone: '133****1122', community: '绿城桂语', area: 176,
+      layout: '4室2厅', houseStatus: '现房', source: '老客转介', intent: '中',
+      decider: '周女士', budgetMin: 350000, budgetMax: 420000,
+      createdDate: shift(-22), stageEnterDate: shift(-3), stage: 'S2',
+      measureDate: shift(-3), siteLink: '',
+      reportDeliverDate: null, clientFeedback: '',
+      concerns: '老公出差，暂时只有她一个人决策',
+      obsidianPath: '恒彩客户库/周女士-绿城桂语-176㎡',
+      feishuLink: 'feishu://bitable/C007',
+      nextFollowDate: shift(-4), lastFollowDate: shift(-4), status: '正常'
+    }),
+    c({
+      id: 'C008', name: '吴先生', phone: '159****0033', community: '旭辉府', area: 110,
+      layout: '3室2厅', houseStatus: '期房', source: '线上咨询', intent: '低',
+      decider: '吴先生', budgetMin: 150000, budgetMax: 180000,
+      createdDate: shift(-3), stageEnterDate: shift(-3), stage: 'S0',
+      sourceNote: '抖音私信', firstContact: '',
+      obsidianPath: '恒彩客户库/吴先生-旭辉府-110㎡',
+      feishuLink: 'feishu://bitable/C008',
+      nextFollowDate: shift(-2), lastFollowDate: null, status: '正常'
+    }),
+    c({
+      id: 'C011', name: '郑先生', phone: '177****7712', community: '金地悦峰', area: 145,
+      layout: '3室2厅', houseStatus: '现房', source: '线上咨询', intent: '中',
+      decider: '郑先生', budgetMin: 240000, budgetMax: 290000,
+      createdDate: shift(-60), stageEnterDate: shift(-46), stage: 'S3',
+      measureDate: shift(-48), siteLink: 'Obsidian://03_量房资料',
+      reportDeliverDate: shift(-45), clientFeedback: '',
+      concerns: '一直说忙，方案迟迟不推进',
+      obsidianPath: '恒彩客户库/郑先生-金地悦峰-145㎡',
+      feishuLink: 'feishu://bitable/C011',
+      nextFollowDate: shift(3), lastFollowDate: shift(-45), status: '正常'
+    }),
+    c({
+      id: 'C012', name: '林女士', phone: '186****9910', community: '蓝光雍锦', area: 128,
+      layout: '3室2厅', houseStatus: '现房', source: '老客转介', intent: '中',
+      decider: '林女士（本人）', budgetMin: 180000, budgetMax: 220000,
+      createdDate: shift(-140), stageEnterDate: shift(-100), stage: 'S5',
+      measureDate: shift(-120), reportDeliverDate: shift(-115),
+      planVersion: 'v2', planDeliverDate: shift(-95), clientFeedback: '方案满意，报价再想想',
+      quoteVersion: 'Q2（整装 21 万）', budgetAgreed: '未确认（失联）',
+      concerns: '报价超预算 2 万，之后电话不接、微信不回',
+      obsidianPath: '恒彩客户库/林女士-蓝光雍锦-128㎡',
+      feishuLink: 'feishu://bitable/C012',
+      nextFollowDate: shift(-35), lastFollowDate: shift(-70), status: '正常'
+    }),
+    c({
+      id: 'C009', name: '赵女士', phone: '188****8899', community: '华润昆仑', area: 155,
+      layout: '4室2厅', houseStatus: '期房', source: '门店到访', intent: '观望',
+      decider: '赵女士 + 父母', budgetMin: 250000, budgetMax: 300000,
+      createdDate: shift(-150), stageEnterDate: shift(-120), stage: 'S5',
+      measureDate: shift(-110), reportDeliverDate: shift(-105),
+      planVersion: 'v2', planDeliverDate: shift(-95),
+      quoteVersion: 'Q1', budgetAgreed: '未确认（等交房）',
+      concerns: '期房 2027 年才交房，暂缓', competitor: '',
+      obsidianPath: '恒彩客户库/赵女士-华润昆仑-155㎡',
+      feishuLink: 'feishu://bitable/C009',
+      nextFollowDate: shift(45), lastFollowDate: shift(-88), status: '沉睡'
+    }),
+    c({
+      id: 'C010', name: '孙先生', phone: '150****4455', community: '阳光城', area: 120,
+      layout: '3室2厅', houseStatus: '现房', source: '线上咨询', intent: '比价',
+      decider: '孙先生', budgetMin: 130000, budgetMax: 150000,
+      createdDate: shift(-80), stageEnterDate: shift(-60), stage: 'S5',
+      measureDate: shift(-55), reportDeliverDate: shift(-50),
+      planVersion: 'v1', planDeliverDate: shift(-45),
+      quoteVersion: 'Q1（半包 8.6 万）', budgetAgreed: '未确认（比价中）',
+      concerns: '只想要最低价，不接受工艺差异',
+      competitor: '同城两家低价公司',
+      obsidianPath: '恒彩客户库/孙先生-阳光城-120㎡',
+      feishuLink: 'feishu://bitable/C010',
+      nextFollowDate: null, lastFollowDate: shift(-62), status: '流失'
+    })
+  ];
+
+  const followUps = [
+    { id: 'F001', customerId: 'C001', date: shift(-3), type: '电话', content: '确认油工进场时间，客户同意 3 天后进场；提醒主材下单截止。', nextAction: '跟进主材下单', operator: '本人' },
+    { id: 'F002', customerId: 'C001', date: shift(-10), type: '现场', content: '木工收口验收，客户对收边满意，提出电视墙再收 2cm。', nextAction: '出变更单', operator: '本人' },
+    { id: 'F003', customerId: 'C002', date: shift(-5), type: '微信', content: '客户说方案 v2 整体满意，但担心超预算，希望减项。', nextAction: '出减项对比表', operator: '本人' },
+    { id: 'F004', customerId: 'C003', date: shift(-4), type: '电话', content: '确认后天量房，到场两人，需带户型图。', nextAction: '上门量房', operator: '本人' },
+    { id: 'F005', customerId: 'C004', date: shift(-6), type: '面谈', content: '定金已收，客户要求先出施工图清单再谈施工合同。', nextAction: '出图清单', operator: '本人' },
+    { id: 'F006', customerId: 'C008', date: shift(-3), type: '微信', content: '仅加了微信，未通话（首访超时）。', nextAction: '2 小时内必须首访', operator: '本人' }
+  ];
+
+  const versions = [
+    { id: 'V001', customerId: 'C001', version: 'v1', date: shift(-66), summary: '初稿，双动线方案', status: '已被替换', link: 'Obsidian://04_方案版本/v1' },
+    { id: 'V002', customerId: 'C001', version: 'v2', date: shift(-62), summary: '按客户意见放大厨房', status: '已被替换', link: 'Obsidian://04_方案版本/v2' },
+    { id: 'V003', customerId: 'C001', version: 'v3', date: shift(-60), summary: '定稿，厨房+阳台整合', status: '已确认', link: 'Obsidian://04_方案版本/v3' },
+    { id: 'V004', customerId: 'C002', version: 'v1', date: shift(-9), summary: '初稿', status: '已被替换', link: 'Obsidian://04_方案版本/v1' },
+    { id: 'V005', customerId: 'C002', version: 'v2', date: shift(-2), summary: '过道加宽 + 增加储物', status: '待客户确认', link: 'Obsidian://04_方案版本/v2' }
+  ];
+
+  const briefings = [
+    { id: 'B000', customerId: 'C001', node: '拆除土建交底', date: shift(-39), attendees: '业主/项目经理', issues: '拆除范围确认，承重墙不可动', signed: '已签' },
+    { id: 'B001', customerId: 'C001', node: '水电交底', date: shift(-32), attendees: '业主/项目经理/水电工', issues: '插座点位按 v3 图确认，增加 2 个', signed: '已签' },
+    { id: 'B002', customerId: 'C001', node: '木工交底', date: shift(-20), attendees: '业主/项目经理/木工', issues: '吊顶标高确认，电视墙收边', signed: '已签' },
+    { id: 'B003', customerId: 'C001', node: '瓦工交底', date: shift(-12), attendees: '业主/瓦工', issues: '地砖排版确认，卫生间坡度', signed: '已签' },
+    { id: 'B004', customerId: 'C006', node: '竣工验收', date: shift(-7), attendees: '业主/项目经理', issues: '两处墙面修补，已整改', signed: '已签' }
+  ];
+
+  const changes = [
+    { id: 'CH001', customerId: 'C001', date: shift(-15), content: '电视墙增加岩板造型', amount: 8600, confirmed: '微信确认截图已存' },
+    { id: 'CH002', customerId: 'C001', date: shift(-9), content: '阳台增加收纳柜', amount: 4200, confirmed: '现场签字' },
+    { id: 'CH003', customerId: 'C006', date: shift(-40), content: '卫生间增加壁龛', amount: 1800, confirmed: '微信确认' }
+  ];
+
+  const materials = [
+    { id: 'M001', customerId: 'C001', category: '瓷砖', brand: '诺贝尔', spec: '750×1500 灰', orderDate: shift(-18), arriveDate: shift(-10), status: '已到场' },
+    { id: 'M002', customerId: 'C001', category: '橱柜', brand: '欧派', spec: 'PET 哑光白', orderDate: shift(-6), arriveDate: shift(8), status: '待到场' },
+    { id: 'M003', customerId: 'C001', category: '木门', brand: 'TATA', spec: '免漆白', orderDate: null, arriveDate: null, status: '未下单' },
+    { id: 'M004', customerId: 'C006', category: '卫浴', brand: '箭牌', spec: '智能马桶', orderDate: shift(-70), arriveDate: shift(-60), status: '已到场' }
+  ];
+
+  return { meta: { title: '恒彩客户跟进与交付系统', version: 'V1.0.0', updatedAt: TODAY, source: 'mock' }, customers, followUps, versions, briefings, changes, materials };
+}
+
+/* ---------- 5. 存储层（本地缓存 + 云端同步） ---------- */
+const LS_KEY = 'hl_followup_v1';
+let DB = null;
+
+/* 云端（Supabase）配置，见 config.js */
+const HC_CFG = window.HC_CONFIG || {};
+const CLOUD_ON = !!(HC_CFG.SUPABASE_URL && HC_CFG.SUPABASE_ANON_KEY);
+let HC_SB = null;
+let pushTimer = null;
+
+function initSupabase(cb) {
+  if (!CLOUD_ON) { cb(); return; }
+  function make() {
+    try {
+      HC_SB = window.supabase.createClient(HC_CFG.SUPABASE_URL, HC_CFG.SUPABASE_ANON_KEY);
+    } catch (e) { HC_SB = null; }
+    cb();
+  }
+  if (window.supabase) { make(); return; }
+  const s = document.createElement('script');
+  s.src = 'vendor/supabase.js';
+  s.onload = make;
+  s.onerror = function () {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+    s2.onload = make;
+    s2.onerror = function () { cb(); };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+}
+
+function saveDB() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  } catch (e) {
+    toast('本地缓存失败：' + (e.name === 'QuotaExceededError' ? '存储已满，请导出后清理' : e.message));
+  }
+  if (CLOUD_ON && HC_SB) schedulePush();
+  return true;
+}
+
+function schedulePush() {
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(cloudPush, 700);
+}
+
+function cloudPush() {
+  if (!HC_SB) return;
+  HC_SB.auth.getUser().then(function (r) {
+    const u = r && r.data ? r.data.user : null;
+    if (!u) return;
+    HC_SB.from('hc_data').upsert({
+      user_id: u.id,
+      payload: DB,
+      updated_at: new Date().toISOString()
+    }).then(function (res) {
+      if (res && res.error) {
+        console.warn('[云同步] 写入失败：', res.error.message);
+        toast('云端保存失败：' + res.error.message);
+      }
+    });
+  });
+}
+
+function cloudPull(cb) {
+  if (!HC_SB) { cb(false); return; }
+  HC_SB.auth.getSession().then(function (r) {
+    const s = r && r.data ? r.data.session : null;
+    if (!s) { location.replace('login.html'); return; }
+    HC_SB.from('hc_data').select('payload').eq('user_id', s.user.id).maybeSingle().then(function (res) {
+      if (res && res.data && res.data.payload && res.data.payload.customers) {
+        DB = res.data.payload;
+        cb(true);
+      } else {
+        cb(false);
+      }
+    }).catch(function () { cb(false); });
+  });
+}
+
+function resetDB() {
+  DB = buildMock();
+  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  saveDB();
+}
+
+/* ---------- 6. 派生字段（运行时计算，不写入原始数据） ---------- */
+function cust(id) { return DB.customers.filter((c) => c.id === id)[0]; }
+function overdueDays(c) {
+  if (!c.nextFollowDate) return 0;
+  const d = diffDays(TODAY, c.nextFollowDate);
+  return d > 0 ? d : 0;
+}
+function isOverdue(c) { return overdueDays(c) > 0; }
+function changeCount(c) { return DB.changes.filter((x) => x.customerId === c.id).length; }
+function changeAmount(c) { return sum(DB.changes.filter((x) => x.customerId === c.id), 'amount'); }
+function stageStay(c) {
+  const d = diffDays(TODAY, c.stageEnterDate || c.createdDate);
+  return d > 0 ? d : 0;
+}
+
+/* ---------- 6.1 沉睡自动判定（Q9） ----------
+ * 阈值集中在这里，改一处即全局生效，同步改 01_飞书配置说明书 的公式常量。
+ * 逻辑：距「上次跟进日」的天数（无则回退到建档日）
+ *   ≥60 天 → 沉睡候选
+ *   ≥30 天 且 非期房 → 沉默预警（期房客户等交房周期长，不参与预警，避免天天报警）
+ */
+const SLEEP_WARN_DAYS = 30;
+const SLEEP_DAYS = 60;
+
+function lastTouch(c) { return c.lastFollowDate || c.createdDate || null; }
+function silenceDays(c) {
+  const d = lastTouch(c);
+  if (!d) return 0;
+  const n = diffDays(TODAY, d);
+  return n > 0 ? n : 0;
+}
+function isSleepCandidate(c) {
+  if (c.status === '沉睡' || c.status === '流失' || c.status === '竣工归档') return false;
+  if (c.stage === 'S10') return false;
+  return silenceDays(c) >= SLEEP_DAYS;
+}
+/* 返回 normal / warn / sleep */
+function sleepLevel(c) {
+  if (c.status === '沉睡') return 'sleep';
+  if (c.status === '流失' || c.status === '竣工归档') return 'normal';
+  if (c.stage === 'S10') return 'normal';
+  if (isSleepCandidate(c)) return 'sleep';
+  if (c.houseStatus !== '期房' && silenceDays(c) >= SLEEP_WARN_DAYS) return 'warn';
+  return 'normal';
+}
+function sleepBadge(c) {
+  const lv = sleepLevel(c);
+  if (lv === 'sleep') return '<span class="badge badge-grey">☾ 沉睡</span>';
+  if (lv === 'warn') return '<span class="badge badge-warn">沉默 ' + silenceDays(c) + ' 天</span>';
+  return '';
+}
+function sleepingPool() {
+  return DB.customers.filter(function (c) {
+    return c.status === '沉睡' || isSleepCandidate(c);
+  });
+}
+function stageBadge(c) {
+  const cls = c.stage === 'S10' ? 'badge-ok' : (STAGE_IDX[c.stage] >= 6 ? 'badge-primary' : 'badge-grey');
+  return '<span class="badge ' + cls + '">' + c.stage + ' ' + STAGE_MAP[c.stage] + '</span>';
+}
+function intentBadge(v) {
+  const map = { '高': 'badge-danger', '中': 'badge-warn', '低': 'badge-grey', '观望': 'badge-grey', '比价': 'badge-warn' };
+  return '<span class="badge ' + (map[v] || 'badge-grey') + '">' + esc(v) + '</span>';
+}
+
+/* ---------- 7. 排序引擎（修复原图「下次跟进日期」排序 bug） ---------- */
+/**
+ * 规则：
+ * 1) 空日期置底
+ * 2) 逾期置顶（组内仍升序）
+ * 3) 日期升序（ISO 字符串比较，杜绝 8.24/8.14 混用）
+ * 4) 同日期 → 阶段序号升序 → 建档日升序（稳定）
+ */
+function sortCustomers(list, today) {
+  const t = today || TODAY;
+  return list.slice().sort(function (a, b) {
+    const ad = a.nextFollowDate, bd = b.nextFollowDate;
+    if (!ad && !bd) return tieBreak(a, b);
+    if (!ad) return 1;
+    if (!bd) return -1;
+    const ao = ad < t, bo = bd < t;
+    if (ao !== bo) return ao ? -1 : 1;
+    if (ad < bd) return -1;
+    if (ad > bd) return 1;
+    return tieBreak(a, b);
+  });
+}
+function tieBreak(a, b) {
+  const ai = STAGE_IDX[a.stage] || 0, bi = STAGE_IDX[b.stage] || 0;
+  if (ai !== bi) return ai - bi;
+  const ac = a.createdDate || '', bc = b.createdDate || '';
+  return ac < bc ? -1 : (ac > bc ? 1 : 0);
+}
+/* 自检：包含原图反例（8.24 应排在 8.14 之后） */
+function runSortTests() {
+  const t = '2026-08-13';
+  const results = [];
+  let A = [{ id: 'a', nextFollowDate: '2026-08-24', stage: 'S5', createdDate: '2026-01-01' },
+           { id: 'b', nextFollowDate: '2026-08-14', stage: 'S5', createdDate: '2026-01-01' }];
+  results.push({ name: '原图反例 8.24 / 8.14', pass: sortCustomers(A, t)[0].id === 'b' });
+  let B = [{ id: 'a', nextFollowDate: null, stage: 'S0', createdDate: '2026-01-01' },
+           { id: 'b', nextFollowDate: '2026-08-20', stage: 'S0', createdDate: '2026-01-02' }];
+  results.push({ name: '空日期置底', pass: sortCustomers(B, t)[1].id === 'a' });
+  let C = [{ id: 'a', nextFollowDate: '2026-08-20', stage: 'S0', createdDate: '2026-01-01' },
+           { id: 'b', nextFollowDate: '2026-08-01', stage: 'S9', createdDate: '2026-01-01' }];
+  results.push({ name: '逾期置顶', pass: sortCustomers(C, t)[0].id === 'b' });
+  let D = [{ id: 'a', nextFollowDate: '2026-08-20', stage: 'S9', createdDate: '2026-02-01' },
+           { id: 'b', nextFollowDate: '2026-08-20', stage: 'S4', createdDate: '2026-01-01' }];
+  results.push({ name: '同日期按阶段升序', pass: sortCustomers(D, t)[0].id === 'b' });
+  return results;
+}
+
+/* ---------- 8. 提醒引擎（14 事件型 + 3 节奏型） ---------- */
+function dstr(c, key, off) {
+  const v = c[key];
+  if (!v) return null;
+  return shift(off || 0, new Date(v + 'T00:00:00'));
+}
+/* 已完成判定：节点做完就不再重复提醒，避免"每日同一批"式提醒疲劳 */
+function briefDone(c, node) {
+  return DB.briefings.some(function (b) {
+    return b.customerId === c.id && b.node.indexOf(node) >= 0 && b.signed === '已签';
+  });
+}
+function matsAllOrdered(c) {
+  const rows = DB.materials.filter(function (m) { return m.customerId === c.id; });
+  if (!rows.length) return false;
+  return rows.every(function (m) { return m.status !== '未下单'; });
+}
+function past(c, key, off) {
+  const v = c[key];
+  if (!v) return false;
+  return diffDays(TODAY, shift(off || 0, new Date(v + 'T00:00:00'))) > 0;
+}
+const EVENT_RULES = [
+  { code: 'E01', node: 'S1', stages: ['S1','S2'], name: '量房前 1 天', due: (c) => dstr(c, 'measureDate', -1),
+    done: (c) => past(c, 'measureDate', 0),
+    title: (c) => '明日上门量房 · ' + c.community, detail: (c) => '确认到场人员与资料：' + (c.attendees || '待确认') },
+  { code: 'E02', node: 'S4', stages: ['S4'], name: '方案交付前 1 天', due: (c) => dstr(c, 'planDeliverDate', -1),
+    done: (c) => past(c, 'planDeliverDate', 0),
+    title: (c) => '明日方案交付 · ' + c.name, detail: (c) => '版本 ' + (c.planVersion || '待定') + '，确认图纸已导出' },
+  { code: 'E03', node: 'S4', stages: ['S4'], name: '客户反馈超 48 小时', due: (c) => (c.planDeliverDate && !c.clientFeedback ? shift(2, new Date(c.planDeliverDate + 'T00:00:00')) : null),
+    done: (c) => !!c.clientFeedback,
+    title: (c) => '客户超 48h 未反馈 · ' + c.name, detail: (c) => '已交方案 ' + c.planVersion + '，建议当面讲而非微信看' },
+  { code: 'E04', node: 'S6', stages: ['S6'], name: '定金到期跟进', due: (c) => (c.depositDate && !c.designContractDate ? shift(3, new Date(c.depositDate + 'T00:00:00')) : null),
+    done: (c) => !!c.designContractDate,
+    title: (c) => '定金已 3 天未转设计合同', detail: (c) => '定金 ' + money(c.depositAmount) + '，注意退定风险' },
+  { code: 'E05', node: 'S8', stages: ['S8'], name: '开工前 3 天筹备', due: (c) => dstr(c, 'startDate', -3),
+    done: (c) => past(c, 'startDate', 0),
+    title: (c) => '开工前 3 天 · ' + c.community, detail: (c) => '对接人：' + (c.contacts || '待补') },
+  { code: 'E06', node: 'S8', stages: ['S8','S9'], name: '拆除土建交底当日', due: (c) => dstr(c, 'demolitionBriefDate', 0),
+    done: (c) => briefDone(c, '拆除'),
+    title: (c) => '拆除土建交底 · ' + c.name, detail: () => '带图纸终稿 + 交底记录表，签字留档' },
+  { code: 'E07', node: 'S9', stages: ['S9'], name: '水电交底当日', due: (c) => dstr(c, 'briefElectric', 0),
+    done: (c) => briefDone(c, '水电'),
+    title: (c) => '水电交底 · ' + c.name, detail: (c) => '厂家到场清单：' + (c.contacts || '待补') + '；确认点位图 v' + (c.planVersion || '') },
+  { code: 'E08', node: 'S9', stages: ['S9'], name: '木工交底当日', due: (c) => dstr(c, 'briefWood', 0),
+    done: (c) => briefDone(c, '木工'),
+    title: (c) => '木工交底 · ' + c.name, detail: () => '吊顶标高、收口做法、门套基层' },
+  { code: 'E09', node: 'S9', stages: ['S9'], name: '瓦工交底当日', due: (c) => dstr(c, 'briefMason', 0),
+    done: (c) => briefDone(c, '瓦工'),
+    title: (c) => '瓦工交底 · ' + c.name, detail: () => '排版图、坡度、防水高度、留缝' },
+  { code: 'E10', node: 'S9', stages: ['S9'], name: '油工交底当日', due: (c) => dstr(c, 'briefPaint', 0),
+    done: (c) => briefDone(c, '油工'),
+    title: (c) => '油工交底 · ' + c.name, detail: () => '色号确认、阴阳角、成品保护' },
+  { code: 'E11', node: 'S9', stages: ['S9'], name: '主材下单截止', due: (c) => dstr(c, 'materialDeadline', 0),
+    done: (c) => matsAllOrdered(c),
+    title: (c) => '主材下单截止 · ' + c.community, detail: () => '未下单品类会直接拖工期，需当场确认' },
+  { code: 'E12', node: 'S10', stages: ['S9','S10'], name: '竣工验收前 3 天', due: (c) => dstr(c, 'finishDate', -3),
+    done: (c) => past(c, 'finishDate', 0),
+    title: (c) => '竣工验收前 3 天 · ' + c.name, detail: () => '交付包齐备：隐蔽影像 / 保修卡 / 说明书' },
+  { code: 'E13', node: 'S10', stages: ['S10'], name: '竣工 7 天回访', due: (c) => dstr(c, 'finishDate', 7),
+    title: (c) => '竣工 7 天回访 · ' + c.name, detail: () => '问使用感受 + 收集问题 + 提转介绍' },
+  { code: 'E14', node: 'S10', stages: ['S10'], name: '竣工 3 个月维保', due: (c) => dstr(c, 'finishDate', 90),
+    title: (c) => '竣工 3 个月维保 · ' + c.name, detail: () => '上门巡检一次，记录问题工单' }
+];
+
+const RHYTHM_RULES = [
+  { code: 'P01', name: '每日 09:10 当日待办汇总', type: 'daily', desc: '汇总当日到期跟进、节点到期、交底提醒，推送企微群' },
+  { code: 'P02', name: '每周一 本周重点客户复盘', type: 'weekly', desc: '重点客户池推进情况 + 卡点客户清单' },
+  { code: 'P03', name: '每季度首月 1 号 老客户关怀', type: 'quarterly', desc: '竣工满 1 年 / 沉睡客户唤醒清单' }
+];
+
+function ruleItems() {
+  const out = [];
+  DB.customers.forEach(function (c) {
+    if (c.status === '流失' || c.status === '沉睡') return; // 沉睡客户由季度唤醒统一处理
+    EVENT_RULES.forEach(function (r) {
+      if (r.stages && r.stages.indexOf(c.stage) < 0) return; // 提醒仅在其所属阶段生效
+      const due = r.due(c);
+      if (!due) return;
+      if (r.done && r.done(c)) return; // 已完成的节点不再提醒
+      out.push({ code: r.code, rule: r.name, cid: c.id, due: due, title: r.title(c), detail: r.detail(c) });
+    });
+  });
+  return out;
+}
+function dueState(due) {
+  const d = diffDays(due, TODAY);
+  if (d < 0) return { k: 'over', label: '逾期 ' + (-d) + ' 天', cls: 'badge-danger' };
+  if (d === 0) return { k: 'today', label: '今日', cls: 'badge-warn' };
+  if (d <= 7) return { k: 'soon', label: d + ' 天后', cls: 'badge-primary' };
+  return { k: 'later', label: d + ' 天后', cls: 'badge-grey' };
+}
+function todaysReminders() {
+  return ruleItems().filter(function (it) {
+    const d = diffDays(it.due, TODAY);
+    return d >= 0 && d <= 0;
+  });
+}
+function upcomingReminders() {
+  return ruleItems().filter(function (it) {
+    const d = diffDays(it.due, TODAY);
+    return d > 0 && d <= 7;
+  });
+}
+function overdueReminders() {
+  return ruleItems().filter(function (it) { return diffDays(it.due, TODAY) < 0; });
+}
+
+/* ---------- 9. 视图定义（19 个） ---------- */
+const state = {
+  view: 'today', q: '', drawerId: null, aiTab: 'distill',
+  taskFilter: 'all', lastDistill: null, lastDraft: null
+};
+
+function custList() {
+  let list = DB.customers.filter(function (c) { return !c.escaped; });
+  if (state.q) {
+    const q = state.q.toLowerCase();
+    list = list.filter(function (c) {
+      return (c.name + c.community + c.phone + c.id).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  return list;
+}
+
+const VIEWS = {
+  today: {
+    title: '今日工作台',
+    count: function () { return 0; },
+    render: renderToday
+  },
+  tasks: {
+    title: '全部任务总览',
+    count: function () { return todaysReminders().length + DB.customers.filter(isOverdue).length; },
+    render: renderTasks
+  },
+  ai: {
+    title: 'AI 经营中心',
+    count: function () { return 0; },
+    render: renderAI
+  },
+  customers: {
+    title: '客户资料中心',
+    count: function () { return DB.customers.length; },
+    render: function () { return renderCustomerList(custList(), '统一客户主档 · 全量 ' + DB.customers.length + ' 位'); }
+  },
+  overdue: {
+    title: '逾期复盘看板',
+    count: function () { return DB.customers.filter(isOverdue).length; },
+    render: renderOverdue
+  },
+  key: {
+    title: '重点客户池',
+    count: function () { return filterBy(function (c) { return (c.intent === '高' || c.intent === '中') && STAGE_IDX[c.stage] <= 5; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return (c.intent === '高' || c.intent === '中') && STAGE_IDX[c.stage] <= 5; }), '意向高/中 且 S0~S5'); }
+  },
+  deposit: {
+    title: '定金客户',
+    count: function () { return filterBy(function (c) { return c.stage === 'S6'; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return c.stage === 'S6'; }), '已交定金、待转设计合同'); }
+  },
+  design: {
+    title: '设计合同客户',
+    count: function () { return filterBy(function (c) { return c.designContractDate && !c.buildContractDate; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return c.designContractDate && !c.buildContractDate; }), '已签设计合同、施工合同未签'); }
+  },
+  build: {
+    title: '施工合同客户',
+    count: function () { return filterBy(function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }), '已签施工合同 / 开工筹备中'); }
+  },
+  constructing: {
+    title: '施工进行中',
+    count: function () { return filterBy(function (c) { return c.stage === 'S9'; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return c.stage === 'S9'; }), 'S9 施工管控'); }
+  },
+  nearing: {
+    title: '待竣工客户',
+    count: function () { return filterBy(isNearing).length; },
+    render: function () { return renderCustomerList(filterBy(isNearing), '距竣工 ≤15 天'); }
+  },
+  archived: {
+    title: '竣工归档客户',
+    count: function () { return filterBy(function (c) { return c.status === '竣工归档'; }).length; },
+    render: function () { return renderCustomerList(filterBy(function (c) { return c.status === '竣工归档'; }), '已竣工归档 · 只读'); }
+  },
+  warranty: {
+    title: '售后维保客户',
+    count: function () { return filterBy(inWarranty).length; },
+    render: function () { return renderCustomerList(filterBy(inWarranty), '维保到期日 > 今天'); }
+  },
+  sleeping: {
+    title: '沉睡客户池',
+    count: function () { return sleepingPool().length; },
+    render: function () { return renderSleeping(); }
+  },
+  lost: {
+    title: '流失 / 死单复盘',
+    count: function () { return filterBy(function (c) { return c.status === '流失'; }).length; },
+    render: renderLost
+  },
+  escaped: {
+    title: '逃单客户',
+    count: function () { return DB.customers.filter(function (c) { return c.escaped; }).length; },
+    render: renderEscaped
+  },
+  planlib: {
+    title: '方案版本库',
+    count: function () { return DB.versions.length; },
+    render: renderPlanLib
+  },
+  brieflib: {
+    title: '交底纪要库',
+    count: function () { return DB.briefings.length; },
+    render: renderBriefLib
+  },
+  ledger: {
+    title: '主材 & 变更台账',
+    count: function () { return DB.materials.length + DB.changes.length; },
+    render: renderLedger
+  },
+  scripts: {
+    title: '话术模板库',
+    count: function () { return SCRIPTS.length; },
+    render: renderScripts
+  }
+};
+
+const NAV_GROUPS = [
+  { name: '执行', items: ['today', 'tasks'] },
+  { name: '经营与治理', items: ['ai', 'customers', 'overdue'] },
+  { name: '阶段视图', items: ['key', 'deposit', 'design', 'build', 'constructing', 'nearing', 'archived', 'warranty', 'sleeping', 'lost', 'escaped'] },
+  { name: '资源库', items: ['planlib', 'brieflib', 'ledger', 'scripts'] }
+];
+const NAV_ICONS = {
+  today: '☀', tasks: '☑', ai: '✧', customers: '▤', overdue: '⚠', key: '◆', deposit: '¥',
+  design: '✎', build: '✚', constructing: '⚒', nearing: '◷', archived: '✓', warranty: '✚',
+  sleeping: '☾', lost: '✕', escaped: '⌫', planlib: '▦', brieflib: '✍', ledger: '☰', scripts: '❝'
+};
+
+function filterBy(fn) {
+  return sortByCreatedDesc(DB.customers.filter(function (c) { return !c.escaped && fn(c) && matchesQ(c); }));
+}
+function matchesQ(c) {
+  if (!state.q) return true;
+  const q = state.q.toLowerCase();
+  return (c.name + c.community + c.phone + c.id).toLowerCase().indexOf(q) >= 0;
+}
+function isNearing(c) {
+  return c.stage === 'S9' && c.finishDate && diffDays(c.finishDate, TODAY) >= 0 && diffDays(c.finishDate, TODAY) <= 15;
+}
+function inWarranty(c) {
+  return c.warrantyEnd && diffDays(c.warrantyEnd, TODAY) > 0;
+}
+
+/* ---------- 10. 通用渲染片段 ---------- */
+function statCard(label, num, sub, tone) {
+  return '<div class="stat ' + (tone || '') + '"><div class="lab">' + esc(label) + '</div>'
+    + '<div class="num">' + esc(num) + '</div><div class="sub">' + esc(sub || '') + '</div></div>';
+}
+function customerRow(c) {
+  const od = overdueDays(c);
+  const createdAt = c.created_at || c.createdDate || '';
+  return '<div class="row" data-action="open-customer" data-id="' + c.id + '">'
+    + '<div class="row-main">'
+    + '<div class="row-created">' + esc(createdAt) + '</div>'
+    + '<div class="row-t">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</div>'
+    + '<div class="row-s">' + c.id + ' · ' + esc(c.layout) + ' · ' + esc(c.houseStatus) + ' · ' + esc(c.source) + '</div>'
+    + '</div>'
+    + '<div class="row-right">'
+    + '<div class="flex gap-1 items-center">' + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
+    + '<div class="row-s">' + (c.nextFollowDate ? ('跟进 ' + c.nextFollowDate) : '未设跟进日')
+    + (od > 0 ? ' · <span class="text-danger">逾期' + od + '天</span>' : '') + '</div>'
+    + '</div></div>';
+}
+function sortByCreatedDesc(list) {
+  return list.slice().sort(function (a, b) {
+    const ac = a.created_at || a.createdDate || '';
+    const bc = b.created_at || b.createdDate || '';
+    return ac < bc ? 1 : (ac > bc ? -1 : 0);
+  });
+}
+function renderCustomerList(list, hint) {
+  let html = '<div class="card">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">共 ' + list.length + ' 位</div>'
+    + '<div class="card-sub">' + esc(hint) + ' · 按创建时间倒序</div></div>'
+    + '<button class="btn btn-sm" data-action="new-customer">+ 新增</button></div>';
+  if (!list.length) {
+    html += '<div class="empty">暂无客户。调整筛选或新增一位。</div>';
+  } else {
+    html += list.map(customerRow).join('');
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------- 11. 今日工作台 ---------- */
+function renderToday() {
+  const todayList = sortCustomers(DB.customers.filter(function (c) { return c.nextFollowDate === TODAY; }));
+  const overdueCustomers = DB.customers.filter(isOverdue);
+  const rem = todaysReminders();
+  const soon = upcomingReminders();
+  const totalTodo = todayList.length + overdueCustomers.length + rem.length;
+  const tests = runSortTests();
+  const allPass = tests.every(function (x) { return x.pass; });
+
+  let html = '';
+
+  /* 顶部统计 */
+  html += '<div class="grid-stats mb-4">'
+    + statCard('当日待办', totalTodo, '跟进 + 节点 + 提醒', 'hot')
+    + statCard('逾期', overdueCustomers.length, '客户跟进已超期', overdueCustomers.length ? 'danger' : '')
+    + statCard('今日需跟进', todayList.length, '下次跟进日 = 今天')
+    + statCard('有效任务', DB.customers.filter(function (c) { return c.status !== '流失'; }).length, '另有 ' + DB.customers.filter(function (c) { return c.status === '流失'; }).length + ' 个已排除', '')
+    + '</div>';
+
+  /* 09:10 晨间提醒卡 */
+  html += '<div class="morning mb-4">'
+    + '<div class="morning-head">'
+    + '<div class="clock">09:10</div>'
+    + '<div class="flex-1"><div class="font-semibold">晨间提醒 · 今日全部到期事项</div>'
+    + '<div class="mini">节奏型 P01 每日汇总 · 企微群推送（前端仅页面展示）</div></div>'
+    + '<span class="badge badge-warn">' + rem.length + ' 项今日到期</span>'
+    + '<span class="badge badge-danger">' + overdueReminders().length + ' 项逾期</span>'
+    + '</div>'
+    + '<div class="mt-3">';
+  if (!rem.length && !overdueReminders().length) {
+    html += '<div class="mini">今日无节点到期，按跟进清单推进即可。</div>';
+  } else {
+    overdueReminders().slice(0, 4).forEach(function (it) {
+      html += '<div class="morning-item"><div class="t">逾期</div><div class="d">'
+        + '<b>' + esc(it.title) + '</b> · ' + esc(it.rule) + '<br><span class="mini">' + esc(it.detail) + '</span></div></div>';
+    });
+    rem.forEach(function (it) {
+      html += '<div class="morning-item"><div class="t">今日</div><div class="d">'
+        + '<b>' + esc(it.title) + '</b> · ' + esc(it.rule) + '<br><span class="mini">' + esc(it.detail) + '</span></div></div>';
+    });
+  }
+  html += '</div>';
+  if (soon.length) {
+    html += '<div class="mini mt-2">未来 7 天还有 ' + soon.length + ' 项节点到期（含量房 / 交底 / 验收）</div>';
+  }
+  html += '</div>';
+
+  /* 客户跟进清单 */
+  const list = sortCustomers(custList()).filter(function (c) { return c.status !== '流失'; });
+  html += '<div class="card mb-4">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">客户跟进清单</div>'
+    + '<div class="card-sub">严格按「下次跟进日期」升序 · 空日期置底 · 逾期置顶</div></div>'
+    + '<span class="badge ' + (allPass ? 'badge-ok' : 'badge-danger') + '">排序自检 ' + (allPass ? '通过' : '失败') + '</span>'
+    + '</div>';
+  if (!list.length) html += '<div class="empty">暂无在跟客户</div>';
+  else html += list.map(customerRow).join('');
+  html += '</div>';
+
+  /* 阶段统计 */
+  const counts = {};
+  STAGES.forEach(function (s) { counts[s.code] = 0; });
+  DB.customers.forEach(function (c) { if (counts[c.stage] != null) counts[c.stage]++; });
+  html += '<div class="card mb-4"><div class="card-head"><div class="card-title">阶段统计</div>'
+    + '<div class="card-sub">S0 → S10 共 ' + DB.customers.length + ' 位客户</div></div>'
+    + '<div class="card-body"><div class="stagebar">';
+  STAGES.forEach(function (s) {
+    html += '<div class="stagechip"><b>' + counts[s.code] + '</b>' + s.code + ' ' + s.name + '</div>';
+  });
+  html += '</div></div></div>';
+
+  /* 快捷操作 */
+  html += '<div class="card"><div class="card-head"><div class="card-title">快捷操作</div></div>'
+    + '<div class="card-body flex gap-2 flex-wrap">'
+    + '<button class="btn btn-primary" data-action="new-customer">+ 新增客户</button>'
+    + '<button class="btn" data-action="quick-follow">快速记录跟进</button>'
+    + '<button class="btn" data-action="goto-ai">生成量房报告</button>'
+    + '<button class="btn" data-action="export-ps1">导出建库脚本</button>'
+    + '</div></div>';
+
+  return html;
+}
+
+/* ---------- 12. 任务总览 ---------- */
+function renderTasks() {
+  const items = [];
+  ruleItems().forEach(function (it) {
+    const st = dueState(it.due);
+    if (state.taskFilter === 'today' && st.k !== 'today') return;
+    if (state.taskFilter === 'over' && st.k !== 'over') return;
+    if (state.taskFilter === 'week' && !(st.k === 'today' || st.k === 'over' || st.k === 'soon')) return;
+    items.push({
+      id: it.code + '_' + it.cid, kind: '节点', title: it.title, sub: it.rule + ' · ' + it.detail,
+      due: it.due, st: st, cid: it.cid
+    });
+  });
+  DB.customers.filter(isOverdue).forEach(function (c) {
+    const st = dueState(c.nextFollowDate);
+    if (state.taskFilter === 'today') return;
+    if (state.taskFilter === 'week' && st.k === 'later') return;
+    items.push({
+      id: 'FU_' + c.id, kind: '跟进', title: '跟进逾期 · ' + c.name + '（' + c.community + '）',
+      sub: '下次跟进日 ' + c.nextFollowDate + '，已逾期 ' + overdueDays(c) + ' 天', due: c.nextFollowDate, st: st, cid: c.id
+    });
+  });
+  items.sort(function (a, b) { return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0); });
+
+  const chips = [['all', '全部'], ['today', '今日'], ['over', '逾期'], ['week', '未来 7 天']];
+  let html = '<div class="tabs">';
+  chips.forEach(function (x) {
+    html += '<button class="tab ' + (state.taskFilter === x[0] ? 'active' : '') + '" data-action="task-filter" data-val="' + x[0] + '">' + x[1] + '</button>';
+  });
+  html += '</div>';
+
+  html += '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">任务 ' + items.length + ' 项</div>'
+    + '<div class="card-sub">节点到期 + 跟进逾期，按截止日升序</div></div></div>';
+  if (!items.length) html += '<div class="empty">该筛选下没有任务</div>';
+  else {
+    items.forEach(function (it) {
+      html += '<div class="row" data-action="open-customer" data-id="' + it.cid + '">'
+        + '<div class="row-main"><div class="row-t">' + esc(it.title) + '</div>'
+        + '<div class="row-s">' + esc(it.sub) + '</div></div>'
+        + '<div class="row-right"><span class="badge badge-grey">' + it.kind + '</span>'
+        + '<span class="badge ' + it.st.cls + '">' + it.st.label + '</span>'
+        + '<span class="mini">' + it.due + '</span></div></div>';
+    });
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------- 13. 逾期复盘 ---------- */
+function renderOverdue() {
+  const list = sortCustomers(DB.customers.filter(isOverdue));
+  const stageStuck = sortCustomers(DB.customers.filter(function (c) {
+    return c.status !== '流失' && stageStay(c) > 20;
+  }));
+  const quiet = sortCustomers(DB.customers.filter(function (c) { return sleepLevel(c) === 'warn'; }));
+  let html = '<div class="grid-stats mb-4">'
+    + statCard('跟进逾期', list.length, '下次跟进日 < 今天', 'danger')
+    + statCard('阶段停留 >20 天', stageStuck.length, '客户卡在某阶段', stageStuck.length ? 'warn' : '')
+    + statCard('沉默预警', quiet.length, '≥' + SLEEP_WARN_DAYS + ' 天未跟进', quiet.length ? 'warn' : '')
+    + statCard('沉睡 / 流失', sleepingPool().length + ' / ' + DB.customers.filter(function (c) { return c.status === '流失'; }).length, '沉睡池 / 死单', '')
+    + '</div>';
+  html += '<div class="section-t">跟进逾期</div>' + renderCustomerList(list, '逾期客户 · 按逾期天数倒序');
+  html += '<div class="section-t mt-6">阶段停留超 20 天</div>' + renderCustomerList(stageStuck, '卡点客户 · 需人工判断是否降级');
+  if (quiet.length) {
+    html += '<div class="section-t mt-6">沉默预警（逾期清单可能漏掉的客户）</div>'
+      + renderCustomerList(quiet, '≥' + SLEEP_WARN_DAYS + ' 天未跟进但未来有跟进计划 · 计划本身已脱节');
+  }
+  return html;
+}
+
+/* ---------- 13.1 沉睡客户池（Q9 自动判定） ---------- */
+function renderSleeping() {
+  const manual = sortCustomers(DB.customers.filter(function (c) { return c.status === '沉睡'; }));
+  const auto = sortCustomers(DB.customers.filter(isSleepCandidate));
+  let html = '<div class="card mb-4"><div class="card-head"><div class="flex-1">'
+    + '<div class="card-title">判定规则</div>'
+    + '<div class="card-sub">沉默 ≥' + SLEEP_DAYS + ' 天自动入池；期房不参与 ' + SLEEP_WARN_DAYS + ' 天预警；流失 / 竣工归档不参与</div></div>'
+    + '<span class="badge badge-primary">阈值可在代码顶部调整</span></div>'
+    + '<div class="card-body"><div class="kv">'
+    + '<div class="k">沉默天数</div><div class="v">距「上次跟进日期」，为空时回退到「建档日期」</div>'
+    + '<div class="k">沉睡候选</div><div class="v">沉默 ≥' + SLEEP_DAYS + ' 天 且 非 S10 且 状态为正常</div>'
+    + '<div class="k">沉默预警</div><div class="v">沉默 ≥' + SLEEP_WARN_DAYS + ' 天 且 非期房（只提示，不自动改状态）</div>'
+    + '<div class="k">人工优先</div><div class="v">已手动标「沉睡」的客户，不会被自动规则覆盖</div>'
+    + '</div></div></div>';
+  html += '<div class="section-t">自动命中 ' + auto.length + ' 位</div>'
+    + renderCustomerList(auto, '沉默 ≥' + SLEEP_DAYS + ' 天 · 建议季度唤醒，不判死');
+  html += '<div class="section-t mt-6">人工标记 ' + manual.length + ' 位</div>'
+    + renderCustomerList(manual, '设计师主动暂缓 · 按交房 / 资金周期回访');
+  return html;
+}
+
+/* ---------- 14. 流失复盘 ---------- */
+function renderLost() {
+  const list = DB.customers.filter(function (c) { return c.status === '流失'; });
+  let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">流失 / 死单 ' + list.length + ' 位</div>'
+    + '<div class="card-sub">必须填写流失原因，用于年度复盘；不删除记录</div></div></div>';
+  if (!list.length) html += '<div class="empty">暂无流失客户</div>';
+  else {
+    list.forEach(function (c) {
+      html += '<div class="row" data-action="open-customer" data-id="' + c.id + '">'
+        + '<div class="row-main"><div class="row-t">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</div>'
+        + '<div class="row-s">' + esc(c.concerns || '未填顾虑点') + '</div></div>'
+        + '<div class="row-right"><span class="badge badge-danger">流失</span>'
+        + '<span class="mini">最后跟进 ' + (c.lastFollowDate || '—') + '</span></div></div>';
+    });
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderEscaped() {
+  const list = sortByCreatedDesc(DB.customers.filter(function (c) { return c.escaped; }));
+  let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">逃单客户 ' + list.length + ' 位</div>'
+    + '<div class="card-sub">已标记逃单的客户，不进入各阶段统计；可恢复到原阶段</div></div></div>';
+  if (!list.length) {
+    html += '<div class="empty">暂无逃单客户</div>';
+  } else {
+    list.forEach(function (c) {
+      const st = STAGES.filter(function (s) { return s.id === c.stage; })[0] || {};
+      html += '<div class="row" data-action="open-customer" data-id="' + c.id + '">'
+        + '<div class="row-main">'
+        + '<div class="row-created">创建 ' + esc(c.created_at || c.createdDate || '—') + '</div>'
+        + '<div class="row-t">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</div>'
+        + '<div class="row-s">原阶段：' + esc(st.name || c.stage) + ' · ' + esc(c.layout) + '</div>'
+        + '</div>'
+        + '<div class="row-right">'
+        + '<span class="badge badge-danger">逃单</span>'
+        + '<div class="flex gap-2 mt-1">'
+        + '<button class="btn btn-sm" data-action="restore-customer" data-id="' + c.id + '">↩ 恢复</button>'
+        + '</div>'
+        + '<span class="mini">逃单 ' + (c.escaped_at || '—') + '</span>'
+        + '</div></div>';
+    });
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------- 15. 资源库 ---------- */
+function renderPlanLib() {
+  const list = DB.versions.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">方案版本 ' + list.length + ' 条</div>'
+    + '<div class="card-sub">一版一记录 · 旧版不删，进 _archive</div></div></div>';
+  list.forEach(function (v) {
+    const c = cust(v.customerId) || {};
+    const badge = v.status === '已确认' ? 'badge-ok' : (v.status.indexOf('替换') >= 0 ? 'badge-grey' : 'badge-warn');
+    html += '<div class="row" data-action="open-customer" data-id="' + v.customerId + '">'
+      + '<div class="row-main"><div class="row-t">' + esc(c.name || '') + ' · ' + esc(v.version) + ' · ' + esc(v.summary) + '</div>'
+      + '<div class="row-s">' + v.date + ' · ' + esc(v.link) + '</div></div>'
+      + '<div class="row-right"><span class="badge ' + badge + '">' + esc(v.status) + '</span></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+function renderBriefLib() {
+  const list = DB.briefings.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+  let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">交底纪要 ' + list.length + ' 条</div>'
+    + '<div class="card-sub">每个节点一条，签字后留档，返工的唯一证据链</div></div></div>';
+  list.forEach(function (b) {
+    const c = cust(b.customerId) || {};
+    html += '<div class="row" data-action="open-customer" data-id="' + b.customerId + '">'
+      + '<div class="row-main"><div class="row-t">' + esc(c.name || '') + ' · ' + esc(b.node) + '</div>'
+      + '<div class="row-s">' + b.date + ' · ' + esc(b.attendees) + ' · ' + esc(b.issues) + '</div></div>'
+      + '<div class="row-right"><span class="badge ' + (b.signed === '已签' ? 'badge-ok' : 'badge-warn') + '">' + esc(b.signed) + '</span></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+function renderLedger() {
+  let html = '<div class="card mb-4"><div class="card-head"><div class="flex-1"><div class="card-title">主材确认 ' + DB.materials.length + ' 条</div>'
+    + '<div class="card-sub">未下单品类直接拖工期</div></div></div>';
+  DB.materials.forEach(function (m) {
+    const c = cust(m.customerId) || {};
+    const cls = m.status === '已到场' ? 'badge-ok' : (m.status === '未下单' ? 'badge-danger' : 'badge-warn');
+    html += '<div class="row" data-action="open-customer" data-id="' + m.customerId + '">'
+      + '<div class="row-main"><div class="row-t">' + esc(c.name || '') + ' · ' + esc(m.category) + ' · ' + esc(m.brand) + '</div>'
+      + '<div class="row-s">' + esc(m.spec) + ' · 下单 ' + (m.orderDate || '—') + ' · 到场 ' + (m.arriveDate || '—') + '</div></div>'
+      + '<div class="row-right"><span class="badge ' + cls + '">' + esc(m.status) + '</span></div></div>';
+  });
+  html += '</div>';
+  html += '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">变更增项 ' + DB.changes.length + ' 条 · 合计 ' + money(sum(DB.changes, 'amount')) + '</div>'
+    + '<div class="card-sub">每次改动单独记录，附客户确认凭证</div></div></div>';
+  DB.changes.forEach(function (x) {
+    const c = cust(x.customerId) || {};
+    html += '<div class="row" data-action="open-customer" data-id="' + x.customerId + '">'
+      + '<div class="row-main"><div class="row-t">' + esc(c.name || '') + ' · ' + esc(x.content) + '</div>'
+      + '<div class="row-s">' + x.date + ' · ' + esc(x.confirmed) + '</div></div>'
+      + '<div class="row-right"><span class="badge badge-primary">+' + money(x.amount) + '</span></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+function renderScripts() {
+  let html = '<div class="card mb-4"><div class="card-head"><div class="flex-1"><div class="card-title">14 套节点话术</div>'
+    + '<div class="card-sub">一键复制 · {占位符} 按客户替换</div></div></div></div>';
+  SCRIPTS.forEach(function (s) {
+    html += '<div class="card mb-3"><div class="card-head">'
+      + '<span class="badge badge-primary">' + s.node + '</span>'
+      + '<div class="flex-1"><div class="card-title">' + esc(s.title) + '</div>'
+      + '<div class="card-sub">' + esc(s.scene) + '</div></div>'
+      + '<button class="btn btn-sm" data-action="copy-script" data-id="' + s.id + '">复制</button></div>'
+      + '<div class="card-body"><div class="whitespace-pre-wrap text-sm" style="color:#3d4c47">' + esc(s.text) + '</div></div></div>';
+  });
+  return html;
+}
+
+/* ---------- 16. AI 经营中心 ---------- */
+const AI_RULES = {
+  need: ['喜欢', '想要', '希望', '需要', '要求', '偏好', '考虑', '打算', '习惯', '家里有', '在意', '关注'],
+  revise: ['改', '调整', '换', '不要', '去掉', '加', '太大', '太小', '不合适', '不喜', '重做', '挪'],
+  dispute: ['不同意', '争议', '分歧', '吵', '意见不合', '坚持', '反对', '不肯'],
+  todo: ['明天', '下周', '约', '安排', '确认', '发我', '给到', '对接', '进场', '下单', '什么时候', '几点'],
+  concern: ['担心', '怕', '贵', '超预算', '预算', '犹豫', '再考虑', '比较', '对比', '别家', '后悔', '售后', '不放心', '坑']
+};
+function distill(text) {
+  const sentences = String(text || '')
+    .split(/[。！？!?；;\n\r]/)
+    .map(function (s) { return s.trim(); })
+    .filter(function (s) { return s.length > 1; });
+  const buckets = { need: [], revise: [], dispute: [], todo: [], concern: [] };
+  sentences.forEach(function (s) {
+    Object.keys(AI_RULES).forEach(function (k) {
+      if (AI_RULES[k].some(function (w) { return s.indexOf(w) >= 0; })) buckets[k].push(s);
+    });
+  });
+  return { sentences: sentences.length, buckets: buckets };
+}
+const AI_LABELS = { need: '需求点', revise: '修改意见', dispute: '争议点', todo: '待办事项', concern: '客户顾虑' };
+
+function renderAI() {
+  const tabs = [['distill', '微信群聊天蒸馏'], ['gen', '设计辅助生成'], ['script', '话术模板调用']];
+  let html = '<div class="tabs">';
+  tabs.forEach(function (t) {
+    html += '<button class="tab ' + (state.aiTab === t[0] ? 'active' : '') + '" data-action="ai-tab" data-val="' + t[0] + '">' + t[1] + '</button>';
+  });
+  html += '</div>';
+
+  if (state.aiTab === 'distill') {
+    html += '<div class="card mb-4"><div class="card-head"><div class="flex-1"><div class="card-title">聊天记录 → 结构化</div>'
+      + '<div class="card-sub">离线规则引擎抽取；若配置 LLM 接口则自动升级（见部署说明）</div></div></div>'
+      + '<div class="card-body"><textarea id="distillInput" class="textarea" placeholder="粘贴微信群聊天记录，例如：\n刘女士：客厅这个过道是不是有点窄\n刘女士：还有我想多做点储物，衣服太多了\n设计师：可以把过道收 10 公分，做一组到顶柜\n刘女士：那我老公那边得问一下，他比较在意预算\n刘女士：明天我发你几张参考图"></textarea>'
+      + '<div class="flex gap-2 mt-3 flex-wrap"><button class="btn btn-primary" data-action="ai-distill">开始蒸馏</button>'
+      + '<button class="btn" data-action="ai-backfill">回填到客户</button></div>'
+      + '<div id="distillOut" class="mt-3">' + (state.lastDistill ? renderDistillResult(state.lastDistill) : '<div class="mini">尚未蒸馏</div>') + '</div>'
+      + '</div></div>';
+  } else if (state.aiTab === 'gen') {
+    const opts = DB.customers.map(function (c) {
+      return '<option value="' + c.id + '">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</option>';
+    }).join('');
+    html += '<div class="card mb-4"><div class="card-head"><div class="card-title">选择客户 + 生成类型</div></div>'
+      + '<div class="card-body"><div class="field"><label>客户</label><select id="genCustomer" class="select">' + opts + '</select></div>'
+      + '<div class="field"><label>生成类型</label><select id="genType" class="select">'
+      + '<option value="measure">量房报告</option><option value="need">需求分析</option>'
+      + '<option value="brief">交底纪要</option><option value="prompt">彩平图提示词</option></select></div>'
+      + '<button class="btn btn-primary" data-action="ai-generate">生成初稿</button>'
+      + '<div id="genOut" class="mt-3">' + (state.lastDraft || '') + '</div>'
+      + '</div></div>';
+  } else {
+    html += renderScripts();
+  }
+  return html;
+}
+
+function draftMeasure(c) {
+  return '# 量房报告 · ' + c.name + '（' + c.community + ' ' + c.area + '㎡）\n\n'
+    + '## 一、房屋基本信息\n'
+    + '- 小区：' + c.community + '\n- 面积：' + c.area + '㎡　户型：' + c.layout + '\n'
+    + '- 房态：' + c.houseStatus + '　来源：' + c.source + '\n'
+    + '- 量房日期：' + (c.measureDate || '待填') + '　到场：' + (c.attendees || '待填') + '\n\n'
+    + '## 二、现场勘测记录\n'
+    + '1. 承重墙 / 梁位：待补（现场标注于原始尺寸图）\n'
+    + '2. 层高：待补　朝向采光：待补\n'
+    + '3. 管道与设备位：厨房 / 卫生间 / 阳台\n'
+    + '4. 物业限制：电梯尺寸 ___、施工时间 ___、垃圾清运 ___\n'
+    + '5. 现场问题：待补\n\n'
+    + '## 三、客户需求要点\n'
+    + '- 决策人：' + (c.decider || '待补') + '\n- 预算：' + money(c.budgetMin) + ' ~ ' + money(c.budgetMax) + '\n'
+    + '- 核心诉求：' + (c.coreNeeds || '待补') + '\n- 顾虑：' + (c.concerns || '待补') + '\n\n'
+    + '## 四、下一步\n'
+    + '- [ ] 原始尺寸图归档到 03_量房资料\n- [ ] 现场照片（≥15 张）归档\n'
+    + '- [ ] ' + shift(3) + ' 前输出平面初稿\n';
+}
+function draftNeed(c) {
+  return '# 需求分析 · ' + c.name + '\n\n'
+    + '## 家庭结构\n' + (c.decider || '待补') + '\n\n'
+    + '## 生活方式推断\n- 家庭常住人口：待补\n- 作息与动线：待补\n- 收纳习惯：待补\n\n'
+    + '## 风格与预算\n- 风格：待补\n- 预算区间：' + money(c.budgetMin) + ' ~ ' + money(c.budgetMax) + '\n\n'
+    + '## 决策链\n- 拍板人：' + (c.decider || '待补') + '\n- 反对风险点：' + (c.concerns || '待补') + '\n- 竞品情况：' + (c.competitor || '无') + '\n\n'
+    + '## 设计切入点（3 条）\n1. 待补\n2. 待补\n3. 待补\n';
+}
+function draftBrief(c) {
+  return '# 交底纪要 · ' + c.name + ' · ' + c.community + '\n\n'
+    + '- 交底类型：待选（拆除土建 / 水电 / 木工 / 瓦工 / 油工 / 竣工）\n'
+    + '- 日期：' + shift(0) + '\n- 参与人：' + (c.contacts || '业主 / 项目经理 / 工种师傅') + '\n'
+    + '- 图纸版本：' + (c.planVersion || '待补') + '\n\n'
+    + '## 交底确认项\n1. 待补\n2. 待补\n3. 待补\n\n'
+    + '## 遗留问题\n- 待补\n\n'
+    + '## 签字\n业主：______　项目经理：______　设计师：______\n';
+}
+function draftPrompt(c) {
+  return '彩平图提示词 · ' + c.community + ' ' + c.area + '㎡ ' + c.layout + '\n\n'
+    + '俯视彩平表现，' + c.layout + '，面积 ' + c.area + ' 平米，现代简约风格，'
+    + '暖白与浅木色为主，客厅地面浅灰柔光砖，卧室木地板，'
+    + '软装点缀低饱和莫兰迪色，自然侧光，画面干净，家具比例真实，'
+    + '标注主要功能分区（客厅 / 主卧 / 次卧 / 厨房 / 卫生间 / 阳台）。\n\n'
+    + '（可复制到绘图工具；本系统不生成图片，只生成提示词）';
+}
+
+function renderDraft(type, c) {
+  let text = '';
+  if (type === 'measure') text = draftMeasure(c);
+  else if (type === 'need') text = draftNeed(c);
+  else if (type === 'brief') text = draftBrief(c);
+  else text = draftPrompt(c);
+  return '<div class="out" id="draftText">' + esc(text) + '</div>'
+    + '<div class="flex gap-2 mt-2"><button class="btn btn-sm" data-action="copy-draft">复制初稿</button>'
+    + '<span class="mini">已关联客户 ' + esc(c.name) + '（' + c.id + '）</span></div>';
+}
+
+/* ---------- 17. 客户详情抽屉 ---------- */
+function gateInfo(stage) {
+  const g = GATES.filter(function (x) { return x.from === stage; })[0];
+  if (!g) return null;
+  return g;
+}
+function missingFields(c, need) {
+  return need.filter(function (n) {
+    const v = c[n[0]];
+    return v == null || v === '' || v === 0;
+  });
+}
+function renderDrawer(id) {
+  const c = cust(id);
+  if (!c) return '';
+  const g = gateInfo(c.stage);
+  const miss = g ? missingFields(c, g.need) : [];
+  const nextStage = g ? g.to : null;
+
+  const kv = function (k, v, hint) {
+    return '<div class="k">' + esc(k) + '</div><div class="v">' + (v == null || v === '' ? '<span class="text-muted">待补</span>' : esc(v)) + (hint ? ' <span class="mini">' + esc(hint) + '</span>' : '') + '</div>';
+  };
+
+  let html = '<div class="drawer-panel">'
+    + '<div class="drawer-head">'
+    + '<div class="flex-1"><div class="flex gap-2 items-center flex-wrap"><span class="text-lg font-semibold">' + esc(c.name) + '</span>'
+    + stageBadge(c) + intentBadge(c.intent) + '</div>'
+    + '<div class="mini mt-1">' + c.id + ' · ' + esc(c.community) + ' · ' + c.area + '㎡ · ' + esc(c.layout) + ' · ' + esc(c.houseStatus) + '</div></div>'
+    + '<button class="btn btn-sm" data-action="close-drawer">关闭</button>'
+    + '</div>'
+    + '<div class="drawer-body">';
+
+  /* 阶段条 */
+  html += '<div class="stagebar mb-3">';
+  STAGES.forEach(function (s) {
+    const cur = s.code === c.stage ? ' cur' : '';
+    html += '<div class="stagechip' + cur + '"><b>' + s.code + '</b>' + s.name + '</div>';
+  });
+  html += '</div>';
+
+  /* 门禁 */
+  html += '<div class="card mb-3"><div class="card-head"><div class="flex-1"><div class="card-title">交付物门禁</div>'
+    + '<div class="card-sub">' + (g ? '推进到 ' + g.to + ' 需齐备下列交付物' : '已是最后阶段') + '</div></div>'
+    + '<span class="badge ' + (miss.length ? 'badge-danger' : 'badge-ok') + '">' + (miss.length ? '缺 ' + miss.length + ' 项' : '已齐备') + '</span></div>'
+    + '<div class="card-body">';
+  if (g) {
+    g.need.forEach(function (n) {
+      const v = c[n[0]];
+      const ok = !(v == null || v === '' || v === 0);
+      html += '<div class="flex items-center gap-2 mb-1"><span class="mini">' + (ok ? '✓' : '✕') + '</span>'
+        + '<span class="text-sm">' + esc(n[1]) + '</span>'
+        + '<span class="mini">' + (ok ? esc(String(v)) : '未填写') + '</span></div>';
+    });
+  }
+  html += '<div class="flex gap-2 mt-2"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
+    + '<span class="mini">门禁不通过将拒绝推进</span></div></div></div>';
+
+  /* 基础信息 */
+  html += '<div class="grp-t">基础信息</div><div class="card"><div class="card-body"><div class="kv">'
+    + kv('联系电话', c.phone) + kv('小区', c.community) + kv('面积 / 户型', c.area + '㎡ / ' + c.layout)
+    + kv('房态', c.houseStatus) + kv('线索来源', c.source) + kv('来源明细', c.sourceNote)
+    + kv('决策人', c.decider) + kv('预算区间', money(c.budgetMin) + ' ~ ' + money(c.budgetMax))
+    + kv('建档日期', c.createdDate) + kv('负责设计师', c.designer) + kv('当前阶段', c.stage + ' ' + STAGE_MAP[c.stage])
+    + kv('本阶段停留', stageStay(c) + ' 天')
+    + '</div></div></div>';
+
+  /* 阶段进度 */
+  html += '<div class="grp-t">阶段进度</div><div class="card"><div class="card-body"><div class="kv">'
+    + kv('初次沟通', c.firstContact) + kv('邀约量房', c.visitApptDate) + kv('到场人员', c.attendees)
+    + kv('量房日期', c.measureDate) + kv('现场资料', c.siteLink)
+    + kv('报告交付', c.reportDeliverDate) + kv('客户反馈', c.clientFeedback)
+    + kv('方案版本', c.planVersion) + kv('方案交付', c.planDeliverDate)
+    + kv('报价版本', c.quoteVersion) + kv('预算共识', c.budgetAgreed)
+    + kv('定金', money(c.depositAmount) + ' · ' + (c.depositDate || ''))
+    + kv('设计合同', c.designContractDate) + kv('施工合同', c.buildContractDate)
+    + kv('合同金额', c.contractAmount ? money(c.contractAmount) : '')
+    + kv('开工日期', c.startDate) + kv('拆除交底', c.demolitionBriefDate)
+    + kv('水电交底', c.briefElectric) + kv('木工交底', c.briefWood)
+    + kv('瓦工交底', c.briefMason) + kv('油工交底', c.briefPaint)
+    + kv('主材截止', c.materialDeadline)
+    + kv('竣工日期', c.finishDate) + kv('维保到期', c.warrantyEnd)
+    + '</div></div></div>';
+
+  /* 风险与归档 */
+  html += '<div class="grp-t">风险与归档</div><div class="card"><div class="card-body"><div class="kv">'
+    + kv('逾期', overdueDays(c) > 0 ? '逾期 ' + overdueDays(c) + ' 天' : '正常')
+    + kv('下次跟进', c.nextFollowDate) + kv('上次跟进', c.lastFollowDate)
+    + kv('沉默天数', silenceDays(c) + ' 天 · ' + (sleepLevel(c) === 'sleep' ? '已判沉睡' : (sleepLevel(c) === 'warn' ? '沉默预警' : '正常')))
+    + kv('客户顾虑', c.concerns) + kv('竞品情况', c.competitor)
+    + kv('变更次数', changeCount(c) + ' 次') + kv('累计增项', c.contractAmount ? money(changeAmount(c)) : '—')
+    + kv('客户状态', c.status)
+    + '</div></div></div>';
+
+  /* 归档路径 */
+  html += '<div class="grp-t">一客一档</div><div class="card"><div class="card-body">'
+    + '<div class="pathbox" id="pathBox">' + esc(buildTree(c)) + '</div>'
+    + '<div class="copy-line mt-2"><button class="btn btn-sm" data-action="copy-path" data-id="' + c.id + '">复制目录结构</button>'
+    + '<button class="btn btn-sm" data-action="open-obsidian" data-id="' + c.id + '">在 Obsidian 打开</button>'
+    + '<span class="mini">本地文件夹需桌面端 Obsidian 支持</span></div></div></div>';
+
+  /* 子表 */
+  SUB_TABLES.forEach(function (t) {
+    const rows = DB[t.id].filter(function (x) { return x.customerId === c.id; });
+    html += '<div class="grp-t">' + t.name + '（' + rows.length + '）</div>';
+    if (!rows.length) { html += '<div class="sub-card mini">暂无记录</div>'; return; }
+    rows.forEach(function (r) {
+      let line = '';
+      if (t.id === 'followUps') line = r.date + ' · ' + esc(r.type) + '　' + esc(r.content) + '<br><span class="mini">下一步：' + esc(r.nextAction || '—') + '</span>';
+      else if (t.id === 'versions') line = r.version + ' · ' + r.date + ' · ' + r.summary + '　<span class="mini">' + esc(r.status) + '</span>';
+      else if (t.id === 'briefings') line = r.node + ' · ' + r.date + '　' + r.attendees + '<br><span class="mini">' + esc(r.issues) + ' · ' + esc(r.signed) + '</span>';
+      else if (t.id === 'changes') line = r.date + ' · ' + r.content + '　<b>+' + money(r.amount) + '</b><br><span class="mini">' + esc(r.confirmed) + '</span>';
+      else line = r.category + ' · ' + r.brand + ' ' + esc(r.spec) + '　<span class="mini">' + esc(r.status) + '</span>';
+      html += '<div class="sub-card text-sm">' + line + '</div>';
+    });
+  });
+
+  /* 本客户提醒 */
+  const myRem = ruleItems().filter(function (x) { return x.cid === c.id; });
+  html += '<div class="grp-t">该客户节点提醒（' + myRem.length + '）</div>';
+  if (!myRem.length) html += '<div class="sub-card mini">暂无节点提醒</div>';
+  myRem.forEach(function (r) {
+    const st = dueState(r.due);
+    html += '<div class="sub-card text-sm flex items-center gap-2"><div class="flex-1">' + esc(r.rule)
+      + '<div class="mini">' + esc(r.detail) + '</div></div>'
+      + '<span class="badge ' + st.cls + '">' + st.label + '</span></div>';
+  });
+
+  /* 操作 */
+  const escapeBtn = c.escaped
+    ? '<button class="btn" data-action="restore-customer" data-id="' + c.id + '">↩ 恢复客户</button>'
+    : '<button class="btn" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '">⚠ 标记逃单</button>';
+  html += '<div class="flex gap-2 mt-4 flex-wrap">'
+    + '<button class="btn btn-primary" data-action="record-follow" data-id="' + c.id + '">记录跟进</button>'
+    + '<button class="btn" data-action="copy-feishu" data-id="' + c.id + '">复制飞书链接</button>'
+    + escapeBtn
+    + '</div>';
+
+  html += '</div></div>';
+  return html;
+}
+
+function buildTree(c) {
+  const root = c.obsidianPath || ('恒彩客户库/' + c.name + '-' + c.community + '-' + c.area + '㎡');
+  const subs = ['01 基础资料', '02 沟通记录', '03 量房资料', '04 方案版本', '05 报价与合同',
+    '06 施工交底', '07 主材台账', '08 竣工交付', '09 售后维护'];
+  return root + '\n' + subs.map(function (s, i) {
+    return (i === subs.length - 1 ? '└─ ' : '├─ ') + s;
+  }).join('\n');
+}
+
+/* ---------- 18. 新增客户弹窗 ---------- */
+function renderModal() {
+  return '<div class="modal-panel">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">新增客户</div>'
+    + '<div class="card-sub">保存后进入客户主档，阶段默认 S0</div></div>'
+    + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
+    + '<div class="card-body">'
+    + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
+    + '<div class="field"><label>客户姓名 *</label><input id="f_name" class="input" placeholder="马先生"></div>'
+    + '<div class="field"><label>联系电话</label><input id="f_phone" class="input" placeholder="13800000000"></div>'
+    + '<div class="field"><label>小区名称 *</label><input id="f_community" class="input" placeholder="碧桂园"></div>'
+    + '<div class="field"><label>房屋面积 *</label><input id="f_area" class="input" type="number" placeholder="198"></div>'
+    + '<div class="field"><label>户型</label><select id="f_layout" class="select"><option>3室2厅</option><option>4室2厅</option><option>平层</option><option>复式</option></select></div>'
+    + '<div class="field"><label>房屋状态</label><select id="f_house" class="select"><option>现房</option><option>期房</option><option>二手房</option></select></div>'
+    + '<div class="field"><label>线索来源</label><select id="f_source" class="select"><option>门店到访</option><option>老客转介</option><option>线上咨询</option><option>楼盘活动</option></select></div>'
+    + '<div class="field"><label>意向标签</label><select id="f_intent" class="select"><option>高</option><option>中</option><option>低</option><option>观望</option><option>比价</option></select></div>'
+    + '</div>'
+    + '<div class="field"><label>决策人</label><input id="f_decider" class="input" placeholder="谁拍板 / 谁付钱"></div>'
+    + '<div class="field"><label>下次跟进日期 *</label><input id="f_next" class="input" type="date" value="' + shift(1) + '"></div>'
+    + '<div class="flex gap-2 mt-3"><button class="btn btn-primary" data-action="save-customer">保存</button>'
+    + '<button class="btn" data-action="close-modal">取消</button></div>'
+    + '</div></div>';
+}
+
+/* ---------- 19. 渲染主循环 ---------- */
+function renderNav() {
+  let html = '';
+  NAV_GROUPS.forEach(function (g) {
+    html += '<div class="nav-group"><div class="nav-group-t">' + g.name + '</div>';
+    g.items.forEach(function (k) {
+      const v = VIEWS[k];
+      if (!v) return;
+      const n = typeof v.count === 'function' ? v.count() : 0;
+      html += '<button class="nav-item ' + (state.view === k ? 'active' : '') + '" data-action="nav" data-view="' + k + '">'
+        + '<span class="ico">' + (NAV_ICONS[k] || '·') + '</span><span class="flex-1 truncate">' + v.title + '</span>'
+        + (n ? '<span class="cnt">' + n + '</span>' : '') + '</button>';
+    });
+    html += '</div>';
+  });
+  $('#nav').innerHTML = html;
+}
+function render(noScroll) {
+  const v = VIEWS[state.view] || VIEWS.today;
+  $('#topTitle').textContent = v.title;
+  $('#view').innerHTML = v.render();
+  renderNav();
+  const d = $('#drawer');
+  if (state.drawerId) { d.innerHTML = renderDrawer(state.drawerId); d.classList.add('open'); }
+  else { d.innerHTML = ''; d.classList.remove('open'); }
+  if (!noScroll) window.scrollTo(0, 0);
+}
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function () { t.classList.remove('show'); }, 1900);
+}
+function copyText(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast('已复制'); }, function () { fallbackCopy(text); });
+    } else fallbackCopy(text);
+  } catch (e) { fallbackCopy(text); }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('已复制'); } catch (e) { toast('复制失败，请手动选择'); }
+  document.body.removeChild(ta);
+}
+
+/* ---------- 20. 事件 ---------- */
+document.addEventListener('click', function (e) {
+  if (e.target.id === 'modal') { $('#modal').classList.remove('open'); return; }
+  if (e.target.id === 'drawer') { state.drawerId = null; render(); return; }
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const act = el.getAttribute('data-action');
+  const id = el.getAttribute('data-id');
+
+  if (act === 'toggle-nav') { document.body.classList.toggle('nav-open'); return; }
+  if (act === 'nav') {
+    state.view = el.getAttribute('data-view');
+    state.drawerId = null;
+    document.body.classList.remove('nav-open');
+    render();
+    return;
+  }
+  if (act === 'open-customer') { state.drawerId = id; render(); return; }
+  if (act === 'close-drawer') { state.drawerId = null; render(); return; }
+  if (act === 'new-customer') { $('#modal').innerHTML = renderModal(); $('#modal').classList.add('open'); return; }
+  if (act === 'close-modal') { $('#modal').classList.remove('open'); return; }
+  if (act === 'reset') {
+    if (confirm('重置为演示数据？本地保存的修改将丢失。')) { resetDB(); render(); toast('已重置'); }
+    return;
+  }
+  if (act === 'save-customer') { saveCustomer(); return; }
+  if (act === 'task-filter') { state.taskFilter = el.getAttribute('data-val'); render(); return; }
+  if (act === 'ai-tab') { state.aiTab = el.getAttribute('data-val'); render(); return; }
+  if (act === 'ai-distill') { doDistill(); return; }
+  if (act === 'ai-backfill') { doBackfill(); return; }
+  if (act === 'ai-generate') { doGenerate(); return; }
+  if (act === 'voice-entry') { $('#modal').innerHTML = renderVoiceModal(); $('#modal').classList.add('open'); return; }
+  if (act === 'export-json') { exportJSON(); return; }
+  if (act === 'logout') {
+    try { localStorage.removeItem('hc_session'); } catch (e) {}
+    if (HC_SB) { HC_SB.auth.signOut(); }
+    toast('已退出，正在返回登录页…');
+    setTimeout(function () { location.href = 'login.html'; }, 500);
+    return;
+  }
+  if (act === 'voice-start') { startVoice(); return; }
+  if (act === 'voice-stop') { stopVoice(); return; }
+  if (act === 'voice-save') { saveVoiceEntry(); return; }
+  if (act === 'voice-parse') { parseVoiceText(); return; }
+  if (act === 'goto-ai') { state.view = 'ai'; state.aiTab = 'gen'; render(); return; }
+  if (act === 'copy-script') {
+    const s = SCRIPTS.filter(function (x) { return x.id === id; })[0];
+    if (s) copyText(s.text);
+    return;
+  }
+  if (act === 'copy-path') {
+    const c = cust(id);
+    if (c) copyText(buildTree(c));
+    return;
+  }
+  if (act === 'copy-feishu') {
+    const c = cust(id);
+    if (c) copyText(c.feishuLink || ('feishu://bitable/' + c.id));
+    return;
+  }
+  if (act === 'copy-draft') {
+    const box = $('#draftText');
+    if (box) copyText(box.textContent);
+    return;
+  }
+  if (act === 'open-obsidian') {
+    const c = cust(id);
+    if (!c) return;
+    const p = c.obsidianPath || ('恒彩客户库/' + c.name + '-' + c.community + '-' + c.area + '㎡');
+    try { window.location.href = 'obsidian://open?path=' + encodeURIComponent(p); }
+    catch (err) { toast('仅桌面端 Obsidian 支持'); }
+    toast('若未跳转，请先安装 Obsidian 桌面端');
+    return;
+  }
+  if (act === 'mark-escaped') {
+    if (!confirm('确认将该客户标记为逃单？\n标记后将从其他阶段列表移除，进入「逃单客户」页面。')) return;
+    const c = cust(id);
+    if (c) { c.escaped = true; c.escaped_at = TODAY; saveDB(); toast(c.name + ' 已标记为逃单'); render(); }
+    return;
+  }
+  if (act === 'restore-customer') {
+    const c = cust(id);
+    if (c) { c.escaped = false; c.escaped_at = null; saveDB(); toast(c.name + ' 已恢复到原阶段'); render(); }
+    return;
+  }
+  if (act === 'record-follow') {
+    const c = cust(id);
+    if (!c) return;
+    const text = prompt('记录本次跟进（内容）');
+    if (!text) return;
+    const nextAction = prompt('下一步动作（必填，不填视为无效记录）');
+    if (!nextAction) { toast('未填下一步动作，本次记录未保存'); return; }
+    const nextDate = prompt('下次跟进日期（YYYY-MM-DD）', shift(3));
+    if (!nextDate || !/^\d{4}-\d{2}-\d{2}$/.test(nextDate)) { toast('日期格式需为 YYYY-MM-DD'); return; }
+    DB.followUps.push({
+      id: 'F' + String(DB.followUps.length + 1).padStart(3, '0'),
+      customerId: id, date: TODAY, type: '面谈', content: text, nextAction: nextAction, operator: c.designer || '本人'
+    });
+    c.lastFollowDate = TODAY;
+    c.nextFollowDate = nextDate;
+    saveDB(); render(); toast('已记录，下次跟进 ' + nextDate);
+    return;
+  }
+  if (act === 'quick-follow') {
+    const first = sortCustomers(custList())[0];
+    if (!first) { toast('暂无客户'); return; }
+    state.drawerId = first.id; render();
+    toast('已打开首位待跟进客户');
+    return;
+  }
+  if (act === 'advance') { doAdvance(id); return; }
+  if (act === 'export-ps1') { exportPs1(); return; }
+});
+
+document.addEventListener('input', function (e) {
+  if (e.target.id === 'search') {
+    state.q = e.target.value.trim();
+    render(true);
+    const s = $('#search');
+    if (s) { s.focus(); }
+  }
+});
+
+function saveCustomer() {
+  const name = $('#f_name').value.trim();
+  const community = $('#f_community').value.trim();
+  const area = Number($('#f_area').value);
+  if (!name || !community || !area) { toast('姓名 / 小区 / 面积 必填'); return; }
+  const nextFollow = $('#f_next').value || shift(1);
+  const id = 'C' + String(Date.now()).slice(-4);
+  DB.customers.push({
+    id: id, name: name, phone: $('#f_phone').value.trim(), community: community, area: area,
+    layout: $('#f_layout').value, houseStatus: $('#f_house').value, source: $('#f_source').value,
+    intent: $('#f_intent').value, decider: $('#f_decider').value.trim(),
+    budgetMin: 0, budgetMax: 0, createdDate: TODAY, created_at: TODAY, stageEnterDate: TODAY,
+    designer: '本人', stage: 'S0', status: '正常',
+    nextFollowDate: nextFollow, lastFollowDate: null,
+    obsidianPath: '恒彩客户库/' + name + '-' + community + '-' + area + '㎡',
+    feishuLink: 'feishu://bitable/' + id
+  });
+  saveDB();
+  $('#modal').classList.remove('open');
+  state.drawerId = id;
+  render();
+  toast('已建档：' + name + ' · ' + community + ' ' + area + '㎡');
+}
+function doAdvance(id) {
+  const c = cust(id);
+  if (!c) return;
+  const g = gateInfo(c.stage);
+  if (!g) { toast('已是最后阶段'); return; }
+  const miss = missingFields(c, g.need);
+  if (miss.length) {
+    toast('门禁未通过：缺 ' + miss.map(function (m) { return m[1]; }).join('、'));
+    return;
+  }
+  c.stage = g.to;
+  c.stageEnterDate = TODAY;
+  saveDB(); render();
+  toast('已推进到 ' + g.to + ' ' + STAGE_MAP[g.to]);
+}
+function doDistill() {
+  const text = ($('#distillInput') || {}).value || '';
+  if (!text.trim()) { toast('请先粘贴聊天记录'); return; }
+  const r = distill(text);
+  state.lastDistill = r;
+  const out = $('#distillOut');
+  if (out) out.innerHTML = renderDistillResult(r);
+  toast('已抽取 ' + r.sentences + ' 句');
+}
+function renderDistillResult(r) {
+  let h = '<div class="out">';
+  Object.keys(AI_LABELS).forEach(function (k) {
+    const arr = r.buckets[k];
+    h += '【' + AI_LABELS[k] + '】(' + arr.length + ')\n';
+    h += arr.length ? arr.map(function (s) { return '· ' + s; }).join('\n') : '· 未识别';
+    h += '\n\n';
+  });
+  h += '</div>';
+  return h;
+}
+function doBackfill() {
+  if (!state.lastDistill) { toast('请先蒸馏'); return; }
+  const targets = sortCustomers(DB.customers);
+  const who = prompt('回填到哪位客户？输入姓名（如 刘女士）', targets[0] ? targets[0].name : '');
+  if (!who) return;
+  const c = DB.customers.filter(function (x) { return x.name === who; })[0];
+  if (!c) { toast('未找到客户：' + who); return; }
+  const r = state.lastDistill;
+  const parts = [];
+  Object.keys(AI_LABELS).forEach(function (k) {
+    if (r.buckets[k].length) parts.push(AI_LABELS[k] + '：' + r.buckets[k].join('；'));
+  });
+  DB.followUps.push({
+    id: 'F' + String(DB.followUps.length + 1).padStart(3, '0'),
+    customerId: c.id, date: TODAY, type: '微信',
+    content: '【聊天蒸馏】' + parts.join('｜'),
+    nextAction: '按蒸馏结果确认需求', operator: '本人'
+  });
+  c.lastFollowDate = TODAY;
+  saveDB(); render(); toast('已回填到 ' + c.name + ' 的跟进记录');
+}
+function doGenerate() {
+  const id = $('#genCustomer').value;
+  const type = $('#genType').value;
+  const c = cust(id);
+  if (!c) return;
+  state.lastDraft = renderDraft(type, c);
+  const out = $('#genOut');
+  if (out) out.innerHTML = state.lastDraft;
+  toast('已生成初稿，可复制后细修');
+}
+function exportPs1() {
+  const lines = ['# 恒彩客户库目录批量创建脚本 (PowerShell)', '# 在客户库根目录运行', ''];
+  DB.customers.forEach(function (c) {
+    const root = '恒彩客户库/' + c.name + '-' + c.community + '-' + c.area + '㎡';
+    lines.push('$root = Join-Path (Get-Location) "' + root + '"');
+    lines.push('New-Item -ItemType Directory -Force -Path $root | Out-Null');
+    ['01 基础资料', '02 沟通记录', '03 量房资料', '04 方案版本', '05 报价与合同',
+      '06 施工交底', '07 主材台账', '08 竣工交付', '09 售后维护'].forEach(function (s) {
+      lines.push('New-Item -ItemType Directory -Force -Path (Join-Path $root "' + s + '") | Out-Null');
+    });
+    lines.push('');
+  });
+  lines.push('Write-Host "目录创建完成" -ForegroundColor Green');
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '创建客户库目录.ps1';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('已导出建库脚本');
+}
+
+/* ---------- 21. 启动 ---------- */
+function selfTest() {
+  try {
+    const tests = runSortTests();
+    const bad = tests.filter(function (t) { return !t.pass; });
+    if (bad.length) console.error('[排序自检失败]', bad);
+    else console.log('[排序自检通过]', tests.map(function (t) { return t.name; }).join(' / '));
+  } catch (e) { console.warn('排序自检异常', e); }
+}
+/* ---------- 21. 语音录入（浏览器内置 ASR，免飞书、免企业） ---------- */
+const VOICE_ACTIONS = [
+  { id: 'followup', label: '加跟进记录' },
+  { id: 'status', label: '改客户状态' },
+  { id: 'advance', label: '推进阶段' },
+  { id: 'briefing', label: '加交底记录' },
+  { id: 'material', label: '加主材确认' },
+  { id: 'version', label: '加方案版本' },
+  { id: 'change', label: '加变更增项' },
+];
+let voiceState = { recog: null, recording: false, text: '', parsed: null };
+
+function renderVoiceModal() {
+  const cOpts = DB.customers.map(function (c) {
+    return '<option value="' + c.id + '">' + esc(c.name) + ' · ' + esc(c.community) + '</option>';
+  }).join('');
+  const aOpts = VOICE_ACTIONS.map(function (a) {
+    return '<option value="' + a.id + '">' + a.label + '</option>';
+  }).join('');
+  const p = voiceState.parsed || {};
+  const recBtn = voiceState.recording
+    ? '<button class="btn" style="background:#d64545;color:#fff;border-color:#d64545" data-action="voice-stop">⏹ 停止录音</button>'
+    : '<button class="btn btn-primary" data-action="voice-start">🎙 开始录音</button>';
+  const recDot = voiceState.recording
+    ? '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e74c3c;margin-right:6px;animation:pulse 1s infinite"></span>录音中…'
+    : '';
+  return '<div class="modal-panel" style="max-width:640px">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">🎤 语音录入 ' + recDot + '</div>'
+    + '<div class="card-sub">点击开始说话，说完自动解析。麦克风需要 localhost 打开（见 start.bat）。</div></div>'
+    + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
+    + '<div class="card-body">'
+    + '<div class="flex gap-2 mb-3">' + recBtn
+    + '<button class="btn" data-action="voice-parse">解析文字</button></div>'
+    + '<div class="field"><label>识别文字（可手动修改）</label>'
+    + '<textarea id="voiceText" class="textarea" rows="4" placeholder="例如：给马先生加条跟进，今天电话确认主材下周一进场，三天后再跟进">' + esc(voiceState.text) + '</textarea></div>'
+    + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
+    + '<div class="field"><label>客户</label><select id="v_customer" class="select">' + cOpts + '</select></div>'
+    + '<div class="field"><label>操作类型</label><select id="v_action" class="select">' + aOpts + '</select></div>'
+    + '</div>'
+    + '<div class="field mt-3"><label>内容</label><input id="v_content" class="input" value="' + esc(p.content || '') + '"></div>'
+    + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
+    + '<div class="field"><label>下一步动作</label><input id="v_next" class="input" value="' + esc(p.nextAction || '') + '"></div>'
+    + '<div class="field"><label>下次跟进日期</label><input id="v_nextdate" class="input" type="date" value="' + (p.nextDate || '') + '"></div>'
+    + '</div>'
+    + '<div class="flex gap-2 mt-4" style="justify-content:flex-end">'
+    + '<button class="btn" data-action="close-modal">取消</button>'
+    + '<button class="btn btn-primary" data-action="voice-save">保存</button>'
+    + '</div></div></div>';
+}
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('当前浏览器不支持语音识别，请用 Chrome 或 Edge');
+    return;
+  }
+  // 麦克风需要 localhost 或 HTTPS；file:// 双击打开会被浏览器静默拒绝
+  if (location.protocol === 'file:') {
+    voiceState.recording = false;
+    $('#modal').innerHTML = renderVoiceModal();
+    toast('麦克风不可用：请双击 start.bat 启动本地服务后再用语音，不要直接双击 index.html');
+    return;
+  }
+  const r = new SR();
+  r.lang = 'zh-CN';
+  r.continuous = true;
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+  r.onresult = function (e) {
+    let t = '';
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) t += e.results[i][0].transcript;
+    }
+    if (t) {
+      voiceState.text = (voiceState.text || '') + t;
+      const box = $('#voiceText');
+      if (box) box.value = voiceState.text;
+    }
+  };
+  r.onerror = function (e) {
+    const errMap = {
+      'not-allowed': '麦克风被浏览器拒绝，请在地址栏点锁图标 → 允许麦克风',
+      'service-not-allowed': '语音服务不可用，请检查网络或换用 Chrome / Edge',
+      'no-speech': '没检测到声音，请靠近麦克风再试',
+      'audio-capture': '找不到麦克风设备',
+      'network': '网络错误，语音识别需要联网',
+    };
+    toast('录音出错：' + (errMap[e.error] || e.error));
+    voiceState.recording = false;
+    $('#modal').innerHTML = renderVoiceModal();
+  };
+  // 自动续接：说话停顿导致识别结束时，若用户还没点停止，自动重启
+  r.onend = function () {
+    if (voiceState.recording && voiceState.recog === r) {
+      try { r.start(); } catch (e) { voiceState.recording = false; }
+    } else {
+      voiceState.recording = false;
+    }
+  };
+  voiceState.recog = r;
+  voiceState.recording = true;
+  // 不清空已有文字，支持多次录音追加
+  r.start();
+  $('#modal').innerHTML = renderVoiceModal();
+  toast('正在聆听…说完点「停止录音」');
+}
+
+function stopVoice() {
+  voiceState.recording = false;
+  if (voiceState.recog) {
+    try { voiceState.recog.stop(); } catch (e) {}
+    voiceState.recog = null;
+  }
+  $('#modal').innerHTML = renderVoiceModal();
+  parseVoiceText();
+}
+
+/* 规则解析：从语音文字中提取客户、操作类型、内容、下一步、日期 */
+function parseVoiceText() {
+  const text = ($('#voiceText') || {}).value || voiceState.text || '';
+  if (!text.trim()) { toast('没有可解析的文字'); return; }
+  voiceState.text = text;
+  const p = { content: text, nextAction: '', nextDate: '' };
+
+  // 1. 匹配客户（姓名 / 小区）
+  let best = null, bestScore = 0;
+  DB.customers.forEach(function (c) {
+    let s = 0;
+    if (text.indexOf(c.name) >= 0) s += 10;
+    if (c.community && text.indexOf(c.community) >= 0) s += 5;
+    if (s > bestScore) { bestScore = s; best = c; }
+  });
+  if (best) p.customerId = best.id;
+
+  // 2. 操作类型（"加条跟进" 优先级最高，避免被主材/方案等关键词覆盖）
+  if (/加.{0,2}跟进|跟进记录|联系了|沟通了/.test(text)) p.action = 'followup';
+  else if (/流失|丢了|不做了/.test(text)) p.action = 'status';
+  else if (/沉睡|唤醒|恢复正常/.test(text)) p.action = 'status';
+  else if (/推进|到.{1,4}阶段|阶段/.test(text)) p.action = 'advance';
+  else if (/交底/.test(text)) p.action = 'briefing';
+  else if (/主材|瓷砖|地板|橱柜|木门|卫浴|下单/.test(text)) p.action = 'material';
+  else if (/方案|版本|改图|图纸/.test(text)) p.action = 'version';
+  else if (/变更|增项|加项/.test(text)) p.action = 'change';
+  else p.action = 'followup';
+
+  // 3. 提取日期：优先"X天后/下次跟进"，其次相对日期词
+  const cnNum = { '一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 };
+  let dn = text.match(/(\d+)\s*天(后|之后)/);
+  if (dn) {
+    p.nextDate = shift(Number(dn[1]));
+  } else {
+    dn = text.match(/([一二两三四五六七八九十])\s*天(后|之后)/);
+    if (dn) p.nextDate = shift(cnNum[dn[1]] || 3);
+  }
+  if (!p.nextDate) {
+    const dateMap = { '今天': 0, '明天': 1, '后天': 2, '大后天': 3 };
+    const dm = text.match(/(明天|后天|大后天|下周一|下周二|下周三|下周四|下周五|下周六|下周日)/);
+    if (dm) {
+      const k = dm[1];
+      if (dateMap[k] !== undefined) p.nextDate = shift(dateMap[k]);
+      else {
+        const wd = { '下周一': 1, '下周二': 2, '下周三': 3, '下周四': 4, '下周五': 5, '下周六': 6, '下周日': 0 }[k];
+        if (wd !== undefined) {
+          const now = new Date();
+          const cur = now.getDay();
+          let diff = (wd - cur + 7) % 7;
+          if (diff === 0) diff = 7;
+          p.nextDate = fmtD(new Date(now.getTime() + diff * 86400000));
+        }
+      }
+    }
+  }
+  if (!p.nextDate) p.nextDate = shift(3);
+
+  // 4. 下一步动作（截取"下次"/"之后"/"再"后面的内容）
+  const nm = text.match(/(?:下次|之后|再|回头|稍后)([^。！？；\n]{2,20})/);
+  if (nm) p.nextAction = nm[1].trim();
+
+  voiceState.parsed = p;
+  $('#modal').innerHTML = renderVoiceModal();
+  if (p.customerId) $('#v_customer').value = p.customerId;
+  $('#v_action').value = p.action;
+  toast('解析完成：' + (VOICE_ACTIONS.filter(function(a){return a.id===p.action;})[0]||{}).label);
+}
+
+function saveVoiceEntry() {
+  const cid = $('#v_customer').value;
+  const action = $('#v_action').value;
+  const content = $('#v_content').value.trim();
+  const nextAction = $('#v_next').value.trim();
+  const nextDate = $('#v_nextdate').value;
+  const c = cust(cid);
+  if (!c) { toast('请选择客户'); return; }
+
+  if (action === 'followup') {
+    if (!content) { toast('内容不能为空'); return; }
+    DB.followUps.push({
+      id: 'F' + Date.now(), customerId: cid, date: TODAY,
+      type: '电话', content: content, nextAction: nextAction || '待跟进',
+      nextFollowDate: nextDate || shift(3), operator: '本人'
+    });
+    c.lastFollowDate = TODAY;
+    c.nextFollowDate = nextDate || shift(3);
+    toast('已添加跟进：' + c.name);
+  } else if (action === 'status') {
+    let st = '正常';
+    if (/流失/.test(content)) st = '流失';
+    else if (/沉睡/.test(content)) st = '沉睡';
+    else if (/唤醒|恢复/.test(content)) st = '正常';
+    c.status = st;
+    if (st === '正常') { c.lastFollowDate = TODAY; c.nextFollowDate = shift(3); }
+    toast(c.name + ' 状态 → ' + st);
+  } else if (action === 'advance') {
+    const g = gateInfo(c.stage);
+    if (!g) { toast('已是最后阶段'); return; }
+    const miss = missingFields(c, g.need);
+    if (miss.length) { toast('门禁未通过：缺 ' + miss.map(function(m){return m[1];}).join('、')); return; }
+    c.stage = g.to; c.stageEnterDate = TODAY;
+    toast(c.name + ' 已推进到 ' + g.to);
+  } else if (action === 'briefing') {
+    const node = /拆除|水电|木工|瓦工|油工|竣工/.exec(content);
+    DB.briefings.push({
+      id: 'B' + Date.now(), customerId: cid,
+      node: node ? node[0] + '交底' : '交底', date: TODAY,
+      attendees: '业主 / 项目经理', confirmed: content, issues: '',
+      drawingVersion: c.planVersion || '', signed: '是', voucher: ''
+    });
+    toast('已添加交底记录：' + c.name);
+  } else if (action === 'material') {
+    const cat = /瓷砖|地板|橱柜|木门|卫浴|吊顶|灯具|五金|石材/.exec(content);
+    DB.materials.push({
+      id: 'M' + Date.now(), customerId: cid,
+      category: cat ? cat[0] : '主材', brand: '', spec: content,
+      orderDate: /下单/.test(content) ? TODAY : null, arriveDate: null, status: /下单/.test(content) ? '已下单' : '待确认'
+    });
+    toast('已添加主材确认：' + c.name);
+  } else if (action === 'version') {
+    const vn = /v?(\d+)/i.exec(content);
+    DB.versions.push({
+      id: 'V' + Date.now(), customerId: cid,
+      version: vn ? 'v' + vn[1] : 'v' + (DB.versions.filter(function(x){return x.customerId===cid;}).length + 1),
+      date: TODAY, summary: content, status: '已交付', link: ''
+    });
+    c.planVersion = vn ? 'v' + vn[1] : c.planVersion;
+    toast('已添加方案版本：' + c.name);
+  } else if (action === 'change') {
+    const am = /(\d+\.?\d*)\s*万|(\d+\.?\d*)\s*元/.exec(content);
+    DB.changes.push({
+      id: 'C' + Date.now(), customerId: cid, date: TODAY,
+      content: content, amount: am ? (am[1] ? Number(am[1]) * 10000 : Number(am[2])) : 0,
+      confirmed: '是', voucher: '', impactDays: 0
+    });
+    toast('已添加变更增项：' + c.name);
+  }
+
+  saveDB();
+  $('#modal').classList.remove('open');
+  state.drawerId = cid;
+  render();
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  toast('已导出 data.json');
+}
+
+function boot() {
+  const done = function () { selfTest(); render(); };
+
+  let cached = null;
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) cached = JSON.parse(raw);
+  } catch (e) { /* 私有模式可能不可用 */ }
+
+  initSupabase(function () {
+    /* A. 云端模式：以云端为准 */
+    if (CLOUD_ON && HC_SB) {
+      cloudPull(function (got) {
+        if (got) { done(); return; }
+        DB = cached || buildMock();
+        saveDB();                 // 首次登录，把初始数据推到云端
+        done();
+      });
+      return;
+    }
+
+    /* B. 本机模式：缓存 → data.json → 演示数据 */
+    if (cached) { DB = cached; done(); return; }
+
+    if (typeof fetch === 'function') {
+      fetch('data.json', { cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('no data.json');
+          return r.json();
+        })
+        .then(function (j) {
+          if (j && j.customers && j.customers.length) { DB = j; }
+          else throw new Error('data.json 结构不符');
+        })
+        .catch(function () { DB = buildMock(); })
+        .then(done);
+    } else {
+      DB = buildMock();
+      done();
+    }
+  });
+}
+boot();
+</script>
+</body>
+</html>

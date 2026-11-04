@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人 ERP 客户管理系统 · 登录</title>
+<script src="config.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f6f6f4;
+    color: #111;
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { width: 100%; max-width: 400px; }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 26px; justify-content: center;
+  }
+  .brand .mark {
+    width: 34px; height: 34px; background: #111; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; letter-spacing: .1em; border-radius: 2px;
+    font-weight: 500;
+  }
+  .brand h1 { font-size: 14px; font-weight: 500; letter-spacing: .16em; }
+  .brand small {
+    display: block; font-size: 9.5px; color: #a3a3a3;
+    letter-spacing: .3em; margin-top: 4px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e6e6e3;
+    border-radius: 3px;
+    padding: 30px 26px 24px;
+    box-shadow: 0 10px 34px rgba(0,0,0,.05);
+  }
+  .tabs {
+    display: flex; border-bottom: 1px solid #ececea;
+    margin: -6px 0 24px;
+  }
+  .tabs button {
+    flex: 1; padding: 12px 0; background: none; border: 0;
+    font-size: 12px; letter-spacing: .14em; color: #9a9a9a;
+    cursor: pointer; position: relative; font-family: inherit;
+    transition: color .18s ease;
+  }
+  .tabs button:hover { color: #111; }
+  .tabs button.on { color: #111; font-weight: 600; }
+  .tabs button.on::after {
+    content: ''; position: absolute; left: 18%; right: 18%; bottom: -1px;
+    height: 1.5px; background: #111;
+  }
+  label.f {
+    display: block; font-size: 11px; color: #8b8b8b;
+    letter-spacing: .12em; margin-bottom: 7px;
+  }
+  input[type=text], input[type=password] {
+    width: 100%; height: 42px; padding: 0 12px;
+    font-size: 13.5px; color: #111; background: #fbfbfa;
+    border: 1px solid #e2e2df; border-radius: 2px;
+    outline: none; font-family: inherit; letter-spacing: .02em;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  input:focus { border-color: #111; background: #fff; }
+  .field { margin-bottom: 16px; }
+  .submit {
+    width: 100%; height: 42px; margin-top: 6px;
+    background: #111; color: #fff; border: 0; border-radius: 2px;
+    font-size: 12px; letter-spacing: .24em; cursor: pointer;
+    font-family: inherit; transition: background .18s ease, opacity .18s ease;
+  }
+  .submit:hover { background: #2b2b2b; }
+  .submit:disabled { background: #c9c9c9; cursor: not-allowed; }
+  .msg {
+    margin-top: 14px; font-size: 11.5px; line-height: 1.7;
+    min-height: 17px; text-align: center; color: #b54a3a;
+  }
+  .msg.ok { color: #2f7d4f; }
+  .hint {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0ee;
+    font-size: 10.5px; color: #a8a8a4; line-height: 1.9; text-align: center;
+    letter-spacing: .02em;
+  }
+  .mode {
+    text-align: center; font-size: 10px; letter-spacing: .18em;
+    color: #b5b5b0; margin-top: 18px;
+  }
+  .mode b { color: #6d6d68; font-weight: 500; }
+  .back {
+    display: block; text-align: center; margin-top: 24px;
+    font-size: 11px; color: #9a9a96; text-decoration: none;
+    letter-spacing: .16em; transition: color .18s ease;
+  }
+  .back:hover { color: #111; }
+  .shake { animation: shake .36s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    22% { transform: translateX(-6px); }
+    44% { transform: translateX(5px); }
+    66% { transform: translateX(-3px); }
+    84% { transform: translateX(2px); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <span class="mark">设</span>
+    <span>
+      <h1>个人 ERP 客户管理系统</h1>
+      <small>XU WENQIANG&nbsp;&nbsp;·&nbsp;&nbsp;PRIVATE</small>
+    </span>
+  </div>
+
+  <div class="card" id="card">
+    <div class="tabs">
+      <button data-tab="login" class="on">登 录</button>
+      <button data-tab="register">注 册</button>
+      <button data-tab="reset">改 密 码</button>
+    </div>
+
+    <!-- 登录 -->
+    <div data-panel="login">
+      <div class="field">
+        <label class="f">账号</label>
+        <input id="lgUser" type="text" autocomplete="username" placeholder="请输入账号">
+      </div>
+      <div class="field">
+        <label class="f">密码</label>
+        <input id="lgPwd" type="password" autocomplete="current-password" placeholder="请输入密码">
+      </div>
+      <button class="submit" id="btnLogin">进 入 系 统</button>
+    </div>
+
+    <!-- 注册 -->
+    <div data-panel="register" style="display:none">
+      <div class="field">
+        <label class="f">账号</label>
+        <input id="rgUser" type="text" autocomplete="off" placeholder="建议用英文或拼音，如 xuweiqiang">
+      </div>
+      <div class="field">
+        <label class="f">密码</label>
+        <input id="rgPwd" type="password" autocomplete="new-password" placeholder="至少 6 位">
+      </div>
+      <div class="field">
+        <label class="f">确认密码</label>
+        <input id="rgPwd2" type="password" autocomplete="new-password" placeholder="再输入一次">
+      </div>
+      <button class="submit" id="btnRegister">创 建 账 号</button>
+    </div>
+
+    <!-- 改密码 -->
+    <div data-panel="reset" style="display:none">
+      <div class="field">
+        <label class="f">账号</label>
+        <input id="rsUser" type="text" autocomplete="off" placeholder="请输入账号">
+      </div>
+      <div class="field">
+        <label class="f">原密码</label>
+        <input id="rsOld" type="password" autocomplete="off" placeholder="请输入原密码">
+      </div>
+      <div class="field">
+        <label class="f">新密码</label>
+        <input id="rsNew" type="password" autocomplete="new-password" placeholder="至少 6 位">
+      </div>
+      <button class="submit" id="btnReset">确 认 修 改</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="hint">
+      数据保存在云端，任意一台能上网的电脑<br>登录同一账号即可查看和修改
+    </div>
+  </div>
+
+  <div class="mode">当前模式：<b id="modeText">本地</b></div>
+  <a class="back" href="../index.html">← 返回作品集</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CFG = window.HC_CONFIG || {};
+  var CLOUD = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY);
+  var USER_DOMAIN = '@hc-erp.local';
+  var SESSION_KEY = 'hc_session';
+  var USERS_KEY = 'hc_users_v1';
+
+  var sb = null;
+
+  /* ---------- 工具 ---------- */
+  function $(s) { return document.querySelector(s); }
+  function msg(t, ok) {
+    var el = $('#msg');
+    el.textContent = t;
+    el.className = 'msg' + (ok ? ' ok' : '');
+  }
+  function shake() {
+    var c = $('#card');
+    c.classList.remove('shake');
+    void c.offsetWidth;
+    c.classList.add('shake');
+  }
+  function toEmail(u) {
+    // 中文等非 ASCII 账号用固定哈希映射成合法邮箱，跨设备结果一致
+    if (/^[a-zA-Z0-9_.\-]+$/.test(u)) return u.toLowerCase() + USER_DOMAIN;
+    return 'u' + hashLocal(u) + USER_DOMAIN;
+  }
+  function validUser(u) {
+    // 支持中文姓名
+    return /^[\u4e00-\u9fa5a-zA-Z0-9_\-\.]{2,20}$/.test(u);
+  }
+
+  // 简易哈希（无 crypto.subtle 时兜底；云端模式不用它）
+  function hashLocal(str) {
+    var h1 = 0x811c9dc5, h2 = 0x9e3779b9;
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charCodeAt(i);
+      h1 = ((h1 ^ ch) * 16777619) >>> 0;
+      h2 = ((h2 + ch) * 2654435761) >>> 0;
+    }
+    return h1.toString(16) + h2.toString(16);
+  }
+
+  function saveSession(user) {
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify({ u: user, t: Date.now(), mode: CLOUD ? 'cloud' : 'local' })); } catch (e) {}
+  }
+
+  function listUsers() {
+    try { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function saveUsers(o) {
+    try { localStorage.setItem(USERS_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  /* 默认账号（仅本机模式预置；云端模式请在“注册”页用同一账号注册一次） */
+  var DEFAULT_USER = '徐文强';
+  var DEFAULT_PWD = '19861122';
+  function seedDefault() {
+    if (CLOUD) return;
+    var users = listUsers();
+    if (!users[DEFAULT_USER]) {
+      users[DEFAULT_USER] = { hash: hashLocal(DEFAULT_PWD), at: Date.now(), seed: true };
+      saveUsers(users);
+    }
+  }
+
+  function enter() {
+    msg('验证通过，正在进入…', true);
+    setTimeout(function () { location.href = 'index.html'; }, 600);
+  }
+
+  /* ---------- 初始化云端 ---------- */
+  function initCloud(cb) {
+    if (!CLOUD) { cb(); return; }
+    if (window.supabase) {
+      sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+      cb(); return;
+    }
+    var s = document.createElement('script');
+    s.src = 'vendor/supabase.js';
+    s.onload = function () {
+      sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+      cb();
+    };
+    s.onerror = function () {
+      var s2 = document.createElement('script');
+      s2.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+      s2.onload = function () {
+        sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+        cb();
+      };
+      s2.onerror = function () { msg('云端组件加载失败，请检查网络'); };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+  }
+
+  /* ---------- 登录 ---------- */
+  function doLogin() {
+    var u = $('#lgUser').value.trim();
+    var p = $('#lgPwd').value;
+    if (!u || !p) { msg('请输入账号和密码'); shake(); return; }
+    $('#btnLogin').disabled = true;
+    msg('验证中…');
+
+    if (CLOUD && sb) {
+      sb.auth.signInWithPassword({ email: toEmail(u), password: p }).then(function (r) {
+        $('#btnLogin').disabled = false;
+        if (r.error) { msg('账号或密码不正确'); shake(); return; }
+        saveSession(u);
+        enter();
+      });
+      return;
+    }
+
+    // 本地模式
+    var users = listUsers();
+    var rec = users[u];
+    if (!rec || rec.hash !== hashLocal(p)) {
+      $('#btnLogin').disabled = false;
+      msg('账号或密码不正确'); shake(); return;
+    }
+    saveSession(u);
+    enter();
+  }
+
+  /* ---------- 注册 ---------- */
+  function doRegister() {
+    var u = $('#rgUser').value.trim();
+    var p = $('#rgPwd').value;
+    var p2 = $('#rgPwd2').value;
+    if (!validUser(u)) { msg('账号只能用字母 / 数字 / 下划线，2-32 位'); shake(); return; }
+    if (p.length < 6) { msg('密码至少 6 位'); shake(); return; }
+    if (p !== p2) { msg('两次输入的密码不一致'); shake(); return; }
+    $('#btnRegister').disabled = true;
+    msg('正在创建…');
+
+    if (CLOUD && sb) {
+      // 走服务端 hc_register：直接建号并自动确认邮箱，不依赖确认邮件
+      sb.rpc('hc_register', { p_email: toEmail(u), p_password: p }).then(function (r) {
+        if (r.error) {
+          $('#btnRegister').disabled = false;
+          msg('注册失败：' + r.error.message); shake(); return;
+        }
+        var res = r.data || {};
+        if (!res.ok) {
+          $('#btnRegister').disabled = false;
+          msg(res.error === 'exists' ? '该账号已存在，请直接登录'
+            : (res.error === 'weak_password' ? '密码至少 6 位' : '账号格式不正确'));
+          shake(); return;
+        }
+        sb.auth.signInWithPassword({ email: toEmail(u), password: p }).then(function (r2) {
+          $('#btnRegister').disabled = false;
+          if (r2.error) { msg('账号已创建，请切到「登录」页登录', true); return; }
+          saveSession(u);
+          msg('账号已创建，正在进入…', true);
+          setTimeout(function () { location.href = 'index.html'; }, 800);
+        });
+      });
+      return;
+    }
+
+    var users = listUsers();
+    if (users[u]) { $('#btnRegister').disabled = false; msg('该账号已存在，请直接登录'); shake(); return; }
+    users[u] = { hash: hashLocal(p), at: Date.now() };
+    saveUsers(users);
+    $('#btnRegister').disabled = false;
+    saveSession(u);
+    msg('账号已创建，正在进入…', true);
+    setTimeout(function () { location.href = 'index.html'; }, 800);
+  }
+
+  /* ---------- 改密码 ---------- */
+  function doReset() {
+    var u = $('#rsUser').value.trim();
+    var oldP = $('#rsOld').value;
+    var newP = $('#rsNew').value;
+    if (!u || !oldP || !newP) { msg('请填写完整'); shake(); return; }
+    if (newP.length < 6) { msg('新密码至少 6 位'); shake(); return; }
+    $('#btnReset').disabled = true;
+    msg('处理中…');
+
+    if (CLOUD && sb) {
+      sb.auth.signInWithPassword({ email: toEmail(u), password: oldP }).then(function (r) {
+        if (r.error) {
+          $('#btnReset').disabled = false;
+          msg('账号或原密码不正确'); shake(); return;
+        }
+        return sb.auth.updateUser({ password: newP }).then(function (r2) {
+          $('#btnReset').disabled = false;
+          if (r2.error) { msg('修改失败：' + r2.error.message); shake(); return; }
+          msg('密码已修改，请用新密码登录', true);
+          $('#rsUser').value = u; $('#rsOld').value = ''; $('#rsNew').value = '';
+        });
+      });
+      return;
+    }
+
+    var users = listUsers();
+    var rec = users[u];
+    if (!rec || rec.hash !== hashLocal(oldP)) {
+      $('#btnReset').disabled = false;
+      msg('账号或原密码不正确'); shake(); return;
+    }
+    users[u] = { hash: hashLocal(newP), at: Date.now() };
+    saveUsers(users);
+    $('#btnReset').disabled = false;
+    msg('密码已修改，请用新密码登录', true);
+    $('#rsOld').value = ''; $('#rsNew').value = '';
+  }
+
+  /* ---------- 事件 ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs button'), function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.tabs button'), function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      var tab = b.getAttribute('data-tab');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-panel]'), function (p) {
+        p.style.display = p.getAttribute('data-panel') === tab ? '' : 'none';
+      });
+      msg('');
+    });
+  });
+
+  $('#btnLogin').addEventListener('click', doLogin);
+  $('#btnRegister').addEventListener('click', doRegister);
+  $('#btnReset').addEventListener('click', doReset);
+
+  ['lgUser', 'rgUser', 'rsUser'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var t = el.closest('[data-panel]').getAttribute('data-panel'); if (t === 'login') doLogin(); if (t === 'register') doRegister(); } });
+  });
+  document.getElementById('lgPwd').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('rgPwd2').addEventListener('keydown', function (e) { if (e.key === 'Enter') doRegister(); });
+  document.getElementById('rsNew').addEventListener('keydown', function (e) { if (e.key === 'Enter') doReset(); });
+
+  /* ---------- 启动 ---------- */
+  $('#modeText').textContent = CLOUD ? '云端同步' : '本机（未配置云端）';
+  seedDefault();
+  if (!$('#lgUser').value) $('#lgUser').value = DEFAULT_USER;
+  initCloud(function () { /* 就绪 */ });
+
+  // 已登录则直接进入
+  try {
+    var s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    if (s && s.u && (Date.now() - s.t < 30 * 86400000)) {
+      if (!CLOUD) { enter(); }
+      else if (sb) {
+        sb.auth.getSession().then(function (r) {
+          if (r && r.data && r.data.session) enter();
+        });
+      }
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
