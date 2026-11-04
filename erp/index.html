@@ -397,6 +397,48 @@ const SUB_TABLES = [
   { id: 'materials', name: '主材确认' }
 ];
 
+/* 客户可编辑字段清单（编辑资料弹窗） */
+const EDIT_FIELDS = [
+  { k: 'name', label: '客户姓名', type: 'text', required: true },
+  { k: 'phone', label: '联系电话', type: 'text' },
+  { k: 'community', label: '小区', type: 'text', required: true },
+  { k: 'area', label: '面积(㎡)', type: 'number' },
+  { k: 'layout', label: '户型', type: 'text' },
+  { k: 'houseStatus', label: '房态', type: 'text' },
+  { k: 'source', label: '线索来源', type: 'text' },
+  { k: 'sourceNote', label: '来源明细', type: 'text' },
+  { k: 'intent', label: '意向', type: 'text' },
+  { k: 'decider', label: '决策人', type: 'text' },
+  { k: 'budgetMin', label: '预算下限', type: 'number' },
+  { k: 'budgetMax', label: '预算上限', type: 'number' },
+  { k: 'designer', label: '负责设计师', type: 'text' },
+  { k: 'status', label: '客户状态', type: 'text' },
+  { k: 'firstContact', label: '初次沟通记录', type: 'text' },
+  { k: 'visitApptDate', label: '邀约量房时间', type: 'date' },
+  { k: 'attendees', label: '到场人员', type: 'text' },
+  { k: 'measureDate', label: '量房日期', type: 'date' },
+  { k: 'siteLink', label: '现场资料链接', type: 'text' },
+  { k: 'reportDeliverDate', label: '量房报告交付日期', type: 'date' },
+  { k: 'clientFeedback', label: '客户反馈', type: 'text' },
+  { k: 'planVersion', label: '方案版本号', type: 'text' },
+  { k: 'planDeliverDate', label: '方案交付日期', type: 'date' },
+  { k: 'quoteVersion', label: '报价单版本', type: 'text' },
+  { k: 'budgetAgreed', label: '预算共识确认', type: 'text' },
+  { k: 'depositDate', label: '定金日期', type: 'date' },
+  { k: 'depositAmount', label: '定金金额', type: 'number' },
+  { k: 'designAgreementLink', label: '设计协议链接', type: 'text' },
+  { k: 'designContractDate', label: '设计合同日期', type: 'date' },
+  { k: 'buildContractDate', label: '施工合同日期', type: 'date' },
+  { k: 'contractAmount', label: '合同金额', type: 'number' },
+  { k: 'startDate', label: '开工日期', type: 'date' },
+  { k: 'demolitionBriefDate', label: '拆除交底日期', type: 'date' },
+  { k: 'finishDate', label: '竣工日期', type: 'date' },
+  { k: 'warrantyEnd', label: '维保到期日', type: 'date' },
+  { k: 'concerns', label: '客户顾虑', type: 'text' },
+  { k: 'competitor', label: '竞品情况', type: 'text' },
+  { k: 'nextFollowDate', label: '下次跟进日期', type: 'date' }
+];
+
 /* ---------- 3. 话术库（14 套节点话术） ---------- */
 const SCRIPTS = [
   {
@@ -1683,8 +1725,9 @@ function renderDrawer(id) {
         + '<span class="mini">' + (ok ? esc(String(v)) : '未填写') + '</span></div>';
     });
   }
-  html += '<div class="flex gap-2 mt-2"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
-    + '<span class="mini">门禁不通过将拒绝推进</span></div></div></div>';
+  html += '<div class="flex gap-2 mt-2 flex-wrap"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
+    + '<button class="btn btn-sm" data-action="force-advance" data-id="' + c.id + '">强制推进</button>'
+    + '<span class="mini">门禁不通过可点「强制推进」跳过</span></div></div></div>';
 
   /* 基础信息 */
   html += '<div class="grp-t">基础信息</div><div class="card"><div class="card-body"><div class="kv">'
@@ -1762,6 +1805,8 @@ function renderDrawer(id) {
     : '<button class="btn" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '">⚠ 标记逃单</button>';
   html += '<div class="flex gap-2 mt-4 flex-wrap">'
     + '<button class="btn btn-primary" data-action="record-follow" data-id="' + c.id + '">记录跟进</button>'
+    + '<button class="btn" data-action="edit-customer" data-id="' + c.id + '">✎ 编辑资料</button>'
+    + '<button class="btn" data-action="voice-quick" data-id="' + c.id + '">🎤 语音跟进</button>'
     + '<button class="btn" data-action="copy-feishu" data-id="' + c.id + '">复制飞书链接</button>'
     + escapeBtn
     + '</div>';
@@ -1820,6 +1865,104 @@ function renderModal() {
     + '<div class="flex gap-2 mt-3"><button class="btn btn-primary" data-action="save-customer">保存</button>'
     + '<button class="btn" data-action="close-modal">取消</button></div>'
     + '</div></div>';
+}
+
+/* ---------- 18b. 编辑客户资料弹窗 ---------- */
+function renderEditModal(id) {
+  const c = cust(id);
+  if (!c) return '';
+  let body = '';
+  EDIT_FIELDS.forEach(function (f) {
+    const v = c[f.k] == null ? '' : c[f.k];
+    const inputType = f.type === 'number' ? 'number' : (f.type === 'date' ? 'date' : 'text');
+    body += '<div class="field"><label>' + esc(f.label) + (f.required ? ' *' : '') + '</label>'
+      + '<input id="e_' + f.k + '" class="input" type="' + inputType + '" value="' + esc(String(v)) + '"></div>';
+  });
+  return '<div class="modal-panel" style="max-width:680px">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">编辑客户资料</div>'
+    + '<div class="card-sub">手动补全各阶段门禁字段后，即可推进阶段</div></div>'
+    + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
+    + '<div class="card-body" style="max-height:72vh;overflow:auto">'
+    + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">' + body + '</div>'
+    + '<div class="flex gap-2 mt-3"><button class="btn btn-primary" data-action="save-edit" data-id="' + id + '">保存</button>'
+    + '<button class="btn" data-action="close-modal">取消</button></div></div></div>';
+}
+function saveCustomerEdit(id) {
+  const c = cust(id);
+  if (!c) return;
+  EDIT_FIELDS.forEach(function (f) {
+    const el = document.getElementById('e_' + f.k);
+    if (!el) return;
+    let v = el.value;
+    if (f.type === 'number') v = v === '' ? 0 : Number(v);
+    c[f.k] = v;
+  });
+  saveDB();
+  document.getElementById('modal').classList.remove('open');
+  render();
+  toast('资料已保存');
+}
+
+/* ---------- 18c. 记录跟进弹窗（替代旧的 prompt 链） ---------- */
+function renderFollowModal(id) {
+  const c = cust(id);
+  if (!c) return '';
+  const g = gateInfo(c.stage);
+  const miss = g ? missingFields(c, g.need) : [];
+  const suggest = miss.length ? miss[0] : null;
+  const suggestHtml = suggest
+    ? '<label class="flex items-center gap-2 mt-1" style="font-size:12px;color:var(--muted)">'
+      + '<input type="checkbox" id="fu_sync" checked style="width:auto">'
+      + ' 将本次内容写入门禁字段「' + esc(suggest[1]) + '」</label>'
+    : '<div class="mini" style="color:var(--muted)">当前阶段门禁已齐备，可直接推进</div>';
+  return '<div class="modal-panel" style="max-width:560px">'
+    + '<div class="card-head"><div class="flex-1"><div class="card-title">记录跟进</div>'
+    + '<div class="card-sub">' + esc(c.name) + ' · 当前阶段 ' + c.stage + ' ' + esc(STAGE_MAP[c.stage] || '') + '</div></div>'
+    + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
+    + '<div class="card-body">'
+    + '<div class="field"><label>跟进内容 *</label><textarea id="fu_content" class="textarea" rows="4" placeholder="本次沟通了什么…"></textarea></div>'
+    + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
+    + '<div class="field"><label>跟进方式</label><select id="fu_type" class="select"><option>电话</option><option>面谈</option><option>微信</option><option>短信</option><option>到店</option></select></div>'
+    + '<div class="field"><label>下次跟进日期</label><input id="fu_date" class="input" type="date" value="' + shift(3) + '"></div>'
+    + '</div>'
+    + '<div class="field"><label>下一步动作</label><input id="fu_next" class="input" placeholder="例如：三天后确认主材进场"></div>'
+    + '<div class="field"><label>客户顾虑（可选，将更新客户顾虑字段）</label><input id="fu_concerns" class="input" value="' + esc(c.concerns || '') + '"></div>'
+    + suggestHtml
+    + '<div class="flex gap-2 mt-3" style="justify-content:flex-end">'
+    + '<button class="btn" data-action="close-modal">取消</button>'
+    + '<button class="btn btn-primary" data-action="save-follow" data-id="' + id + '">保存跟进</button></div>'
+    + '</div></div>';
+}
+function saveFollowRecord(id) {
+  const c = cust(id);
+  if (!c) return;
+  const content = (document.getElementById('fu_content') || {}).value.trim();
+  if (!content) { toast('请填写跟进内容'); return; }
+  const type = (document.getElementById('fu_type') || {}).value || '电话';
+  const nextDate = (document.getElementById('fu_date') || {}).value || shift(3);
+  const nextAction = ((document.getElementById('fu_next') || {}).value || '').trim();
+  const concerns = ((document.getElementById('fu_concerns') || {}).value || '').trim();
+  DB.followUps.push({
+    id: 'F' + Date.now(), customerId: id, date: TODAY,
+    type: type, content: content, nextAction: nextAction || '待跟进',
+    nextFollowDate: nextDate, operator: c.designer || '本人'
+  });
+  c.lastFollowDate = TODAY;
+  c.nextFollowDate = nextDate;
+  if (concerns) c.concerns = concerns;
+  const syncEl = document.getElementById('fu_sync');
+  if (syncEl && syncEl.checked) {
+    const g = gateInfo(c.stage);
+    const miss = g ? missingFields(c, g.need) : [];
+    if (miss.length) {
+      const fk = miss[0][0];
+      c[fk] = /Date$/.test(fk) ? nextDate : content;
+    }
+  }
+  saveDB();
+  document.getElementById('modal').classList.remove('open');
+  render();
+  toast('已记录跟进，下次 ' + nextDate);
 }
 
 /* ---------- 19. 渲染主循环 ---------- */
@@ -1994,19 +2137,28 @@ document.addEventListener('click', function (e) {
   if (act === 'record-follow') {
     const c = cust(id);
     if (!c) return;
-    const text = prompt('记录本次跟进（内容）');
-    if (!text) return;
-    const nextAction = prompt('下一步动作（必填，不填视为无效记录）');
-    if (!nextAction) { toast('未填下一步动作，本次记录未保存'); return; }
-    const nextDate = prompt('下次跟进日期（YYYY-MM-DD）', shift(3));
-    if (!nextDate || !/^\d{4}-\d{2}-\d{2}$/.test(nextDate)) { toast('日期格式需为 YYYY-MM-DD'); return; }
-    DB.followUps.push({
-      id: 'F' + String(DB.followUps.length + 1).padStart(3, '0'),
-      customerId: id, date: TODAY, type: '面谈', content: text, nextAction: nextAction, operator: c.designer || '本人'
-    });
-    c.lastFollowDate = TODAY;
-    c.nextFollowDate = nextDate;
-    saveDB(); render(); toast('已记录，下次跟进 ' + nextDate);
+    $('#modal').innerHTML = renderFollowModal(id);
+    $('#modal').classList.add('open');
+    return;
+  }
+  if (act === 'edit-customer') {
+    const c = cust(id);
+    if (!c) return;
+    $('#modal').innerHTML = renderEditModal(id);
+    $('#modal').classList.add('open');
+    return;
+  }
+  if (act === 'save-edit') { saveCustomerEdit(id); return; }
+  if (act === 'save-follow') { saveFollowRecord(id); return; }
+  if (act === 'voice-quick') {
+    const c = cust(id);
+    if (!c) return;
+    voiceState.parsed = { customerId: id, action: 'followup', content: '', nextAction: '', nextDate: shift(3) };
+    $('#modal').innerHTML = renderVoiceModal();
+    $('#modal').classList.add('open');
+    if ($('#v_customer')) $('#v_customer').value = id;
+    if ($('#v_action')) $('#v_action').value = 'followup';
+    toast('已选 ' + c.name + '，可录音或直接填写内容');
     return;
   }
   if (act === 'quick-follow') {
@@ -2016,7 +2168,19 @@ document.addEventListener('click', function (e) {
     toast('已打开首位待跟进客户');
     return;
   }
-  if (act === 'advance') { doAdvance(id); return; }
+  if (act === 'advance') { doAdvance(id, false); return; }
+  if (act === 'force-advance') {
+    const c = cust(id);
+    if (!c) return;
+    const g = gateInfo(c.stage);
+    if (!g) { toast('已是最后阶段'); return; }
+    const miss = missingFields(c, g.need);
+    if (miss.length) {
+      if (!confirm('门禁字段未齐（缺 ' + miss.map(function (m) { return m[1]; }).join('、') + '），确认强制推进到 ' + g.to + ' ？')) return;
+    }
+    doAdvance(id, true);
+    return;
+  }
   if (act === 'export-ps1') { exportPs1(); return; }
 });
 
@@ -2052,20 +2216,20 @@ function saveCustomer() {
   render();
   toast('已建档：' + name + ' · ' + community + ' ' + area + '㎡');
 }
-function doAdvance(id) {
+function doAdvance(id, force) {
   const c = cust(id);
   if (!c) return;
   const g = gateInfo(c.stage);
   if (!g) { toast('已是最后阶段'); return; }
   const miss = missingFields(c, g.need);
-  if (miss.length) {
-    toast('门禁未通过：缺 ' + miss.map(function (m) { return m[1]; }).join('、'));
+  if (miss.length && !force) {
+    toast('门禁未通过：缺 ' + miss.map(function (m) { return m[1]; }).join('、') + '。可点「强制推进」跳过。');
     return;
   }
   c.stage = g.to;
   c.stageEnterDate = TODAY;
   saveDB(); render();
-  toast('已推进到 ' + g.to + ' ' + STAGE_MAP[g.to]);
+  toast((force ? '（强制）' : '') + '已推进到 ' + g.to + ' ' + STAGE_MAP[g.to]);
 }
 function doDistill() {
   const text = ($('#distillInput') || {}).value || '';
@@ -2366,9 +2530,10 @@ function saveVoiceEntry() {
     const g = gateInfo(c.stage);
     if (!g) { toast('已是最后阶段'); return; }
     const miss = missingFields(c, g.need);
-    if (miss.length) { toast('门禁未通过：缺 ' + miss.map(function(m){return m[1];}).join('、')); return; }
+    const force = /强制|跳过|硬推|直接推/.test(content);
+    if (miss.length && !force) { toast('门禁未通过：缺 ' + miss.map(function(m){return m[1];}).join('、') + '。内容里加「强制」二字可跳过。'); return; }
     c.stage = g.to; c.stageEnterDate = TODAY;
-    toast(c.name + ' 已推进到 ' + g.to);
+    toast(c.name + (force ? '（强制）' : '') + ' 已推进到 ' + g.to);
   } else if (action === 'briefing') {
     const node = /拆除|水电|木工|瓦工|油工|竣工/.exec(content);
     DB.briefings.push({
