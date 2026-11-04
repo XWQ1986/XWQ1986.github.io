@@ -1167,6 +1167,7 @@ function customerRow(c) {
     + '<div class="flex gap-1 items-center">' + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
     + '<div class="row-s">' + (c.nextFollowDate ? ('跟进 ' + c.nextFollowDate) : '未设跟进日')
     + (od > 0 ? ' · <span class="text-danger">逾期' + od + '天</span>' : '') + '</div>'
+    + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '">逃单</button>'
     + '</div></div>';
 }
 function sortByCreatedDesc(list) {
@@ -1893,9 +1894,16 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (act === 'mark-escaped') {
-    if (!confirm('确认将该客户标记为逃单？\n标记后将从其他阶段列表移除，进入「逃单客户」页面。')) return;
+    if (!confirm('确认将该客户标记为逃单？\n标记后将从各阶段列表移除，并跳转到「逃单客户」页面。')) return;
     const c = cust(id);
-    if (c) { c.escaped = true; c.escaped_at = TODAY; saveDB(); toast(c.name + ' 已标记为逃单'); render(); }
+    if (!c) return;
+    c.escaped = true; c.escaped_at = TODAY;
+    saveDB();
+    state.drawerId = null;
+    state.view = 'escaped';
+    document.body.classList.remove('nav-open');
+    render();
+    toast(c.name + ' 已标记逃单，已移到「逃单客户」页面');
     return;
   }
   if (act === 'restore-customer') {
