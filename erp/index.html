@@ -1047,53 +1047,53 @@ const VIEWS = {
   },
   key: {
     title: '重点客户池',
-    count: function () { return filterBy(function (c) { return (c.intent === '高' || c.intent === '中') && STAGE_IDX[c.stage] <= 5; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return (c.intent === '高' || c.intent === '中') && STAGE_IDX[c.stage] <= 5; }), '意向高/中 且 S0~S5'); }
+    count: function () { return filterBucket('key', isKeyCust).length; },
+    render: function () { return renderCustomerList(filterBucket('key', isKeyCust), '意向高/中 且 S0~S5'); }
   },
   deposit: {
     title: '定金客户',
-    count: function () { return filterBy(function (c) { return c.stage === 'S6'; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return c.stage === 'S6'; }), '已交定金、待转设计合同'); }
+    count: function () { return filterBucket('deposit', function (c) { return c.stage === 'S6'; }).length; },
+    render: function () { return renderCustomerList(filterBucket('deposit', function (c) { return c.stage === 'S6'; }), '已交定金、待转设计合同'); }
   },
   design: {
     title: '设计合同客户',
-    count: function () { return filterBy(function (c) { return c.designContractDate && !c.buildContractDate; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return c.designContractDate && !c.buildContractDate; }), '已签设计合同、施工合同未签'); }
+    count: function () { return filterBucket('design', function (c) { return c.designContractDate && !c.buildContractDate; }).length; },
+    render: function () { return renderCustomerList(filterBucket('design', function (c) { return c.designContractDate && !c.buildContractDate; }), '已签设计合同、施工合同未签'); }
   },
   build: {
     title: '施工合同客户',
-    count: function () { return filterBy(function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }), '已签施工合同 / 开工筹备中'); }
+    count: function () { return filterBucket('build', function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }).length; },
+    render: function () { return renderCustomerList(filterBucket('build', function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }), '已签施工合同 / 开工筹备中'); }
   },
   constructing: {
     title: '施工进行中',
-    count: function () { return filterBy(function (c) { return c.stage === 'S9'; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return c.stage === 'S9'; }), 'S9 施工管控'); }
+    count: function () { return filterBucket('constructing', function (c) { return c.stage === 'S9'; }).length; },
+    render: function () { return renderCustomerList(filterBucket('constructing', function (c) { return c.stage === 'S9'; }), 'S9 施工管控'); }
   },
   nearing: {
     title: '待竣工客户',
-    count: function () { return filterBy(isNearing).length; },
-    render: function () { return renderCustomerList(filterBy(isNearing), '距竣工 ≤15 天'); }
+    count: function () { return filterBucket('nearing', isNearing).length; },
+    render: function () { return renderCustomerList(filterBucket('nearing', isNearing), '距竣工 ≤15 天'); }
   },
   archived: {
     title: '竣工归档客户',
-    count: function () { return filterBy(function (c) { return c.status === '竣工归档'; }).length; },
-    render: function () { return renderCustomerList(filterBy(function (c) { return c.status === '竣工归档'; }), '已竣工归档 · 只读'); }
+    count: function () { return filterBucket('archived', function (c) { return c.status === '竣工归档'; }).length; },
+    render: function () { return renderCustomerList(filterBucket('archived', function (c) { return c.status === '竣工归档'; }), '已竣工归档 · 只读'); }
   },
   warranty: {
     title: '售后维保客户',
-    count: function () { return filterBy(inWarranty).length; },
-    render: function () { return renderCustomerList(filterBy(inWarranty), '维保到期日 > 今天'); }
+    count: function () { return filterBucket('warranty', inWarranty).length; },
+    render: function () { return renderCustomerList(filterBucket('warranty', inWarranty), '维保到期日 > 今天'); }
   },
   sleeping: {
     title: '沉睡客户池',
-    count: function () { return sleepingPool().length; },
+    count: function () { return filterBucket('sleeping', function (c) { return c.status === '沉睡' || isSleepCandidate(c); }).length; },
     render: function () { return renderSleeping(); }
   },
   lost: {
     title: '流失 / 死单复盘',
-    count: function () { return filterBy(function (c) { return c.status === '流失'; }).length; },
-    render: renderLost
+    count: function () { return filterBucket('lost', function (c) { return c.status === '流失'; }).length; },
+    render: function () { return renderLost(); }
   },
   escaped: {
     title: '逃单客户',
@@ -1149,6 +1149,34 @@ function inWarranty(c) {
   return c.warrantyEnd && diffDays(c.warrantyEnd, TODAY) > 0;
 }
 
+/* ---------- 客户分类（手动归类，优先于自动规则） ---------- */
+const CLASSIFY = [
+  { k: 'key', label: '重点客户池' },
+  { k: 'deposit', label: '定金客户' },
+  { k: 'design', label: '设计合同客户' },
+  { k: 'build', label: '施工合同客户' },
+  { k: 'constructing', label: '施工进行中' },
+  { k: 'nearing', label: '待竣工客户' },
+  { k: 'archived', label: '竣工归档客户' },
+  { k: 'warranty', label: '售后维保客户' },
+  { k: 'sleeping', label: '沉睡客户池' },
+  { k: 'lost', label: '流失 / 死单复盘' }
+];
+const CLASSIFY_LABELS = {};
+CLASSIFY.forEach(function (b) { CLASSIFY_LABELS[b.k] = b.label; });
+
+function isKeyCust(c) {
+  return (c.intent === '高' || c.intent === '中') && STAGE_IDX[c.stage] <= 5;
+}
+/* 手动分类优先：已分类的客户只出现在所选分类里，不再跟随自动规则 */
+function filterBucket(key, fn) {
+  return sortByCreatedDesc(DB.customers.filter(function (c) {
+    if (c.escaped || !matchesQ(c)) return false;
+    if (c.classified) return c.classified === key;
+    return fn(c);
+  }));
+}
+
 /* ---------- 10. 通用渲染片段 ---------- */
 function statCard(label, num, sub, tone) {
   return '<div class="stat ' + (tone || '') + '"><div class="lab">' + esc(label) + '</div>'
@@ -1164,7 +1192,9 @@ function customerRow(c) {
     + '<div class="row-s">' + c.id + ' · ' + esc(c.layout) + ' · ' + esc(c.houseStatus) + ' · ' + esc(c.source) + '</div>'
     + '</div>'
     + '<div class="row-right">'
-    + '<div class="flex gap-1 items-center">' + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
+    + '<div class="flex gap-1 items-center">'
+    + (c.classified ? '<span class="badge badge-primary">' + esc(CLASSIFY_LABELS[c.classified] || c.classified) + '</span>' : '')
+    + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
     + '<div class="row-s">' + (c.nextFollowDate ? ('跟进 ' + c.nextFollowDate) : '未设跟进日')
     + (od > 0 ? ' · <span class="text-danger">逾期' + od + '天</span>' : '') + '</div>'
     + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '">逃单</button>'
@@ -1346,8 +1376,14 @@ function renderOverdue() {
 
 /* ---------- 13.1 沉睡客户池（Q9 自动判定） ---------- */
 function renderSleeping() {
-  const manual = sortCustomers(DB.customers.filter(function (c) { return c.status === '沉睡'; }));
-  const auto = sortCustomers(DB.customers.filter(isSleepCandidate));
+  const pool = DB.customers.filter(function (c) { return !c.escaped; });
+  const manual = sortCustomers(pool.filter(function (c) {
+    if (c.classified) return c.classified === 'sleeping';
+    return c.status === '沉睡';
+  }));
+  const auto = sortCustomers(pool.filter(function (c) {
+    return !c.classified && isSleepCandidate(c);
+  }));
   let html = '<div class="card mb-4"><div class="card-head"><div class="flex-1">'
     + '<div class="card-title">判定规则</div>'
     + '<div class="card-sub">沉默 ≥' + SLEEP_DAYS + ' 天自动入池；期房不参与 ' + SLEEP_WARN_DAYS + ' 天预警；流失 / 竣工归档不参与</div></div>'
@@ -1367,7 +1403,7 @@ function renderSleeping() {
 
 /* ---------- 14. 流失复盘 ---------- */
 function renderLost() {
-  const list = DB.customers.filter(function (c) { return c.status === '流失'; });
+  const list = filterBucket('lost', function (c) { return c.status === '流失'; });
   let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">流失 / 死单 ' + list.length + ' 位</div>'
     + '<div class="card-sub">必须填写流失原因，用于年度复盘；不删除记录</div></div></div>';
   if (!list.length) html += '<div class="empty">暂无流失客户</div>';
@@ -1730,6 +1766,25 @@ function renderDrawer(id) {
     + escapeBtn
     + '</div>';
 
+  /* 客户分类（每项一个单独按钮） */
+  if (!c.escaped) {
+    html += '<div class="grp-t">客户分类（点击即归类，并跳到该类页面）</div>';
+    html += '<div class="flex gap-2 flex-wrap">';
+    CLASSIFY.forEach(function (b) {
+      const on = c.classified === b.k;
+      html += '<button class="btn btn-sm" data-action="classify" data-id="' + c.id + '" data-bucket="' + b.k + '"'
+        + (on ? ' style="background:var(--primary);color:#fff;border-color:var(--primary)"' : '') + '>'
+        + (on ? '✓ ' : '') + b.label + '</button>';
+    });
+    if (c.classified) {
+      html += '<button class="btn btn-sm" data-action="classify-clear" data-id="' + c.id + '">清除分类</button>';
+    }
+    html += '</div>';
+    html += '<div class="mini mt-2">当前分类：' + esc(c.classified
+      ? CLASSIFY_LABELS[c.classified] + '（' + (c.classified_at || '—') + '）'
+      : '未分类 · 跟随自动规则') + '</div>';
+  }
+
   html += '</div></div>';
   return html;
 }
@@ -1904,6 +1959,31 @@ document.addEventListener('click', function (e) {
     document.body.classList.remove('nav-open');
     render();
     toast(c.name + ' 已标记逃单，已移到「逃单客户」页面');
+    return;
+  }
+  if (act === 'classify') {
+    const bucket = el.getAttribute('data-bucket');
+    if (!CLASSIFY_LABELS[bucket]) return;
+    const c = cust(id);
+    if (!c) return;
+    c.classified = bucket;
+    c.classified_at = TODAY;
+    saveDB();
+    state.drawerId = null;
+    state.view = bucket;
+    document.body.classList.remove('nav-open');
+    render();
+    toast(c.name + ' 已归入「' + CLASSIFY_LABELS[bucket] + '」');
+    return;
+  }
+  if (act === 'classify-clear') {
+    const c = cust(id);
+    if (!c) return;
+    c.classified = null;
+    c.classified_at = null;
+    saveDB();
+    toast(c.name + ' 已取消分类，恢复自动规则');
+    render();
     return;
   }
   if (act === 'restore-customer') {
