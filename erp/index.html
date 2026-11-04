@@ -1696,6 +1696,29 @@ function renderDrawer(id) {
     return '<div class="k">' + esc(k) + '</div><div class="v">' + (v == null || v === '' ? '<span class="text-muted">待补</span>' : esc(v)) + (hint ? ' <span class="mini">' + esc(hint) + '</span>' : '') + '</div>';
   };
 
+  /* 合同附件上传字段（支持图片/文件，多文件） */
+  const fileField = function (key, label) {
+    const files = Array.isArray(c[key]) ? c[key] : [];
+    let items = '';
+    files.forEach(function (f, i) {
+      const isImg = /^data:image\//.test(f.dataUrl || '');
+      const thumb = isImg
+        ? '<img src="' + f.dataUrl + '" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0">'
+        : '<div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#f1f5f3;border-radius:6px;font-size:16px;flex-shrink:0">📄</div>';
+      items += '<div class="flex items-center gap-2 mb-1">'
+        + thumb
+        + '<div class="flex-1 mini truncate">' + esc(f.name || '未命名') + '</div>'
+        + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" onclick="removeContractFile(\'' + c.id + '\',\'' + key + '\',' + i + ')">删除</button>'
+        + '</div>';
+    });
+    return '<div class="field" style="margin-bottom:8px"><label>' + esc(label) + '（' + files.length + '）</label>'
+      + '<div>' + items + '</div>'
+      + '<label class="btn btn-sm" style="margin-top:2px;cursor:pointer">'
+      + '📎 上传文件/图片'
+      + '<input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" style="display:none" onchange="uploadContractFile(\'' + c.id + '\',\'' + key + '\',this)">'
+      + '</label></div>';
+  };
+
   let html = '<div class="drawer-panel">'
     + '<div class="drawer-head">'
     + '<div class="flex-1"><div class="flex gap-2 items-center flex-wrap"><span class="text-lg font-semibold">' + esc(c.name) + '</span>'
@@ -1752,6 +1775,14 @@ function renderDrawer(id) {
     + kv('定金', money(c.depositAmount) + ' · ' + (c.depositDate || ''))
     + kv('设计合同', c.designContractDate) + kv('施工合同', c.buildContractDate)
     + kv('合同金额', c.contractAmount ? money(c.contractAmount) : '')
+    + '</div>'
+    + '<div style="border-top:1px dashed var(--line);margin:8px 0;padding-top:8px">'
+    + fileField('discountContent', '优惠内容')
+    + fileField('mainMaterial', '主材选材')
+    + fileField('frameworkTable', '构架表')
+    + fileField('constructionDrawings', '施工图纸')
+    + '</div>'
+    + '<div class="kv">'
     + kv('开工日期', c.startDate) + kv('拆除交底', c.demolitionBriefDate)
     + kv('水电交底', c.briefElectric) + kv('木工交底', c.briefWood)
     + kv('瓦工交底', c.briefMason) + kv('油工交底', c.briefPaint)
@@ -2254,6 +2285,70 @@ function setGateField(el, cid, key) {
     }
   }
 }
+
+/* 图片压缩：避免 localStorage / 云端 payload 过大 */
+function compressImage(dataUrl, cb) {
+  const img = new Image();
+  img.onload = function () {
+    const maxW = 1600;
+    let w = img.width, h = img.height;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    try {
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.82));
+    } catch (e) { cb(dataUrl); }
+  };
+  img.onerror = function () { cb(dataUrl); };
+  img.src = dataUrl;
+}
+
+/* 上传合同附件（优惠内容/主材选材/构架表/施工图纸） */
+function uploadContractFile(cid, key, input) {
+  const c = cust(cid);
+  if (!c || !input.files || !input.files.length) { return; }
+  if (!Array.isArray(c[key])) c[key] = [];
+  const total = input.files.length;
+  let done = 0;
+  Array.from(input.files).forEach(function (file) {
+    if (file.size > 8 * 1024 * 1024) {
+      toast(file.name + ' 超过 8MB，已跳过');
+      done++;
+      if (done === total) { saveDB(); render(); }
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const dataUrl = e.target.result;
+      if (file.type.indexOf('image/') === 0) {
+        compressImage(dataUrl, function (compressed) {
+          c[key].push({ name: file.name, dataUrl: compressed });
+          done++;
+          if (done === total) { saveDB(); render(); toast('已上传 ' + total + ' 个文件'); }
+        });
+      } else {
+        c[key].push({ name: file.name, dataUrl: dataUrl });
+        done++;
+        if (done === total) { saveDB(); render(); toast('已上传 ' + total + ' 个文件'); }
+      }
+    };
+    reader.onerror = function () { done++; if (done === total) { saveDB(); render(); } };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+/* 删除合同附件 */
+function removeContractFile(cid, key, idx) {
+  const c = cust(cid);
+  if (!c || !Array.isArray(c[key])) return;
+  c[key].splice(idx, 1);
+  saveDB();
+  render();
+  toast('已删除');
+}
+
 function doAdvance(id, force) {
   const c = cust(id);
   if (!c) return;
