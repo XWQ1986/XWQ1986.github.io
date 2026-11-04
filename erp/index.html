@@ -179,7 +179,9 @@ body.nav-open .sidebar{transform:translateX(0)}
 .stagechip{
   flex:1;min-width:56px;text-align:center;padding:7px 6px;border-radius:8px;
   background:#f1f5f3;border:1px solid var(--line);font-size:11px;
+  cursor:pointer;transition:.15s;
 }
+.stagechip:hover{background:#e3ede9;border-color:var(--primary-2)}
 .stagechip b{display:block;font-size:13px;color:var(--primary-2)}
 .stagechip.cur{background:var(--primary);border-color:var(--primary);color:#fff}
 .stagechip.cur b{color:#fff}
@@ -1703,26 +1705,28 @@ function renderDrawer(id) {
     + '</div>'
     + '<div class="drawer-body">';
 
-  /* 阶段条 */
+  /* 阶段条（可点击切换阶段） */
   html += '<div class="stagebar mb-3">';
   STAGES.forEach(function (s) {
     const cur = s.code === c.stage ? ' cur' : '';
-    html += '<div class="stagechip' + cur + '"><b>' + s.code + '</b>' + s.name + '</div>';
+    html += '<div class="stagechip' + cur + '" data-action="set-stage" data-id="' + c.id + '" data-stage="' + s.code + '" title="点击切换到 ' + s.code + ' ' + s.name + '"><b>' + s.code + '</b>' + s.name + '</div>';
   });
   html += '</div>';
 
-  /* 门禁 */
+  /* 门禁（字段可直接填写） */
   html += '<div class="card mb-3"><div class="card-head"><div class="flex-1"><div class="card-title">交付物门禁</div>'
-    + '<div class="card-sub">' + (g ? '推进到 ' + g.to + ' 需齐备下列交付物' : '已是最后阶段') + '</div></div>'
-    + '<span class="badge ' + (miss.length ? 'badge-danger' : 'badge-ok') + '">' + (miss.length ? '缺 ' + miss.length + ' 项' : '已齐备') + '</span></div>'
+    + '<div class="card-sub">' + (g ? '推进到 ' + g.to + ' 需齐备下列交付物（可直接填写）' : '已是最后阶段') + '</div></div>'
+    + '<span class="badge gate-badge ' + (miss.length ? 'badge-danger' : 'badge-ok') + '">' + (miss.length ? '缺 ' + miss.length + ' 项' : '已齐备') + '</span></div>'
     + '<div class="card-body">';
   if (g) {
     g.need.forEach(function (n) {
       const v = c[n[0]];
       const ok = !(v == null || v === '' || v === 0);
-      html += '<div class="flex items-center gap-2 mb-1"><span class="mini">' + (ok ? '✓' : '✕') + '</span>'
-        + '<span class="text-sm">' + esc(n[1]) + '</span>'
-        + '<span class="mini">' + (ok ? esc(String(v)) : '未填写') + '</span></div>';
+      const inputType = /Date$/.test(n[0]) ? 'date' : (n[0] === 'contractAmount' ? 'number' : 'text');
+      html += '<div class="flex items-center gap-2 mb-1"><span class="mini gate-mark">' + (ok ? '✓' : '✕') + '</span>'
+        + '<span class="text-sm" style="min-width:92px;flex-shrink:0">' + esc(n[1]) + '</span>'
+        + '<input class="input" style="flex:1;padding:5px 8px;font-size:12px" type="' + inputType + '" value="' + esc(String(v == null ? '' : v)) + '"'
+        + ' onchange="setGateField(this,\'' + c.id + '\',\'' + n[0] + '\')" placeholder="点击填写' + esc(n[1]) + '"></div>';
     });
   }
   html += '<div class="flex gap-2 mt-2 flex-wrap"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
@@ -2181,6 +2185,20 @@ document.addEventListener('click', function (e) {
     doAdvance(id, true);
     return;
   }
+  if (act === 'set-stage') {
+    const c = cust(id);
+    if (!c) return;
+    const stage = el.getAttribute('data-stage');
+    if (!stage || !STAGE_MAP[stage]) return;
+    if (stage === c.stage) return;
+    if (!confirm('确认将「' + c.name + '」阶段切换为 ' + stage + ' ' + STAGE_MAP[stage] + ' ？')) return;
+    c.stage = stage;
+    c.stageEnterDate = TODAY;
+    saveDB();
+    render();
+    toast(c.name + ' 阶段已切换到 ' + stage + ' ' + STAGE_MAP[stage]);
+    return;
+  }
   if (act === 'export-ps1') { exportPs1(); return; }
 });
 
@@ -2215,6 +2233,26 @@ function saveCustomer() {
   state.drawerId = id;
   render();
   toast('已建档：' + name + ' · ' + community + ' ' + area + '㎡');
+}
+/* 抽屉内直接填写门禁字段：更新数据、保存、即时刷新 ✓/✕ 与缺项数 */
+function setGateField(el, cid, key) {
+  const c = cust(cid);
+  if (!c) return;
+  let v = el.value;
+  c[key] = v;
+  saveDB();
+  const ok = !(v == null || v === '' || v === 0);
+  const mark = el.parentElement.querySelector('.gate-mark');
+  if (mark) mark.textContent = ok ? '✓' : '✕';
+  const g = gateInfo(c.stage);
+  if (g) {
+    const miss = missingFields(c, g.need);
+    const badge = document.querySelector('.gate-badge');
+    if (badge) {
+      badge.textContent = miss.length ? '缺 ' + miss.length + ' 项' : '已齐备';
+      badge.className = 'badge gate-badge ' + (miss.length ? 'badge-danger' : 'badge-ok');
+    }
+  }
 }
 function doAdvance(id, force) {
   const c = cust(id);
