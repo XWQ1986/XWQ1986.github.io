@@ -805,6 +805,17 @@ function lsKey() {
 function emptyDB() {
   return { customers: [], followUps: [], versions: [], briefings: [], changes: [], materials: [] };
 }
+function showBlocked(name) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#f5f7f6;display:flex;align-items:center;justify-content:center;padding:24px;font-family:inherit';
+  d.innerHTML = '<div style="max-width:430px;background:#fff;border:1px solid #e3e8e6;border-radius:14px;padding:30px 26px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.06)">'
+    + '<div style="font-size:34px;line-height:1">🔒</div>'
+    + '<div style="font-size:18px;font-weight:700;margin:12px 0 8px">账号已停用</div>'
+    + '<div style="font-size:13px;color:#6b7280;line-height:1.8">租户「' + esc(name || '当前账号') + '」已被管理员停用，暂时无法访问系统数据。<br>如需恢复请联系系统管理员。</div>'
+    + '<div style="margin-top:20px"><a href="login.html" style="display:inline-block;padding:9px 18px;border-radius:9px;background:#1a5c4b;color:#fff;text-decoration:none;font-size:13px">返回登录</a></div>'
+    + '</div>';
+  document.body.appendChild(d);
+}
 function loadMe(cb) {
   if (!HC_SB) { cb(); return; }
   HC_SB.auth.getUser().then(function (r) {
@@ -815,7 +826,15 @@ function loadMe(cb) {
         ME = (res && res.data) ? res.data
           : { id: u.id, username: '', role: 'tenant_owner', tenant_id: u.id };
         ACTIVE_TENANT = ME.tenant_id || u.id;
-        cb();
+        HC_SB.from('tenants').select('name,status').eq('id', ACTIVE_TENANT).maybeSingle()
+          .then(function (tr) {
+            if (tr && tr.data) {
+              ME.tenant_name = tr.data.name || '';
+              ME.tenant_status = tr.data.status || 'active';
+            }
+            cb();
+          })
+          .catch(function () { cb(); });
       })
       .catch(function () {
         ME = { id: u.id, username: '', role: 'tenant_owner', tenant_id: u.id };
@@ -3161,6 +3180,10 @@ function boot() {
     /* A. 云端模式：先取身份/角色，再以云端为准 */
     if (CLOUD_ON && HC_SB) {
       loadMe(function () {
+        if (ME && ME.tenant_status === 'disabled' && !isAdmin()) {
+          showBlocked(ME.tenant_name);
+          return;
+        }
         cloudPull(function (got) {
           if (got) { done(); return; }
           DB = cached || buildMock();
