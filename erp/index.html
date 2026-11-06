@@ -1245,6 +1245,7 @@ const state = {
   taskFilter: 'all', constructingStage: 'all',
   stageFilter: 'all', intentFilter: 'all', statusFilter: 'all', overdueFilter: 'all',
   showFilter: false,
+  auditDateRange: '7d', auditTenantFilter: 'all', auditActionFilter: 'all',
   lastDistill: null, lastDraft: null
 };
 
@@ -2175,6 +2176,55 @@ function renderDrawer(id) {
     + '<div class="card-sub">按阶段展示对应资料 · 单文件 ≤ ' + MAX_FILE_MB + 'MB · 支持 DWG/DXF</div></div></div>'
     + '<div class="card-body">' + renderStageForms(c, attBlock) + '</div></div>';
 
+  /* P3-9 跟进记录置顶 */
+  const fups = DB.followUps.filter(function (x) { return x.customerId === c.id; })
+    .sort(function (a, b) { return (b.date || '').localeCompare(a.date || ''); });
+  html += '<div class="grp-t">跟进记录（' + fups.length + '）</div>';
+  if (!fups.length) {
+    html += '<div class="sub-card mini">暂无跟进记录 · <button class="btn btn-xs" data-action="record-follow" data-id="' + c.id + '">立即记录</button></div>';
+  } else {
+    fups.forEach(function (r) {
+      html += '<div class="sub-card text-sm"><b>' + esc(r.type) + '</b> · ' + esc(r.date)
+        + '<div style="margin-top:3px">' + esc(r.content) + '</div>'
+        + (r.nextAction ? '<div class="mini text-muted" style="margin-top:2px">下一步：' + esc(r.nextAction) + '</div>' : '')
+        + '</div>';
+    });
+  }
+
+  /* P3-11 附件汇总：按阶段分组 */
+  const allAtts = (ATT_CACHE[c.id] || []);
+  if (allAtts.length) {
+    const stageGrouped = {};
+    allAtts.forEach(function (a) {
+      const key = a.stage || '其他';
+      if (!stageGrouped[key]) stageGrouped[key] = [];
+      stageGrouped[key].push(a);
+    });
+    const stageOrder = STAGES.map(function (s) { return s.code; });
+    let summaryHtml = '';
+    Object.keys(stageGrouped).sort(function (a, b) {
+      const ai = stageOrder.indexOf(a); const bi = stageOrder.indexOf(b);
+      if (ai >= 0 && bi >= 0) return ai - bi;
+      if (ai >= 0) return -1; if (bi >= 0) return 1;
+      return a < b ? -1 : 1;
+    }).forEach(function (sk) {
+      const arr = stageGrouped[sk];
+      summaryHtml += '<div style="border-top:1px dashed var(--line);padding:6px 0">'
+        + '<div class="mini text-muted">' + sk + ' · ' + arr.length + ' 个</div>';
+      arr.forEach(function (a) {
+        summaryHtml += '<div class="flex items-center gap-2 mini" style="margin-top:2px">'
+          + '<span class="truncate" style="flex:1">' + esc(a.file_name) + '</span>'
+          + '<span class="text-muted">' + fmtSize(a.size) + '</span>'
+          + '<button class="btn btn-xs" style="cursor:pointer" onclick="openAttachment(\'' + a.id + '\')">下载</button>'
+          + '</div>';
+      });
+      summaryHtml += '</div>';
+    });
+    html += '<details style="margin-top:10px">'
+      + '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:5px 0;color:var(--primary)">📋 全部附件汇总（' + allAtts.length + ' 个）</summary>'
+      + '<div style="padding:4px 0">' + summaryHtml + '</div></details>';
+  }
+
   /* 基础信息 */
   html += '<div class="grp-t">基础信息</div><div class="card"><div class="card-body"><div class="kv">'
     + kv('联系电话', c.phone) + kv('小区', c.community) + kv('面积 / 户型', c.area + '㎡ / ' + c.layout)
@@ -2219,7 +2269,7 @@ function renderDrawer(id) {
     + '<span class="mini">本地文件夹需桌面端 Obsidian 支持</span></div></div></div>';
 
   /* 子表 */
-  SUB_TABLES.forEach(function (t) {
+  SUB_TABLES.filter(function (t) { return t.id !== 'followUps'; }).forEach(function (t) {
     const rows = DB[t.id].filter(function (x) { return x.customerId === c.id; });
     html += '<div class="grp-t">' + t.name + '（' + rows.length + '）</div>';
     if (!rows.length) { html += '<div class="sub-card mini">暂无记录</div>'; return; }
@@ -2608,14 +2658,48 @@ function renderAudit() {
     + '<div class="card-sub">仅记录超级管理员以「进入查看」方式操作其他租户数据的动作，最多显示最近 200 条</div></div>'
     + '<button class="btn btn-sm" data-action="refresh-audit">刷新</button></div>';
 
-  if (!AUDIT_LIST.length) {
-    html += '<div class="card-body"><div class="mini text-muted">暂无审计记录。进入其他租户并修改数据后，这里会自动留痕。</div></div></div>';
+  /* 筛选面板 */
+  let dateOpts = [['1d', '近 1 天'], ['7d', '近 7 天'], ['30d', '近 30 天'], ['all', '全部']];
+  let tenantOpts = [['all', '全部租户']];
+  (TENANT_LIST || []).forEach(function (t) { tenantOpts.push([t.id, esc(t.name || '未命名')]); });
+  let actionOpts = [['all', '全部动作']];
+  Object.keys(AUDIT_ACTIONS).forEach(function (k) { actionOpts.push([k, AUDIT_ACTIONS[k]]); });
+
+  html += '<div class="card-body" style="padding:10px 14px;border-bottom:1px solid var(--line)">'
+    + '<div class="fp-row"><span class="fp-label">时间</span><div class="fp-chips">';
+  dateOpts.forEach(function (o) {
+    html += '<button class="chip ' + (state.auditDateRange === o[0] ? 'active' : '') + '" data-action="audit-filter" data-key="auditDateRange" data-val="' + o[0] + '">' + o[1] + '</button>';
+  });
+  html += '</div></div>'
+    + '<div class="fp-row"><span class="fp-label">租户</span><div class="fp-chips">';
+  tenantOpts.forEach(function (o) {
+    html += '<button class="chip ' + (state.auditTenantFilter === o[0] ? 'active' : '') + '" data-action="audit-filter" data-key="auditTenantFilter" data-val="' + o[0] + '">' + o[1] + '</button>';
+  });
+  html += '</div></div>'
+    + '<div class="fp-row"><span class="fp-label">动作</span><div class="fp-chips">';
+  actionOpts.forEach(function (o) {
+    html += '<button class="chip ' + (state.auditActionFilter === o[0] ? 'active' : '') + '" data-action="audit-filter" data-key="auditActionFilter" data-val="' + o[0] + '">' + o[1] + '</button>';
+  });
+  html += '</div></div></div>';
+
+  /* 应用筛选 */
+  let list = AUDIT_LIST.slice();
+  if (state.auditDateRange !== 'all') {
+    const days = { '1d': 1, '7d': 7, '30d': 30 }[state.auditDateRange] || 7;
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
+    list = list.filter(function (a) { return new Date(a.created_at) >= cutoff; });
+  }
+  if (state.auditTenantFilter !== 'all') list = list.filter(function (a) { return a.tenant_id === state.auditTenantFilter; });
+  if (state.auditActionFilter !== 'all') list = list.filter(function (a) { return a.action === state.auditActionFilter; });
+
+  if (!list.length) {
+    html += '<div class="card-body"><div class="mini text-muted">该筛选条件下暂无记录。</div></div></div>';
     return html;
   }
   html += '<div class="card-body" style="padding:0;overflow:auto"><table class="tbl"><thead><tr>'
     + '<th>时间</th><th>租户</th><th>客户</th><th>动作</th><th>详情</th>'
     + '</tr></thead><tbody>';
-  AUDIT_LIST.forEach(function (a) {
+  list.forEach(function (a) {
     const c = a.customer_id ? cust(a.customer_id) : null;
     const raw = a.detail ? (typeof a.detail === 'string' ? a.detail : JSON.stringify(a.detail)) : '';
     const detail = raw ? esc(raw.slice(0, 120)) + (raw.length > 120 ? '…' : '') : '—';
@@ -2815,6 +2899,7 @@ document.addEventListener('click', function (e) {
   if (act === 'toggle-filter') { state.showFilter = !state.showFilter; render(); return; }
   if (act === 'filter-change') { state[el.getAttribute('data-key')] = el.getAttribute('data-val'); render(); return; }
   if (act === 'filter-clear') { clearCustomerFilters(); render(); return; }
+  if (act === 'audit-filter') { state[el.getAttribute('data-key')] = el.getAttribute('data-val'); render(); return; }
   if (act === 'ai-tab') { state.aiTab = el.getAttribute('data-val'); render(); return; }
   if (act === 'ai-distill') { doDistill(); return; }
   if (act === 'ai-backfill') { doBackfill(); return; }
