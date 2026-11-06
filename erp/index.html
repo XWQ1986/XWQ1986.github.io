@@ -275,6 +275,7 @@ body.nav-open .sidebar{transform:translateX(0)}
   background:#fff;font-size:13px;outline:none;
 }
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(26,92,75,.1)}
+.input::placeholder,.textarea::placeholder{color:#a9bab2;opacity:1}
 .textarea{min-height:120px;resize:vertical;line-height:1.6}
 .toast{
   position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:90;
@@ -2350,16 +2351,16 @@ function renderModal() {
     + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
     + '<div class="card-body">'
     + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
-    + '<div class="field"><label>客户姓名 *</label><input id="f_name" class="input" placeholder="马先生"></div>'
-    + '<div class="field"><label>联系电话</label><input id="f_phone" class="input" placeholder="13800000000"></div>'
-    + '<div class="field"><label>小区名称 *</label><input id="f_community" class="input" placeholder="碧桂园"></div>'
-    + '<div class="field"><label>房屋面积 *</label><input id="f_area" class="input" type="number" placeholder="198"></div>'
+    + '<div class="field"><label>客户姓名 *</label><input id="f_name" class="input" placeholder="请输入客户姓名"></div>'
+    + '<div class="field"><label>联系电话</label><input id="f_phone" class="input" placeholder="请输入手机号"></div>'
+    + '<div class="field"><label>小区名称 *</label><input id="f_community" class="input" placeholder="请输入小区 / 楼盘名称"></div>'
+    + '<div class="field"><label>房屋面积 *</label><input id="f_area" class="input" type="number" placeholder="建筑面积（㎡）"></div>'
     + '<div class="field"><label>户型</label><select id="f_layout" class="select"><option>3室2厅</option><option>4室2厅</option><option>平层</option><option>复式</option></select></div>'
     + '<div class="field"><label>房屋状态</label><select id="f_house" class="select"><option>现房</option><option>期房</option><option>二手房</option></select></div>'
     + '<div class="field"><label>线索来源</label><select id="f_source" class="select"><option>门店到访</option><option>老客转介</option><option>线上咨询</option><option>楼盘活动</option></select></div>'
     + '<div class="field"><label>意向标签</label><select id="f_intent" class="select"><option>高</option><option>中</option><option>低</option><option>观望</option><option>比价</option></select></div>'
-    + '<div class="field"><label>预算下限（元）</label><input id="f_bmin" class="input" type="number" placeholder="0"></div>'
-    + '<div class="field"><label>预算上限（元）</label><input id="f_bmax" class="input" type="number" placeholder="0"></div>'
+    + '<div class="field"><label>预算下限（元）</label><input id="f_bmin" class="input" type="number" placeholder="选填"></div>'
+    + '<div class="field"><label>预算上限（元）</label><input id="f_bmax" class="input" type="number" placeholder="选填"></div>'
     + '</div>'
     + '<div class="field"><label>合同金额（元）</label><input id="f_contract" class="input" type="number" placeholder="签订施工合同后可补填"></div>'
     + '<div class="grid mt-2" style="grid-template-columns:1fr 1fr;gap:0 12px">'
@@ -2815,6 +2816,24 @@ function fallbackCopy(text) {
 }
 
 /* ---------- 20. 事件 ---------- */
+/* 模态框焦点隔离：open 时背景区域 inert，关闭时恢复；自动聚焦首个输入框 */
+(function () {
+  const modal = document.getElementById('modal');
+  if (!modal) return;
+  const bg = ['.app', '#tabbar', '#drawer', '#uploadbar'];
+  new MutationObserver(function () {
+    const open = modal.classList.contains('open');
+    bg.forEach(function (sel) {
+      const el = document.querySelector(sel);
+      if (el) { if (open) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }
+    });
+    if (open) {
+      const f = modal.querySelector('input, select, textarea');
+      if (f) setTimeout(function () { f.focus(); }, 60);
+    }
+  }).observe(modal, { attributes: true, attributeFilter: ['class'] });
+})();
+
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   const m = $('#modal');
