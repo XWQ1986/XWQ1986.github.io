@@ -1198,7 +1198,7 @@ const VIEWS = {
       const esc = DB.customers.filter(function (c) { return c.escaped; }).length;
       const sub = esc
         ? '统一客户主档 · 全量 ' + all + ' 位（含逃单 ' + esc + ' 位，当前显示 ' + shown + ' 位）'
-        : '统一客户主档 · 全量 ' + all + ' 位 · 按创建时间倒序';
+        : '统一客户主档 · 全量 ' + all + ' 位';
       return renderCustomerList(custList(), sub);
     }
   },
