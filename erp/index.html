@@ -325,7 +325,7 @@ body.nav-open .sidebar{transform:translateX(0)}
       <div class="side-foot-t">自动提醒</div>
       <div class="side-foot-s"><span class="dot"></span>每日 09:10 晨间汇总</div>
       <div class="side-foot-s text-muted mt-1">各设计师负责自己的客户 · 无公海池</div>
-      <button class="btn btn-ghost btn-sm mt-3" data-action="reset">重置演示数据</button>
+      <button class="btn btn-ghost btn-sm mt-3" data-action="reset" id="btnReset">重置演示数据</button>
     </div>
   </aside>
 
@@ -862,7 +862,9 @@ const ATT_URL = {};          // storage path -> signed url
 function isAdmin() { return !!(ME && ME.role === 'super_admin'); }
 function isOtherTenant() { return !!(ME && ACTIVE_TENANT && ACTIVE_TENANT !== ME.tenant_id); }
 function lsKey() {
-  return isOtherTenant() ? 'hl_followup_v1_admin_' + ACTIVE_TENANT : LS_KEY;
+  /* 本地缓存按租户隔离：同一浏览器切换账号互不串数据 */
+  const t = ACTIVE_TENANT || (ME && ME.tenant_id);
+  return t ? LS_KEY + '_' + t : LS_KEY;
 }
 function emptyDB() {
   return { customers: [], followUps: [], versions: [], briefings: [], changes: [], materials: [] };
@@ -1014,7 +1016,8 @@ function cloudPull(cb) {
 }
 
 function resetDB() {
-  DB = buildMock();
+  /* 云端模式：清空为空白工作区（真实租户不注入演示数据）；本机模式：恢复演示数据 */
+  DB = CLOUD_ON ? emptyDB() : buildMock();
   try { localStorage.removeItem(lsKey()); } catch (e) {}
   saveDB();
 }
@@ -2852,7 +2855,10 @@ document.addEventListener('click', function (e) {
   if (act === 'new-customer') { $('#modal').innerHTML = renderModal(); $('#modal').classList.add('open'); return; }
   if (act === 'close-modal') { $('#modal').classList.remove('open'); return; }
   if (act === 'reset') {
-    if (confirm('重置为演示数据？本地保存的修改将丢失。')) { resetDB(); render(); toast('已重置'); }
+    const tip = CLOUD_ON
+      ? '确定清空当前租户的全部数据？此操作不可恢复。'
+      : '重置为演示数据？本地保存的修改将丢失。';
+    if (confirm(tip)) { resetDB(); render(); toast(CLOUD_ON ? '已清空' : '已重置'); }
     return;
   }
   if (act === 'save-customer') { saveCustomer(); return; }
@@ -3685,13 +3691,11 @@ function exportJSON() {
 }
 
 function boot() {
-  const done = function () { selfTest(); render(); };
-
-  let cached = null;
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) cached = JSON.parse(raw);
-  } catch (e) { /* 私有模式可能不可用 */ }
+  const done = function () {
+    const rb = document.getElementById('btnReset');
+    if (rb) rb.textContent = CLOUD_ON ? '清空全部数据' : '重置演示数据';
+    selfTest(); render();
+  };
 
   initSupabase(function () {
     /* A. 云端模式：先取身份/角色，再以云端为准 */
@@ -3701,13 +3705,21 @@ function boot() {
           showBlocked(ME.tenant_name);
           return;
         }
+        /* 缓存必须在 loadMe 之后按租户 key 读取，避免串租户 */
+        let cached = null;
+        try {
+          const raw = localStorage.getItem(lsKey());
+          if (raw) cached = JSON.parse(raw);
+        } catch (e) { /* 私有模式可能不可用 */ }
         cloudPull(function (st) {
           if (st === 'ok') { done(); return; }
-          DB = cached || buildMock();
-          /* 只有「云端确实没有数据」时才写入初始数据；读取失败绝不覆盖云端 */
           if (st === 'empty') {
+            /* 新注册租户：从空白工作区开始，绝不注入演示数据 */
+            DB = emptyDB();
             saveDB();
           } else {
+            /* 读取失败：只回退到本租户自己的缓存，绝不覆盖云端 */
+            DB = cached || emptyDB();
             toast('云端读取失败，已使用本地缓存，未覆盖云端数据');
           }
           done();
@@ -3717,6 +3729,11 @@ function boot() {
     }
 
     /* B. 本机模式：缓存 → data.json → 演示数据 */
+    let cached = null;
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) cached = JSON.parse(raw);
+    } catch (e) { /* 私有模式可能不可用 */ }
     if (cached) { DB = cached; done(); return; }
 
     if (typeof fetch === 'function') {
