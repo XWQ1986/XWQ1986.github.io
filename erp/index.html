@@ -222,8 +222,11 @@ body.nav-open .sidebar{transform:translateX(0)}
 }
 .stagechip:hover{background:#e3ede9;border-color:var(--primary-2)}
 .stagechip b{display:block;font-size:13px;color:var(--primary-2)}
-.stagechip.cur{background:var(--primary);border-color:var(--primary);color:#fff}
+.stagechip.cur{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px rgba(26,92,75,.15);transform:translateY(-1px)}
 .stagechip.cur b{color:#fff}
+.stagechip.done{background:#e7f1ec;border-color:#b8d5c7;color:#1a5c4b}
+.stagechip.done b{color:#1a5c4b}
+.stagechip.todo{opacity:.45;background:#f7f9f8}
 
 /* 提醒卡 */
 .morning{
@@ -253,6 +256,10 @@ body.nav-open .sidebar{transform:translateX(0)}
 @media (min-width:700px){.drawer-panel{border-radius:16px 0 0 16px}}
 .drawer-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
 .drawer-body{flex:1;overflow:auto;padding:14px 16px 40px}
+@media (max-width:899px){
+  .drawer-panel{bottom:60px}  /* 避让底部 tabbar ~50px */
+  .drawer-body{padding-bottom:80px}
+}
 .kv{display:grid;grid-template-columns:92px 1fr;gap:6px 10px;font-size:12.5px}
 .kv .k{color:var(--muted)}
 .kv .v{min-width:0;word-break:break-word}
@@ -281,6 +288,12 @@ body.nav-open .sidebar{transform:translateX(0)}
   font-size:12.5px;cursor:pointer;
 }
 .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.fp-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.fp-label{font-size:12px;color:var(--muted);width:36px;flex-shrink:0}
+.fp-chips{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.fp-chips .chip{padding:4px 10px;border-radius:14px;border:1px solid #cfdcd6;background:#fff;font-size:12px;cursor:pointer;color:var(--text)}
+.fp-chips .chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-xs{padding:3px 8px;font-size:11px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer}
 .out{
   background:#0f2721;color:#d8efe7;border-radius:10px;padding:12px;font-size:12.5px;
   white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;line-height:1.7;
@@ -322,6 +335,7 @@ body.nav-open .sidebar{transform:translateX(0)}
       <div class="topbar-title" id="topTitle">今日工作台</div>
       <div class="topbar-right">
         <input id="search" class="search" placeholder="搜索客户 / 小区">
+        <button class="btn btn-sm" data-action="toggle-filter" id="filterBtn" title="高级筛选">⚙ 筛选<span id="filterBadge" style="display:none;background:#d64545;color:#fff;font-size:10px;padding:0 4px;border-radius:8px;margin-left:4px">●</span></button>
         <button class="btn btn-primary btn-sm" data-action="voice-entry" title="语音录入跟进">🎤 语音</button>
         <button class="btn btn-sm" data-action="export-json" title="导出 data.json">⬇ 导出</button>
         <button class="btn btn-sm" data-action="logout" title="锁定并退出">🔒 锁定</button>
@@ -1228,7 +1242,10 @@ function overdueReminders() {
 /* ---------- 9. 视图定义（19 个） ---------- */
 const state = {
   view: 'today', q: '', drawerId: null, aiTab: 'distill',
-  taskFilter: 'all', lastDistill: null, lastDraft: null
+  taskFilter: 'all', constructingStage: 'all',
+  stageFilter: 'all', intentFilter: 'all', statusFilter: 'all', overdueFilter: 'all',
+  showFilter: false,
+  lastDistill: null, lastDraft: null
 };
 
 function custList() {
@@ -1239,7 +1256,58 @@ function custList() {
       return (c.name + c.community + c.phone + c.id).toLowerCase().indexOf(q) >= 0;
     });
   }
+  if (state.stageFilter !== 'all') list = list.filter(function (c) { return c.stage === state.stageFilter; });
+  if (state.intentFilter !== 'all') list = list.filter(function (c) { return c.intent === state.intentFilter; });
+  if (state.statusFilter !== 'all') {
+    list = list.filter(function (c) {
+      if (state.statusFilter === '正常') return c.status === '正常';
+      if (state.statusFilter === '沉睡') return c.status === '沉睡';
+      if (state.statusFilter === '流失') return c.status === '流失';
+      if (state.statusFilter === '竣工归档') return c.status === '竣工归档';
+      return true;
+    });
+  }
+  if (state.overdueFilter !== 'all') {
+    list = list.filter(function (c) {
+      if (state.overdueFilter === 'yes') return isOverdue(c);
+      if (state.overdueFilter === 'no') return !isOverdue(c);
+      if (state.overdueFilter === '7plus') return overdueDays(c) >= 7;
+      return true;
+    });
+  }
   return list;
+}
+function clearCustomerFilters() {
+  state.stageFilter = 'all'; state.intentFilter = 'all';
+  state.statusFilter = 'all'; state.overdueFilter = 'all';
+}
+function renderFilterPanel() {
+  const intentOpts = [['all', '全部'], ['高', '高意向'], ['中', '中意向'], ['低', '低意向'], ['观望', '观望'], ['比价', '比价']];
+  const statusOpts = [['all', '全部'], ['正常', '正常'], ['沉睡', '沉睡'], ['流失', '流失'], ['竣工归档', '竣工归档']];
+  const overdueOpts = [['all', '不限'], ['yes', '仅逾期'], ['7plus', '逾期 ≥7 天'], ['no', '仅正常']];
+  let stageOpts = [['all', '全部阶段']];
+  STAGES.forEach(function (s) { stageOpts.push([s.code, s.code + ' ' + s.name]); });
+
+  function chipRow(label, key, opts, cur) {
+    let html = '<div class="fp-row"><span class="fp-label">' + label + '</span><div class="fp-chips">';
+    opts.forEach(function (o) {
+      html += '<button class="chip ' + (cur === o[0] ? 'active' : '') + '" data-action="filter-change" data-key="' + key + '" data-val="' + o[0] + '">' + o[1] + '</button>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  let html = '<div class="card mb-3" style="border:1px solid #d8e2df;background:#f8fbfa">'
+    + '<div class="card-body" style="padding:12px">'
+    + '<div class="flex items-center gap-2 mb-2"><b style="font-size:13px">⚙ 客户筛选</b>'
+    + '<button class="btn btn-xs" data-action="filter-clear" style="margin-left:auto">全部清除</button>'
+    + '<button class="btn btn-xs" data-action="toggle-filter">收起</button></div>'
+    + chipRow('阶段', 'stageFilter', stageOpts, state.stageFilter)
+    + chipRow('意向', 'intentFilter', intentOpts, state.intentFilter)
+    + chipRow('状态', 'statusFilter', statusOpts, state.statusFilter)
+    + chipRow('逾期', 'overdueFilter', overdueOpts, state.overdueFilter)
+    + '</div></div>';
+  return html;
 }
 
 const VIEWS = {
@@ -1297,9 +1365,34 @@ const VIEWS = {
     render: function () { return renderCustomerList(filterBucket('build', function (c) { return (c.buildContractDate && c.stage === 'S7') || c.stage === 'S8'; }), '已签施工合同 / 开工筹备中'); }
   },
   constructing: {
-    title: '施工进行中',
-    count: function () { return filterBucket('constructing', function (c) { return c.stage === 'S9'; }).length; },
-    render: function () { return renderCustomerList(filterBucket('constructing', function (c) { return c.stage === 'S9'; }), 'S9 施工管控'); }
+    title: '施工总览（S8–S10）',
+    count: function () { return DB.customers.filter(function (c) { return !c.escaped && ['S8', 'S9', 'S10'].indexOf(c.stage) >= 0; }).length; },
+    render: function () {
+      const stages = ['S8', 'S9', 'S10'];
+      const stageNames = { S8: '开工筹备', S9: '施工管控', S10: '竣工售后' };
+      let list = DB.customers.filter(function (c) {
+        return !c.escaped && stages.indexOf(c.stage) >= 0;
+      });
+      if (state.constructingStage !== 'all') {
+        list = list.filter(function (c) { return c.stage === state.constructingStage; });
+      }
+      // 按阶段分组，组内按下次跟进日期排序
+      list.sort(function (a, b) {
+        const si = stages.indexOf(a.stage) - stages.indexOf(b.stage);
+        if (si !== 0) return si;
+        const ad = a.nextFollowDate || '9999-99-99';
+        const bd = b.nextFollowDate || '9999-99-99';
+        return ad < bd ? -1 : (ad > bd ? 1 : 0);
+      });
+      let chips = '<div class="tabs">';
+      chips += '<button class="tab ' + (state.constructingStage === 'all' ? 'active' : '') + '" data-action="constructing-filter" data-val="all">全部 ' + DB.customers.filter(function (c) { return !c.escaped && stages.indexOf(c.stage) >= 0; }).length + '</button>';
+      stages.forEach(function (s) {
+        const n = DB.customers.filter(function (c) { return !c.escaped && c.stage === s; }).length;
+        chips += '<button class="tab ' + (state.constructingStage === s ? 'active' : '') + '" data-action="constructing-filter" data-val="' + s + '">' + s + ' ' + stageNames[s] + ' ' + n + '</button>';
+      });
+      chips += '</div>';
+      return chips + renderCustomerList(list, '施工全阶段 · 按阶段分组');
+    }
   },
   nearing: {
     title: '待竣工客户',
@@ -1425,10 +1518,17 @@ function statCard(label, num, sub, tone) {
   return '<div class="stat ' + (tone || '') + '"><div class="lab">' + esc(label) + '</div>'
     + '<div class="num">' + esc(num) + '</div><div class="sub">' + esc(sub || '') + '</div></div>';
 }
+const QUICK_FOLLOW_TYPES = [
+  ['电话', '电话'], ['微信', '微信'], ['现场', '现场'], ['线上视频', '线上'],
+  ['到访', '到访'], ['报价', '报价'], ['方案', '方案'], ['合同', '合同'],
+  ['量房', '量房'], ['交底', '交底'], ['复盘', '复盘'], ['售后', '售后']
+];
+
 function customerRow(c) {
   const od = overdueDays(c);
   const createdAt = c.created_at || c.createdDate || '';
-  return '<div class="row" data-action="open-customer" data-id="' + c.id + '">'
+  const rowId = 'row_' + c.id;
+  return '<div id="' + rowId + '" class="row" data-action="open-customer" data-id="' + c.id + '">'
     + '<div class="row-main">'
     + '<div class="row-created">' + esc(createdAt) + '</div>'
     + '<div class="row-t">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</div>'
@@ -1440,10 +1540,44 @@ function customerRow(c) {
     + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
     + '<div class="row-s">' + (c.nextFollowDate ? ('跟进 ' + c.nextFollowDate) : '未设跟进日')
     + (od > 0 ? ' · <span class="text-danger">逾期' + od + '天</span>' : '') + '</div>'
+    + '<div class="flex gap-1">'
+    + '<button class="btn btn-sm btn-primary" style="padding:2px 8px;font-size:11px" data-action="toggle-quick-follow" data-id="' + c.id + '">+ 跟进</button>'
     + (c.escaped
-        ? '<button class="btn btn-sm" style="color:#1a5c4b;border-color:#c0d8d1" data-action="restore-customer" data-id="' + c.id + '">↩ 恢复</button>'
-        : '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '" title="标记逃单">逃单</button>')
+        ? '<button class="btn btn-sm" style="color:#1a5c4b;border-color:#c0d8d1" data-action="restore-customer" data-id="' + c.id + '" onclick="event.stopPropagation()">↩ 恢复</button>'
+        : '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '" title="标记逃单" onclick="event.stopPropagation()">逃单</button>')
+    + '</div></div></div>'
+    + '<div id="qf_' + c.id + '" class="quick-follow" style="display:none"></div>';
+}
+function renderQuickFollow(cid) {
+  const c = cust(cid); if (!c) return '';
+  const nextDate = shift(1);
+  let typeOpts = QUICK_FOLLOW_TYPES.map(function (o) { return '<option>' + o[1] + '</option>'; }).join('');
+  return '<div class="quick-follow-box" style="background:#f8fbfa;border:1px dashed #cfdcd6;border-radius:8px;padding:10px 12px;margin:4px 0 10px">'
+    + '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">快速跟进 · ' + esc(c.name) + '</div>'
+    + '<div class="flex gap-2 items-center" style="flex-wrap:wrap">'
+    + '<select class="select" style="width:auto" data-qf-type="' + cid + '">' + typeOpts + '</select>'
+    + '<input class="input" style="flex:1;min-width:160px" data-qf-content="' + cid + '" placeholder="跟进简要（可留空）">'
+    + '<label style="font-size:11px;color:var(--muted)">下次</label>'
+    + '<input class="input" style="width:140px" type="date" data-qf-next="' + cid + '" value="' + nextDate + '">'
+    + '<button class="btn btn-primary btn-sm" data-action="save-quick-follow" data-id="' + cid + '">保存</button>'
+    + '<button class="btn btn-sm" data-action="toggle-quick-follow" data-id="' + cid + '">取消</button>'
     + '</div></div>';
+}
+function saveQuickFollow(cid, type, content, nextDate) {
+  const c = cust(cid); if (!c) return;
+  const today = new Date().toISOString().slice(0, 10);
+  DB.followUps.push({
+    id: 'FU' + String(Date.now()).slice(-6),
+    customerId: cid, date: today,
+    type: type || '跟进',
+    content: content || '(自动录入)',
+    nextAction: content ? content.slice(0, 60) : '',
+    owner: ME ? ME.tenant_name || '' : ''
+  });
+  if (nextDate) c.nextFollowDate = nextDate;
+  if (!c.lastFollowDate || c.lastFollowDate < today) c.lastFollowDate = today;
+  saveDB();
+  toast('已记录跟进，下次：' + (nextDate || '未设'));
 }
 function sortByCreatedDesc(list) {
   return list.slice().sort(function (a, b) {
@@ -1993,10 +2127,16 @@ function renderDrawer(id) {
     + '<div class="drawer-body">';
 
   /* 阶段条（可点击切换阶段） */
+  const curIdx = STAGE_IDX[c.stage] || 0;
   html += '<div class="stagebar mb-3">';
   STAGES.forEach(function (s) {
-    const cur = s.code === c.stage ? ' cur' : '';
-    html += '<div class="stagechip' + cur + '" data-action="set-stage" data-id="' + c.id + '" data-stage="' + s.code + '" title="点击切换到 ' + s.code + ' ' + s.name + '"><b>' + s.code + '</b>' + s.name + '</div>';
+    const idx = STAGE_IDX[s.code];
+    let cls = '';
+    if (s.code === c.stage) cls = ' cur';
+    else if (idx < curIdx) cls = ' done';
+    else cls = ' todo';
+    const mark = idx < curIdx ? '✓ ' : '';
+    html += '<div class="stagechip' + cls + '" data-action="set-stage" data-id="' + c.id + '" data-stage="' + s.code + '" title="点击切换到 ' + s.code + ' ' + s.name + '"><b>' + s.code + '</b>' + mark + s.name + '</div>';
   });
   html += '</div>';
 
@@ -2019,6 +2159,16 @@ function renderDrawer(id) {
   html += '<div class="flex gap-2 mt-2 flex-wrap"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
     + '<button class="btn btn-sm" data-action="force-advance" data-id="' + c.id + '">强制推进</button>'
     + '<span class="mini">门禁不通过可点「强制推进」跳过</span></div></div></div>';
+
+  /* 高频操作前置：把跟进/编辑提到前面 */
+  html += '<div class="card mb-3" style="background:linear-gradient(90deg,#f0f7f4,#fff);border:1px solid #d8e8e2">'
+    + '<div class="card-body" style="padding:10px 14px"><div class="flex gap-2 flex-wrap items-center">'
+    + '<span class="mini" style="color:var(--muted)">⚡ 高频：</span>'
+    + '<button class="btn btn-primary btn-sm" data-action="record-follow" data-id="' + c.id + '">✍ 记录跟进</button>'
+    + '<button class="btn btn-sm" data-action="quick-follow-row" data-id="' + c.id + '">一键快速跟进</button>'
+    + '<button class="btn btn-sm" data-action="edit-customer" data-id="' + c.id + '">✎ 编辑资料</button>'
+    + '<button class="btn btn-sm" data-action="voice-quick" data-id="' + c.id + '">🎤 语音跟进</button>'
+    + '</div></div></div>';
 
   /* 分阶段资料（不同阶段展示不同填写项与上传项） */
   html += '<div class="card mb-3"><div class="card-head"><div class="flex-1"><div class="card-title">阶段资料</div>'
@@ -2155,21 +2305,23 @@ function renderModal() {
     + '<div class="field"><label>房屋状态</label><select id="f_house" class="select"><option>现房</option><option>期房</option><option>二手房</option></select></div>'
     + '<div class="field"><label>线索来源</label><select id="f_source" class="select"><option>门店到访</option><option>老客转介</option><option>线上咨询</option><option>楼盘活动</option></select></div>'
     + '<div class="field"><label>意向标签</label><select id="f_intent" class="select"><option>高</option><option>中</option><option>低</option><option>观望</option><option>比价</option></select></div>'
+    + '<div class="field"><label>预算下限（元）</label><input id="f_bmin" class="input" type="number" placeholder="0"></div>'
+    + '<div class="field"><label>预算上限（元）</label><input id="f_bmax" class="input" type="number" placeholder="0"></div>'
     + '</div>'
+    + '<div class="field"><label>合同金额（元）</label><input id="f_contract" class="input" type="number" placeholder="签订施工合同后可补填"></div>'
+    + '<div class="grid mt-2" style="grid-template-columns:1fr 1fr;gap:0 12px">'
     + '<div class="field"><label>决策人</label><input id="f_decider" class="input" placeholder="谁拍板 / 谁付钱"></div>'
     + '<div class="field"><label>下次跟进日期 *</label><input id="f_next" class="input" type="date" value="' + shift(1) + '"></div>'
+    + '</div>'
     + '<details class="mt-3"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">更多信息（可选，建档时可先留空）</summary>'
     + '<div class="grid mt-2" style="grid-template-columns:1fr 1fr;gap:0 12px">'
     + '<div class="field"><label>初次沟通记录</label><input id="f_first" class="input" placeholder="首次接触的关键信息"></div>'
     + '<div class="field"><label>邀约量房日期</label><input id="f_visit" class="input" type="date"></div>'
     + '<div class="field"><label>量房日期</label><input id="f_measure" class="input" type="date"></div>'
     + '<div class="field"><label>定金日期</label><input id="f_deposit" class="input" type="date"></div>'
-    + '<div class="field"><label>预算下限（元）</label><input id="f_bmin" class="input" type="number" placeholder="0"></div>'
-    + '<div class="field"><label>预算上限（元）</label><input id="f_bmax" class="input" type="number" placeholder="0"></div>'
-    + '<div class="field"><label>合同金额（元）</label><input id="f_contract" class="input" type="number" placeholder="0"></div>'
     + '<div class="field"><label>竞品情况</label><input id="f_competitor" class="input" placeholder="对比过哪家公司"></div>'
-    + '</div>'
     + '<div class="field"><label>客户顾虑</label><input id="f_concerns" class="input" placeholder="价格 / 工期 / 环保…"></div>'
+    + '</div>'
     + '</details>'
     + '<div class="flex gap-2 mt-3"><button class="btn btn-primary" data-action="save-customer">保存</button>'
     + '<button class="btn" data-action="close-modal">取消</button></div>'
@@ -2481,9 +2633,13 @@ function renderAudit() {
 
 /* ---------- 19. 渲染主循环 ---------- */
 function renderNav() {
+  const hideGroups = !isAdmin() ? ['资源库', '系统管理'] : [];
+  const hideItems = !isAdmin() ? ['nearing', 'archived', 'warranty', 'sleeping', 'lost', 'escaped'] : [];
   let html = '';
   NAV_GROUPS.forEach(function (g) {
+    if (hideGroups.indexOf(g.name) >= 0) return;
     const items = g.items.filter(function (k) {
+      if (hideItems.indexOf(k) >= 0) return false;
       return (k !== 'tenants' && k !== 'audit') || isAdmin();
     });
     if (!items.length) return;
@@ -2510,6 +2666,15 @@ function render(noScroll) {
       + '⚠ 正在以管理员身份编辑租户「' + esc(t ? t.name : ACTIVE_TENANT) + '」的数据，所有改动会直接写入该租户。'
       + ' <button class="btn btn-sm" style="margin-left:8px;background:#fff;color:#d64545;border:none" data-action="exit-tenant">退出该租户</button>'
       + '</div>' + body;
+  }
+  /* 筛选面板：只在客户视图 / 今日视图 显示 */
+  const filterViews = ['customers', 'today', 'key', 'deposit', 'design', 'build', 'constructing', 'nearing', 'warranty', 'sleeping', 'lost', 'escaped'];
+  const hasFilter = filterViews.indexOf(state.view) >= 0;
+  const anyFilter = hasFilter && (state.stageFilter !== 'all' || state.intentFilter !== 'all' || state.statusFilter !== 'all' || state.overdueFilter !== 'all');
+  const badge = document.getElementById('filterBadge');
+  if (badge) badge.style.display = anyFilter ? 'inline-block' : 'none';
+  if (state.showFilter && hasFilter) {
+    body = renderFilterPanel() + body;
   }
   $('#view').innerHTML = body;
   renderNav();
@@ -2607,7 +2772,49 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (act === 'save-customer') { saveCustomer(); return; }
+  if (act === 'toggle-quick-follow') {
+    const qf = $('#qf_' + id);
+    if (!qf) return;
+    if (qf.style.display === 'none' || !qf.innerHTML) {
+      qf.innerHTML = renderQuickFollow(id);
+      qf.style.display = 'block';
+    } else {
+      qf.style.display = 'none';
+    }
+    return;
+  }
+  if (act === 'quick-follow-row') {
+    /* 在抽屉底部动态插入快速跟进表单 */
+    const existing = $('#qf_drawer_' + id);
+    if (existing && existing.style.display !== 'none') {
+      existing.style.display = 'none';
+      return;
+    }
+    const box = document.createElement('div');
+    box.id = 'qf_drawer_' + id;
+    box.innerHTML = renderQuickFollow(id);
+    box.style.display = 'block';
+    const drawerBody = $('#drawer .drawer-body');
+    if (drawerBody) drawerBody.insertBefore(box, drawerBody.firstChild);
+    return;
+  }
+  if (act === 'save-quick-follow') {
+    const cid = id;
+    const typeEl = document.querySelector('[data-qf-type="' + cid + '"]');
+    const contentEl = document.querySelector('[data-qf-content="' + cid + '"]');
+    const nextEl = document.querySelector('[data-qf-next="' + cid + '"]');
+    saveQuickFollow(cid, typeEl?.value || '', contentEl?.value || '', nextEl?.value || '');
+    const qf = $('#qf_' + cid);
+    if (qf) qf.style.display = 'none';
+    /* 更新该行显示 */
+    render();
+    return;
+  }
   if (act === 'task-filter') { state.taskFilter = el.getAttribute('data-val'); render(); return; }
+  if (act === 'constructing-filter') { state.constructingStage = el.getAttribute('data-val'); render(); return; }
+  if (act === 'toggle-filter') { state.showFilter = !state.showFilter; render(); return; }
+  if (act === 'filter-change') { state[el.getAttribute('data-key')] = el.getAttribute('data-val'); render(); return; }
+  if (act === 'filter-clear') { clearCustomerFilters(); render(); return; }
   if (act === 'ai-tab') { state.aiTab = el.getAttribute('data-val'); render(); return; }
   if (act === 'ai-distill') { doDistill(); return; }
   if (act === 'ai-backfill') { doBackfill(); return; }
