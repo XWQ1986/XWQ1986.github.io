@@ -980,21 +980,23 @@ function auditWrite(customerId, action, detail) {
 }
 
 function cloudPull(cb) {
-  if (!HC_SB) { cb(false); return; }
+  if (!HC_SB) { cb('error'); return; }
   HC_SB.auth.getSession().then(function (r) {
     const s = r && r.data ? r.data.session : null;
     if (!s) { location.replace('login.html'); return; }
     const target = ACTIVE_TENANT || s.user.id;
     HC_SB.from('hc_data').select('payload,updated_at').eq('user_id', target).maybeSingle().then(function (res) {
-      if (res && res.data && res.data.payload && res.data.payload.customers) {
-        DB = res.data.payload;
-        cloudStamp = res.data.updated_at || null;
-        cb(true);
+      if (res && res.error) { cb('error'); return; }
+      const row = res && res.data;
+      if (row && row.payload && row.payload.customers) {
+        DB = row.payload;
+        cloudStamp = row.updated_at || null;
+        cb('ok');
       } else {
-        cb(false);
+        cb('empty');
       }
-    }).catch(function () { cb(false); });
-  });
+    }).catch(function () { cb('error'); });
+  }).catch(function () { cb('error'); });
 }
 
 function resetDB() {
@@ -2357,10 +2359,18 @@ function switchTenant(tid) {
   DB = emptyDB();
   state.drawerId = null;
   state.view = 'today';
-  cloudPull(function (got) {
-    if (!got) DB = emptyDB();
+  cloudPull(function (st) {
+    if (st === 'error') {
+      ACTIVE_TENANT = ME.tenant_id;
+      DB = emptyDB();
+      state.view = 'tenants';
+      render();
+      toast('读取该租户数据失败，已返回租户列表');
+      return;
+    }
+    if (st === 'empty') DB = emptyDB();
     render();
-    toast(got ? '已进入该租户' : '该租户暂无数据，已进入空工作区');
+    toast(st === 'empty' ? '该租户暂无数据，已进入空工作区' : '已进入该租户');
   });
 }
 function exitTenant() {
@@ -2371,10 +2381,10 @@ function exitTenant() {
   DB = emptyDB();
   state.drawerId = null;
   state.view = 'tenants';
-  cloudPull(function (got) {
-    if (!got) DB = emptyDB();
+  cloudPull(function (st) {
+    if (st !== 'ok') DB = emptyDB();
     render();
-    toast('已退出，返回本租户');
+    toast(st === 'error' ? '读取本租户数据失败，请刷新页面重试' : '已退出，返回本租户');
   });
 }
 function setTenantStatus(tid, status) {
@@ -3397,10 +3407,15 @@ function boot() {
           showBlocked(ME.tenant_name);
           return;
         }
-        cloudPull(function (got) {
-          if (got) { done(); return; }
+        cloudPull(function (st) {
+          if (st === 'ok') { done(); return; }
           DB = cached || buildMock();
-          saveDB();                 // 首次登录，把初始数据推到云端
+          /* 只有「云端确实没有数据」时才写入初始数据；读取失败绝不覆盖云端 */
+          if (st === 'empty') {
+            saveDB();
+          } else {
+            toast('云端读取失败，已使用本地缓存，未覆盖云端数据');
+          }
           done();
         });
       });
