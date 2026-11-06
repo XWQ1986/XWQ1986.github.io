@@ -441,6 +441,41 @@ const EDIT_FIELDS = [
   { k: 'nextFollowDate', label: '下次跟进日期', type: 'date' }
 ];
 
+/* ---------- 分阶段资料表单（上传项单一事实来源） ---------- */
+const CONSTRUCTION_NODES = [
+  { key: 'N1', name: '拆除阶段' },
+  { key: 'N2', name: '开工仪式' },
+  { key: 'N3', name: '水电阶段' },
+  { key: 'N4', name: '瓦工阶段' },
+  { key: 'N5', name: '木工阶段' },
+  { key: 'N6', name: '油工阶段' },
+  { key: 'N7', name: '安装阶段' }
+];
+
+const STAGE_FORMS = [
+  {
+    stage: 'S2', name: '量房阶段',
+    texts: [{ k: 'demandNote', label: '客户需求整理', ph: '客户口头/书面需求要点、风格偏好、功能要求…' }],
+    files: [
+      { c: 'sitePhoto', label: '现场照片' },
+      { c: 'measureDraw', label: '量房图纸' },
+      { c: 'demandSheet', label: '客户需求表' }
+    ]
+  },
+  {
+    stage: 'S7', name: '签合同阶段',
+    texts: [{ k: 'contractNote', label: '合同备注', ph: '付款方式、工期约定、违约条款等…' }],
+    files: [
+      { c: 'designContract', label: '设计合同' },
+      { c: 'buildContract', label: '施工合同' },
+      { c: 'discount', label: '优惠内容' },
+      { c: 'mainMaterial', label: '主材选材' },
+      { c: 'framework', label: '构架表' },
+      { c: 'constructionDraw', label: '施工图纸' }
+    ]
+  }
+];
+
 /* ---------- 3. 话术库（14 套节点话术） ---------- */
 const SCRIPTS = [
   {
@@ -749,6 +784,46 @@ const CLOUD_ON = !!(HC_CFG.SUPABASE_URL && HC_CFG.SUPABASE_ANON_KEY);
 let HC_SB = null;
 let pushTimer = null;
 
+/* 附件存储 */
+const BUCKET = HC_CFG.STORAGE_BUCKET || 'tenant-files';
+const MAX_FILE_MB = Number(HC_CFG.MAX_FILE_MB || 20);
+const MAX_FILES_PER_PICK = Number(HC_CFG.MAX_FILES_PER_PICK || 20);
+
+/* 多租户 / 权限 */
+let ME = null;               // { id, username, role, tenant_id }
+let ACTIVE_TENANT = null;    // 当前操作租户（超管可切换）
+let TENANT_LIST = null;      // 超管租户总览缓存
+const ATT_CACHE = {};        // customerId -> attachments[]
+const ATT_URL = {};          // storage path -> signed url
+
+function isAdmin() { return !!(ME && ME.role === 'super_admin'); }
+function isOtherTenant() { return !!(ME && ACTIVE_TENANT && ACTIVE_TENANT !== ME.tenant_id); }
+function lsKey() {
+  return isOtherTenant() ? 'hl_followup_v1_admin_' + ACTIVE_TENANT : LS_KEY;
+}
+function emptyDB() {
+  return { customers: [], followUps: [], versions: [], briefings: [], changes: [], materials: [] };
+}
+function loadMe(cb) {
+  if (!HC_SB) { cb(); return; }
+  HC_SB.auth.getUser().then(function (r) {
+    const u = r && r.data ? r.data.user : null;
+    if (!u) { cb(); return; }
+    HC_SB.from('profiles').select('id,username,role,tenant_id').eq('id', u.id).maybeSingle()
+      .then(function (res) {
+        ME = (res && res.data) ? res.data
+          : { id: u.id, username: '', role: 'tenant_owner', tenant_id: u.id };
+        ACTIVE_TENANT = ME.tenant_id || u.id;
+        cb();
+      })
+      .catch(function () {
+        ME = { id: u.id, username: '', role: 'tenant_owner', tenant_id: u.id };
+        ACTIVE_TENANT = u.id;
+        cb();
+      });
+  }).catch(function () { cb(); });
+}
+
 function initSupabase(cb) {
   if (!CLOUD_ON) { cb(); return; }
   function make() {
@@ -773,7 +848,7 @@ function initSupabase(cb) {
 
 function saveDB() {
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(DB));
+    localStorage.setItem(lsKey(), JSON.stringify(DB));
   } catch (e) {
     toast('本地缓存失败：' + (e.name === 'QuotaExceededError' ? '存储已满，请导出后清理' : e.message));
   }
@@ -791,8 +866,9 @@ function cloudPush() {
   HC_SB.auth.getUser().then(function (r) {
     const u = r && r.data ? r.data.user : null;
     if (!u) return;
+    const target = ACTIVE_TENANT || u.id;
     HC_SB.from('hc_data').upsert({
-      user_id: u.id,
+      user_id: target,
       payload: DB,
       updated_at: new Date().toISOString()
     }).then(function (res) {
@@ -804,12 +880,26 @@ function cloudPush() {
   });
 }
 
+/* 超管跨租户写操作留痕（只在"以管理员身份操作他人租户"时记录） */
+function auditWrite(customerId, action, detail) {
+  if (!isOtherTenant() || !HC_SB) return;
+  try {
+    HC_SB.from('admin_audit').insert({
+      tenant_id: ACTIVE_TENANT,
+      customer_id: customerId || null,
+      action: action,
+      detail: detail || null
+    });
+  } catch (e) { /* 审计失败不阻塞业务 */ }
+}
+
 function cloudPull(cb) {
   if (!HC_SB) { cb(false); return; }
   HC_SB.auth.getSession().then(function (r) {
     const s = r && r.data ? r.data.session : null;
     if (!s) { location.replace('login.html'); return; }
-    HC_SB.from('hc_data').select('payload').eq('user_id', s.user.id).maybeSingle().then(function (res) {
+    const target = ACTIVE_TENANT || s.user.id;
+    HC_SB.from('hc_data').select('payload').eq('user_id', target).maybeSingle().then(function (res) {
       if (res && res.data && res.data.payload && res.data.payload.customers) {
         DB = res.data.payload;
         cb(true);
@@ -822,7 +912,7 @@ function cloudPull(cb) {
 
 function resetDB() {
   DB = buildMock();
-  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  try { localStorage.removeItem(lsKey()); } catch (e) {}
   saveDB();
 }
 
@@ -1163,6 +1253,11 @@ const VIEWS = {
     title: '话术模板库',
     count: function () { return SCRIPTS.length; },
     render: renderScripts
+  },
+  tenants: {
+    title: '租户管理',
+    count: function () { return TENANT_LIST ? TENANT_LIST.length : 0; },
+    render: renderTenants
   }
 };
 
@@ -1170,12 +1265,14 @@ const NAV_GROUPS = [
   { name: '执行', items: ['today', 'tasks'] },
   { name: '经营与治理', items: ['ai', 'customers', 'overdue'] },
   { name: '阶段视图', items: ['key', 'deposit', 'design', 'build', 'constructing', 'nearing', 'archived', 'warranty', 'sleeping', 'lost', 'escaped'] },
-  { name: '资源库', items: ['planlib', 'brieflib', 'ledger', 'scripts'] }
+  { name: '资源库', items: ['planlib', 'brieflib', 'ledger', 'scripts'] },
+  { name: '系统管理', items: ['tenants'] }
 ];
 const NAV_ICONS = {
   today: '☀', tasks: '☑', ai: '✧', customers: '▤', overdue: '⚠', key: '◆', deposit: '¥',
   design: '✎', build: '✚', constructing: '⚒', nearing: '◷', archived: '✓', warranty: '✚',
-  sleeping: '☾', lost: '✕', escaped: '⌫', planlib: '▦', brieflib: '✍', ledger: '☰', scripts: '❝'
+  sleeping: '☾', lost: '✕', escaped: '⌫', planlib: '▦', brieflib: '✍', ledger: '☰', scripts: '❝',
+  tenants: '⚙'
 };
 
 function filterBy(fn) {
@@ -1685,6 +1782,64 @@ function missingFields(c, need) {
     return v == null || v === '' || v === 0;
   });
 }
+/* 分阶段资料表单：不同阶段渲染不同填写项 / 上传项 */
+function renderStageForms(c, attBlock) {
+  let out = '';
+  STAGE_FORMS.forEach(function (cfg) {
+    const open = c.stage === cfg.stage ? ' open' : '';
+    out += '<details' + open + ' style="margin-bottom:6px">'
+      + '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:5px 0">'
+      + cfg.stage + ' ' + esc(cfg.name) + '</summary>';
+    (cfg.texts || []).forEach(function (t) {
+      out += '<div class="field" style="margin-top:6px"><label>' + esc(t.label) + '</label>'
+        + '<textarea class="textarea" rows="3" placeholder="' + esc(t.ph || '') + '"'
+        + ' onchange="setStageText(\'' + c.id + '\',\'' + t.k + '\',this)">' + esc(c[t.k] || '') + '</textarea></div>';
+    });
+    (cfg.files || []).forEach(function (f) {
+      out += '<div style="margin-top:6px">' + attBlock(cfg.stage, f.c, f.label) + '</div>';
+    });
+    out += '</details>';
+  });
+
+  /* 施工 7 个节点：计划起止时间 + 现场图片 */
+  const nodeOpen = (c.stage === 'S9' || c.stage === 'S8') ? ' open' : '';
+  out += '<details' + nodeOpen + ' style="margin-bottom:4px">'
+    + '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:5px 0">施工节点资料（7 个节点）</summary>';
+  CONSTRUCTION_NODES.forEach(function (n) {
+    const nd = (c.nodes && c.nodes[n.key]) || {};
+    out += '<div style="border-top:1px dashed var(--line);padding:8px 0">'
+      + '<div class="text-sm font-semibold" style="margin-bottom:4px">' + n.key + ' ' + esc(n.name) + '</div>'
+      + '<div class="flex gap-2 mb-2" style="flex-wrap:wrap">'
+      + '<div style="flex:1;min-width:128px"><div class="mini text-muted">计划开始</div>'
+      + '<input class="input" type="date" style="padding:4px 6px;font-size:12px" value="' + esc(nd.planStart || '') + '"'
+      + ' onchange="setNodeDate(\'' + c.id + '\',\'' + n.key + '\',\'planStart\',this)"></div>'
+      + '<div style="flex:1;min-width:128px"><div class="mini text-muted">计划结束</div>'
+      + '<input class="input" type="date" style="padding:4px 6px;font-size:12px" value="' + esc(nd.planEnd || '') + '"'
+      + ' onchange="setNodeDate(\'' + c.id + '\',\'' + n.key + '\',\'planEnd\',this)"></div>'
+      + '</div>'
+      + attBlock(n.key, 'nodePhoto', '现场图片')
+      + '</div>';
+  });
+  out += '</details>';
+  return out;
+}
+function setStageText(cid, key, el) {
+  const c = cust(cid);
+  if (!c) return;
+  c[key] = el.value;
+  saveDB();
+  auditWrite(cid, 'stage_text_update', { field: key, value: el.value });
+}
+function setNodeDate(cid, nodeKey, field, el) {
+  const c = cust(cid);
+  if (!c) return;
+  if (!c.nodes) c.nodes = {};
+  if (!c.nodes[nodeKey]) c.nodes[nodeKey] = {};
+  c.nodes[nodeKey][field] = el.value;
+  saveDB();
+  auditWrite(cid, 'node_date_update', { node: nodeKey, field: field, value: el.value });
+}
+
 function renderDrawer(id) {
   const c = cust(id);
   if (!c) return '';
@@ -1696,26 +1851,31 @@ function renderDrawer(id) {
     return '<div class="k">' + esc(k) + '</div><div class="v">' + (v == null || v === '' ? '<span class="text-muted">待补</span>' : esc(v)) + (hint ? ' <span class="mini">' + esc(hint) + '</span>' : '') + '</div>';
   };
 
-  /* 合同附件上传字段（支持图片/文件，多文件） */
-  const fileField = function (key, label) {
-    const files = Array.isArray(c[key]) ? c[key] : [];
+  /* 单个上传项（元数据在 attachments 表，文件在 Storage，私有桶走签名链接） */
+  const attBlock = function (stageCode, cat, label) {
+    const rows = attOf(c.id, stageCode, cat);
     let items = '';
-    files.forEach(function (f, i) {
-      const isImg = /^data:image\//.test(f.dataUrl || '');
-      const thumb = isImg
-        ? '<img src="' + f.dataUrl + '" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0">'
-        : '<div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#f1f5f3;border-radius:6px;font-size:16px;flex-shrink:0">📄</div>';
-      items += '<div class="flex items-center gap-2 mb-1">'
-        + thumb
-        + '<div class="flex-1 mini truncate">' + esc(f.name || '未命名') + '</div>'
-        + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" onclick="removeContractFile(\'' + c.id + '\',\'' + key + '\',' + i + ')">删除</button>'
+    rows.forEach(function (a) {
+      const img = isImageName(a.file_name, a.mime);
+      const isCad = /\.(dwg|dxf)$/i.test(a.file_name || '');
+      const thumb = img
+        ? '<img data-att-path="' + esc(a.path) + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0;background:#f1f5f3">'
+        : '<div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#f1f5f3;border-radius:6px;font-size:15px;flex-shrink:0">' + (isCad ? '🗂' : '📄') + '</div>';
+      items += '<div class="flex items-center gap-2 mb-1">' + thumb
+        + '<div class="flex-1 mini truncate">' + esc(a.file_name || '未命名')
+        + '<span class="text-muted"> · ' + fmtSize(a.size) + '</span></div>'
+        + '<button class="btn btn-sm" onclick="openAttachment(\'' + a.id + '\')">下载</button>'
+        + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" onclick="removeAttachment(\'' + a.id + '\')">删除</button>'
         + '</div>';
     });
-    return '<div class="field" style="margin-bottom:8px"><label>' + esc(label) + '（' + files.length + '）</label>'
-      + '<div>' + items + '</div>'
-      + '<label class="btn btn-sm" style="margin-top:2px;cursor:pointer">'
-      + '📎 上传文件/图片'
-      + '<input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" style="display:none" onchange="uploadContractFile(\'' + c.id + '\',\'' + key + '\',this)">'
+    return '<div style="margin-bottom:10px">'
+      + '<div class="flex items-center gap-2" style="margin-bottom:3px">'
+      + '<span class="text-sm font-semibold">' + esc(label) + '</span>'
+      + '<span class="mini text-muted">' + rows.length + ' 个</span></div>'
+      + items
+      + '<label class="btn btn-sm" style="margin-top:2px;cursor:pointer">📎 上传文件/图片'
+      + '<input type="file" multiple accept="' + ACCEPT_FILES + '" style="display:none"'
+      + ' onchange="uploadAttachments(\'' + c.id + '\',\'' + stageCode + '\',\'' + cat + '\',this)">'
       + '</label></div>';
   };
 
@@ -1751,17 +1911,15 @@ function renderDrawer(id) {
         + '<input class="input" style="flex:1;padding:5px 8px;font-size:12px" type="' + inputType + '" value="' + esc(String(v == null ? '' : v)) + '"'
         + ' onchange="setGateField(this,\'' + c.id + '\',\'' + n[0] + '\')" placeholder="点击填写' + esc(n[1]) + '"></div>';
     });
-    /* 合同附件上传（跟在门禁字段下方，如 S7 即「合同金额」下面） */
-    html += '<div style="border-top:1px dashed var(--line);margin:8px 0 4px;padding-top:8px">'
-      + fileField('discountContent', '优惠内容')
-      + fileField('mainMaterial', '主材选材')
-      + fileField('frameworkTable', '构架表')
-      + fileField('constructionDrawings', '施工图纸')
-      + '</div>';
   }
   html += '<div class="flex gap-2 mt-2 flex-wrap"><button class="btn btn-sm btn-primary" data-action="advance" data-id="' + c.id + '">推进阶段</button>'
     + '<button class="btn btn-sm" data-action="force-advance" data-id="' + c.id + '">强制推进</button>'
     + '<span class="mini">门禁不通过可点「强制推进」跳过</span></div></div></div>';
+
+  /* 分阶段资料（不同阶段展示不同填写项与上传项） */
+  html += '<div class="card mb-3"><div class="card-head"><div class="flex-1"><div class="card-title">阶段资料</div>'
+    + '<div class="card-sub">按阶段展示对应资料 · 单文件 ≤ ' + MAX_FILE_MB + 'MB · 支持 DWG/DXF</div></div></div>'
+    + '<div class="card-body">' + renderStageForms(c, attBlock) + '</div></div>';
 
   /* 基础信息 */
   html += '<div class="grp-t">基础信息</div><div class="card"><div class="card-body"><div class="kv">'
@@ -1932,6 +2090,7 @@ function saveCustomerEdit(id) {
     c[f.k] = v;
   });
   saveDB();
+  auditWrite(id, 'customer_edit', { name: c.name });
   document.getElementById('modal').classList.remove('open');
   render();
   toast('资料已保存');
@@ -1994,17 +2153,124 @@ function saveFollowRecord(id) {
     }
   }
   saveDB();
+  auditWrite(id, 'follow_up', { content: content.slice(0, 80), nextDate: nextDate });
   document.getElementById('modal').classList.remove('open');
   render();
   toast('已记录跟进，下次 ' + nextDate);
+}
+
+/* ---------- 18.5 超管：租户管理 ---------- */
+let tenantLoading = false;
+function refreshTenants() {
+  if (!HC_SB || tenantLoading) return;
+  tenantLoading = true;
+  HC_SB.from('tenant_overview').select('*').order('created_at', { ascending: true })
+    .then(function (r) {
+      tenantLoading = false;
+      if (r && r.data) {
+        TENANT_LIST = r.data;
+        if (state.view === 'tenants') render();
+      }
+    })
+    .catch(function () { tenantLoading = false; });
+}
+function renderTenants() {
+  if (!isAdmin()) return '<div class="card"><div class="card-body">仅超级管理员可访问</div></div>';
+  if (!HC_SB) return '<div class="card"><div class="card-body">未连接云端，无法查看租户</div></div>';
+  if (!TENANT_LIST) {
+    refreshTenants();
+    return '<div class="card"><div class="card-body">正在加载租户列表…</div></div>';
+  }
+  const totalCust = TENANT_LIST.reduce(function (s, t) { return s + Number(t.customer_count || 0); }, 0);
+  const totalFile = TENANT_LIST.reduce(function (s, t) { return s + Number(t.file_count || 0); }, 0);
+  const totalSize = TENANT_LIST.reduce(function (s, t) { return s + Number(t.storage_bytes || 0); }, 0);
+  const active = TENANT_LIST.filter(function (t) { return t.status === 'active'; }).length;
+
+  let html = '<div class="grid grid-4 mb-3">'
+    + '<div class="card"><div class="card-body"><div class="mini text-muted">租户总数</div><div style="font-size:24px;font-weight:700">' + TENANT_LIST.length + '</div><div class="mini text-muted">启用 ' + active + ' 个</div></div></div>'
+    + '<div class="card"><div class="card-body"><div class="mini text-muted">客户总数</div><div style="font-size:24px;font-weight:700">' + totalCust + '</div></div></div>'
+    + '<div class="card"><div class="card-body"><div class="mini text-muted">附件总数</div><div style="font-size:24px;font-weight:700">' + totalFile + '</div></div></div>'
+    + '<div class="card"><div class="card-body"><div class="mini text-muted">占用存储</div><div style="font-size:24px;font-weight:700">' + fmtSize(totalSize) + '</div></div></div>'
+    + '</div>';
+
+  html += '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">租户列表</div>'
+    + '<div class="card-sub">点「进入查看」可查看并编辑该租户数据（所有改动会记入审计日志）</div></div>'
+    + '<button class="btn btn-sm" data-action="refresh-tenants">刷新</button></div>'
+    + '<div class="card-body" style="padding:0"><table class="tbl"><thead><tr>'
+    + '<th>租户名称</th><th>状态</th><th>客户</th><th>附件</th><th>存储</th><th>最后活跃</th><th style="text-align:right">操作</th>'
+    + '</tr></thead><tbody>';
+  TENANT_LIST.forEach(function (t) {
+    const isSelf = ME && t.id === ME.tenant_id;
+    const on = t.status === 'active';
+    html += '<tr>'
+      + '<td><div class="font-semibold">' + esc(t.name || '未命名') + (isSelf ? ' <span class="mini text-muted">(本租户)</span>' : '') + '</div>'
+      + '<div class="mini text-muted">' + t.id.slice(0, 8) + '…</div></td>'
+      + '<td><span class="pill" style="' + (on ? 'background:#e6f4ec;color:#1c7c4a' : 'background:#fbe9e9;color:#b03030') + '">' + (on ? '启用' : '已停用') + '</span></td>'
+      + '<td>' + Number(t.customer_count || 0) + '</td>'
+      + '<td>' + Number(t.file_count || 0) + '</td>'
+      + '<td>' + fmtSize(Number(t.storage_bytes || 0)) + '</td>'
+      + '<td class="mini">' + (t.updated_at ? String(t.updated_at).replace('T', ' ').slice(0, 16) : '—') + '</td>'
+      + '<td style="text-align:right;white-space:nowrap">'
+      + (isSelf ? '' : '<button class="btn btn-sm" data-action="switch-tenant" data-id="' + t.id + '">进入查看</button> ')
+      + '<button class="btn btn-sm" data-action="tenant-status" data-id="' + t.id + '" data-status="' + (on ? 'disabled' : 'active') + '"'
+      + (isSelf ? ' disabled' : '') + '>' + (on ? '停用' : '启用') + '</button>'
+      + '</td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+function switchTenant(tid) {
+  if (!isAdmin()) return;
+  ACTIVE_TENANT = tid;
+  Object.keys(ATT_CACHE).forEach(function (k) { delete ATT_CACHE[k]; });
+  Object.keys(ATT_URL).forEach(function (k) { delete ATT_URL[k]; });
+  DB = emptyDB();
+  state.drawerId = null;
+  state.view = 'today';
+  cloudPull(function (got) {
+    if (!got) DB = emptyDB();
+    render();
+    toast(got ? '已进入该租户' : '该租户暂无数据，已进入空工作区');
+  });
+}
+function exitTenant() {
+  if (!isAdmin() || !ME) return;
+  ACTIVE_TENANT = ME.tenant_id;
+  Object.keys(ATT_CACHE).forEach(function (k) { delete ATT_CACHE[k]; });
+  Object.keys(ATT_URL).forEach(function (k) { delete ATT_URL[k]; });
+  DB = emptyDB();
+  state.drawerId = null;
+  state.view = 'tenants';
+  cloudPull(function (got) {
+    if (!got) DB = emptyDB();
+    render();
+    toast('已退出，返回本租户');
+  });
+}
+function setTenantStatus(tid, status) {
+  if (!isAdmin() || !HC_SB) return;
+  const label = status === 'active' ? '启用' : '停用';
+  if (status === 'disabled' && !confirm('确认停用该租户？停用后该账号将无法正常使用系统。')) return;
+  HC_SB.from('tenants').update({
+    status: status,
+    disabled_at: status === 'disabled' ? new Date().toISOString() : null
+  }).eq('id', tid).then(function (r) {
+    if (r && r.error) { toast('操作失败：' + r.error.message); return; }
+    toast(label + '成功');
+    TENANT_LIST = null;
+    refreshTenants();
+    render();
+  });
 }
 
 /* ---------- 19. 渲染主循环 ---------- */
 function renderNav() {
   let html = '';
   NAV_GROUPS.forEach(function (g) {
+    const items = g.items.filter(function (k) { return k !== 'tenants' || isAdmin(); });
+    if (!items.length) return;
     html += '<div class="nav-group"><div class="nav-group-t">' + g.name + '</div>';
-    g.items.forEach(function (k) {
+    items.forEach(function (k) {
       const v = VIEWS[k];
       if (!v) return;
       const n = typeof v.count === 'function' ? v.count() : 0;
@@ -2019,11 +2285,34 @@ function renderNav() {
 function render(noScroll) {
   const v = VIEWS[state.view] || VIEWS.today;
   $('#topTitle').textContent = v.title;
-  $('#view').innerHTML = v.render();
+  let body = v.render();
+  if (isOtherTenant()) {
+    const t = (TENANT_LIST || []).filter(function (x) { return x.id === ACTIVE_TENANT; })[0];
+    body = '<div style="background:#d64545;color:#fff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13px">'
+      + '⚠ 正在以管理员身份编辑租户「' + esc(t ? t.name : ACTIVE_TENANT) + '」的数据，所有改动会直接写入该租户。'
+      + ' <button class="btn btn-sm" style="margin-left:8px;background:#fff;color:#d64545;border:none" data-action="exit-tenant">退出该租户</button>'
+      + '</div>' + body;
+  }
+  $('#view').innerHTML = body;
   renderNav();
   const d = $('#drawer');
-  if (state.drawerId) { d.innerHTML = renderDrawer(state.drawerId); d.classList.add('open'); }
-  else { d.innerHTML = ''; d.classList.remove('open'); }
+  /* 记录展开中的折叠面板，重渲染后恢复，避免上传/保存后被收起 */
+  const openIdx = [];
+  if (state.drawerId && d.querySelectorAll('details').length) {
+    Array.prototype.forEach.call(d.querySelectorAll('details'), function (el, i) {
+      if (el.open) openIdx.push(i);
+    });
+  }
+  if (state.drawerId) {
+    d.innerHTML = renderDrawer(state.drawerId);
+    d.classList.add('open');
+    if (openIdx.length) {
+      Array.prototype.forEach.call(d.querySelectorAll('details'), function (el, i) {
+        if (openIdx.indexOf(i) >= 0) el.open = true;
+      });
+    }
+  } else { d.innerHTML = ''; d.classList.remove('open'); }
+  hydrateAttUrls();
   if (!noScroll) window.scrollTo(0, 0);
 }
 function toast(msg) {
@@ -2068,7 +2357,19 @@ document.addEventListener('click', function (e) {
     render();
     return;
   }
-  if (act === 'open-customer') { state.drawerId = id; render(); return; }
+  if (act === 'open-customer') {
+    state.drawerId = id;
+    render();
+    loadAttachments(id, function () { if (state.drawerId === id) render(); });
+    return;
+  }
+  if (act === 'refresh-tenants') { TENANT_LIST = null; refreshTenants(); render(); return; }
+  if (act === 'switch-tenant') { switchTenant(id); return; }
+  if (act === 'exit-tenant') { exitTenant(); return; }
+  if (act === 'tenant-status') {
+    setTenantStatus(id, (el && el.getAttribute('data-status')) || 'disabled');
+    return;
+  }
   if (act === 'close-drawer') { state.drawerId = null; render(); return; }
   if (act === 'new-customer') { $('#modal').innerHTML = renderModal(); $('#modal').classList.add('open'); return; }
   if (act === 'close-modal') { $('#modal').classList.remove('open'); return; }
@@ -2222,9 +2523,11 @@ document.addEventListener('click', function (e) {
     if (!stage || !STAGE_MAP[stage]) return;
     if (stage === c.stage) return;
     if (!confirm('确认将「' + c.name + '」阶段切换为 ' + stage + ' ' + STAGE_MAP[stage] + ' ？')) return;
+    const fromStage = c.stage;
     c.stage = stage;
     c.stageEnterDate = TODAY;
     saveDB();
+    auditWrite(id, 'stage_change', { from: fromStage, to: stage });
     render();
     toast(c.name + ' 阶段已切换到 ' + stage + ' ' + STAGE_MAP[stage]);
     return;
@@ -2271,6 +2574,7 @@ function setGateField(el, cid, key) {
   let v = el.value;
   c[key] = v;
   saveDB();
+  auditWrite(cid, 'gate_field', { field: key, value: v });
   const ok = !(v == null || v === '' || v === 0);
   const mark = el.parentElement.querySelector('.gate-mark');
   if (mark) mark.textContent = ok ? '✓' : '✕';
@@ -2285,67 +2589,160 @@ function setGateField(el, cid, key) {
   }
 }
 
-/* 图片压缩：避免 localStorage / 云端 payload 过大 */
-function compressImage(dataUrl, cb) {
+/* ---------- 附件（Supabase Storage 直传，私有桶 + 签名链接） ---------- */
+const ACCEPT_FILES = 'image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.dwg,.dxf';
+
+function fmtSize(n) {
+  if (!n) return '0 KB';
+  if (n < 1024 * 1024) return Math.max(1, Math.round(n / 1024)) + ' KB';
+  return (n / 1024 / 1024).toFixed(1) + ' MB';
+}
+function isImageName(name, mime) {
+  if (mime && mime.indexOf('image/') === 0) return true;
+  return /\.(png|jpe?g|gif|webp|bmp)$/i.test(name || '');
+}
+function attOf(cid, stage, cat) {
+  return (ATT_CACHE[cid] || []).filter(function (a) {
+    return a.stage === stage && a.category === cat;
+  });
+}
+function loadAttachments(cid, cb) {
+  if (!HC_SB) { ATT_CACHE[cid] = []; cb(); return; }
+  HC_SB.from('attachments')
+    .select('id,tenant_id,customer_id,stage,category,path,file_name,size,mime,created_at')
+    .eq('tenant_id', ACTIVE_TENANT || (ME && ME.tenant_id))
+    .eq('customer_id', cid)
+    .order('created_at', { ascending: true })
+    .then(function (r) {
+      ATT_CACHE[cid] = (r && r.data) ? r.data : [];
+      cb();
+    })
+    .catch(function () { ATT_CACHE[cid] = []; cb(); });
+}
+function hydrateAttUrls() {
+  if (!HC_SB) return;
+  const els = $$('#drawer [data-att-path]');
+  if (!els.length) return;
+  const paths = [];
+  els.forEach(function (e) {
+    const p = e.getAttribute('data-att-path');
+    if (p && paths.indexOf(p) < 0) paths.push(p);
+  });
+  paths.forEach(function (p) {
+    if (ATT_URL[p]) { applyAttUrl(p, ATT_URL[p]); return; }
+    HC_SB.storage.from(BUCKET).createSignedUrl(p, 3600).then(function (r) {
+      if (r && r.data && r.data.signedUrl) {
+        ATT_URL[p] = r.data.signedUrl;
+        applyAttUrl(p, r.data.signedUrl);
+      }
+    });
+  });
+}
+function applyAttUrl(path, url) {
+  $$('#drawer [data-att-path]').forEach(function (e) {
+    if (e.getAttribute('data-att-path') === path && e.tagName === 'IMG') e.src = url;
+  });
+}
+/* 图片压缩为 Blob（>500KB 才压，最长边 1600px） */
+function compressToBlob(file, cb) {
+  if (file.type.indexOf('image/') !== 0 || file.size <= 500 * 1024) { cb(file); return; }
+  const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = function () {
     const maxW = 1600;
     let w = img.width, h = img.height;
     if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
+    const cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
     try {
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      cb(canvas.toDataURL('image/jpeg', 0.82));
-    } catch (e) { cb(dataUrl); }
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      cv.toBlob(function (blob) {
+        URL.revokeObjectURL(url);
+        cb(blob || file);
+      }, 'image/jpeg', 0.82);
+    } catch (e) {
+      URL.revokeObjectURL(url);
+      cb(file);
+    }
   };
-  img.onerror = function () { cb(dataUrl); };
-  img.src = dataUrl;
+  img.onerror = function () { URL.revokeObjectURL(url); cb(file); };
+  img.src = url;
 }
-
-/* 上传合同附件（优惠内容/主材选材/构架表/施工图纸） */
-function uploadContractFile(cid, key, input) {
-  const c = cust(cid);
-  if (!c || !input.files || !input.files.length) { return; }
-  if (!Array.isArray(c[key])) c[key] = [];
-  const total = input.files.length;
-  let done = 0;
-  Array.from(input.files).forEach(function (file) {
-    if (file.size > 8 * 1024 * 1024) {
-      toast(file.name + ' 超过 8MB，已跳过');
-      done++;
-      if (done === total) { saveDB(); render(); }
+function uploadAttachments(cid, stage, cat, input) {
+  const files = Array.prototype.slice.call(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  if (!HC_SB) { toast('未连接云端，无法上传'); return; }
+  if (files.length > MAX_FILES_PER_PICK) { toast('单次最多 ' + MAX_FILES_PER_PICK + ' 个文件，请分批上传'); return; }
+  const tenantId = ACTIVE_TENANT || (ME && ME.tenant_id);
+  const limit = MAX_FILE_MB * 1024 * 1024;
+  let done = 0, ok = 0, fail = 0;
+  const finish = function () {
+    done++;
+    if (done < files.length) return;
+    delete ATT_CACHE[cid];
+    loadAttachments(cid, function () {
+      render();
+      toast('上传完成：成功 ' + ok + '，失败 ' + fail);
+      if (ok > 0) auditWrite(cid, 'attachment_upload', { stage: stage, category: cat, count: ok });
+    });
+  };
+  files.forEach(function (file) {
+    if (file.size > limit) {
+      fail++;
+      toast(file.name + ' 超过 ' + MAX_FILE_MB + 'MB，已跳过');
+      finish();
       return;
     }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const dataUrl = e.target.result;
-      if (file.type.indexOf('image/') === 0) {
-        compressImage(dataUrl, function (compressed) {
-          c[key].push({ name: file.name, dataUrl: compressed });
-          done++;
-          if (done === total) { saveDB(); render(); toast('已上传 ' + total + ' 个文件'); }
-        });
-      } else {
-        c[key].push({ name: file.name, dataUrl: dataUrl });
-        done++;
-        if (done === total) { saveDB(); render(); toast('已上传 ' + total + ' 个文件'); }
-      }
-    };
-    reader.onerror = function () { done++; if (done === total) { saveDB(); render(); } };
-    reader.readAsDataURL(file);
+    compressToBlob(file, function (blob) {
+      const safe = (file.name || 'file').replace(/[^\w.\-\u4e00-\u9fa5]/g, '_');
+      const path = tenantId + '/' + cid + '/' + stage + '/' + cat + '/' + Date.now() + '_' + safe;
+      const mime = blob.type || file.type || 'application/octet-stream';
+      HC_SB.storage.from(BUCKET).upload(path, blob, { contentType: mime, upsert: false })
+        .then(function (r) {
+          if (r && r.error) { fail++; console.warn('[上传失败]', r.error.message); finish(); return; }
+          HC_SB.from('attachments').insert({
+            tenant_id: tenantId,
+            customer_id: cid,
+            stage: stage,
+            category: cat,
+            path: path,
+            file_name: file.name,
+            size: blob.size || file.size,
+            mime: mime
+          }).then(function (r2) {
+            if (r2 && r2.error) { fail++; console.warn('[入库失败]', r2.error.message); }
+            else { ok++; }
+            finish();
+          });
+        })
+        .catch(function (e) { fail++; console.warn('[上传异常]', e); finish(); });
+    });
   });
-  input.value = '';
 }
-
-/* 删除合同附件 */
-function removeContractFile(cid, key, idx) {
-  const c = cust(cid);
-  if (!c || !Array.isArray(c[key])) return;
-  c[key].splice(idx, 1);
-  saveDB();
-  render();
-  toast('已删除');
+function removeAttachment(attId) {
+  const cid = state.drawerId;
+  const row = (ATT_CACHE[cid] || []).filter(function (a) { return a.id === attId; })[0];
+  if (!row || !HC_SB) return;
+  if (!confirm('确认删除该附件？')) return;
+  HC_SB.storage.from(BUCKET).remove([row.path]).then(function () {
+    HC_SB.from('attachments').delete().eq('id', attId).then(function () {
+      delete ATT_CACHE[cid];
+      loadAttachments(cid, function () {
+        render();
+        toast('已删除');
+        auditWrite(cid, 'attachment_delete', { path: row.path });
+      });
+    });
+  });
+}
+function openAttachment(attId) {
+  const row = (ATT_CACHE[state.drawerId] || []).filter(function (a) { return a.id === attId; })[0];
+  if (!row || !HC_SB) return;
+  HC_SB.storage.from(BUCKET).createSignedUrl(row.path, 600).then(function (r) {
+    if (r && r.data && r.data.signedUrl) window.open(r.data.signedUrl, '_blank');
+    else toast('获取下载链接失败');
+  });
 }
 
 function doAdvance(id, force) {
@@ -2360,7 +2757,9 @@ function doAdvance(id, force) {
   }
   c.stage = g.to;
   c.stageEnterDate = TODAY;
-  saveDB(); render();
+  saveDB();
+  auditWrite(id, 'stage_advance', { to: g.to, force: !!force });
+  render();
   toast((force ? '（强制）' : '') + '已推进到 ' + g.to + ' ' + STAGE_MAP[g.to]);
 }
 function doDistill() {
@@ -2730,13 +3129,15 @@ function boot() {
   } catch (e) { /* 私有模式可能不可用 */ }
 
   initSupabase(function () {
-    /* A. 云端模式：以云端为准 */
+    /* A. 云端模式：先取身份/角色，再以云端为准 */
     if (CLOUD_ON && HC_SB) {
-      cloudPull(function (got) {
-        if (got) { done(); return; }
-        DB = cached || buildMock();
-        saveDB();                 // 首次登录，把初始数据推到云端
-        done();
+      loadMe(function () {
+        cloudPull(function (got) {
+          if (got) { done(); return; }
+          DB = cached || buildMock();
+          saveDB();                 // 首次登录，把初始数据推到云端
+          done();
+        });
       });
       return;
     }

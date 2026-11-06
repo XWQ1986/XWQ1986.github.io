@@ -337,11 +337,17 @@
           shake(); return;
         }
         sb.auth.signInWithPassword({ email: toEmail(u), password: p }).then(function (r2) {
-          $('#btnRegister').disabled = false;
-          if (r2.error) { msg('账号已创建，请切到「登录」页登录', true); return; }
-          saveSession(u);
-          msg('账号已创建，正在进入…', true);
-          setTimeout(function () { location.href = 'index.html'; }, 800);
+          if (r2.error) {
+            $('#btnRegister').disabled = false;
+            msg('账号已创建，请切到「登录」页登录', true); return;
+          }
+          // 用账号名作为租户显示名（触发器只拿到哈希邮箱，这里补中文名）
+          sb.rpc('hc_set_tenant_name', { p_name: u }).then(function () {
+            $('#btnRegister').disabled = false;
+            saveSession(u);
+            msg('账号已创建，正在进入…', true);
+            setTimeout(function () { location.href = 'index.html'; }, 800);
+          });
         });
       });
       return;
