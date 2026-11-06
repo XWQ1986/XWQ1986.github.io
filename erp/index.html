@@ -118,6 +118,7 @@ body.nav-open .sidebar{transform:translateX(0)}
   .search{width:220px}
 }
 @media (max-width:899px){
+  html,body{overflow-x:hidden}
   .icon-btn.mobile-only{display:grid}
   .topbar-right .search{width:110px}
   .topbar-right .btn-primary{padding:7px 10px;font-size:12px}
@@ -1172,7 +1173,15 @@ const VIEWS = {
   customers: {
     title: '客户资料中心',
     count: function () { return DB.customers.length; },
-    render: function () { return renderCustomerList(custList(), '统一客户主档 · 全量 ' + DB.customers.length + ' 位'); }
+    render: function () {
+      const all = DB.customers.length;
+      const shown = custList().length;
+      const esc = DB.customers.filter(function (c) { return c.escaped; }).length;
+      const sub = esc
+        ? '统一客户主档 · 全量 ' + all + ' 位（含逃单 ' + esc + ' 位，当前显示 ' + shown + ' 位）'
+        : '统一客户主档 · 全量 ' + all + ' 位 · 按创建时间倒序';
+      return renderCustomerList(custList(), sub);
+    }
   },
   overdue: {
     title: '逾期复盘看板',
@@ -1859,7 +1868,7 @@ function renderDrawer(id) {
       const img = isImageName(a.file_name, a.mime);
       const isCad = /\.(dwg|dxf)$/i.test(a.file_name || '');
       const thumb = img
-        ? '<img data-att-path="' + esc(a.path) + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0;background:#f1f5f3">'
+        ? '<img data-att-path="' + esc(a.path) + '" alt="" loading="lazy" decoding="async" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0;background:#f1f5f3">'
         : '<div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#f1f5f3;border-radius:6px;font-size:15px;flex-shrink:0">' + (isCad ? '🗂' : '📄') + '</div>';
       items += '<div class="flex items-center gap-2 mb-1">' + thumb
         + '<div class="flex-1 mini truncate">' + esc(a.file_name || '未命名')
@@ -2341,6 +2350,13 @@ function fallbackCopy(text) {
 }
 
 /* ---------- 20. 事件 ---------- */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const m = $('#modal');
+  if (m && m.classList.contains('open')) { m.classList.remove('open'); return; }
+  if (state.drawerId) { state.drawerId = null; render(); }
+});
+
 document.addEventListener('click', function (e) {
   if (e.target.id === 'modal') { $('#modal').classList.remove('open'); return; }
   if (e.target.id === 'drawer') { state.drawerId = null; render(); return; }
@@ -2623,18 +2639,31 @@ function hydrateAttUrls() {
   if (!HC_SB) return;
   const els = $$('#drawer [data-att-path]');
   if (!els.length) return;
-  const paths = [];
+  const need = [];
   els.forEach(function (e) {
     const p = e.getAttribute('data-att-path');
-    if (p && paths.indexOf(p) < 0) paths.push(p);
-  });
-  paths.forEach(function (p) {
+    if (!p) return;
     if (ATT_URL[p]) { applyAttUrl(p, ATT_URL[p]); return; }
-    HC_SB.storage.from(BUCKET).createSignedUrl(p, 3600).then(function (r) {
-      if (r && r.data && r.data.signedUrl) {
-        ATT_URL[p] = r.data.signedUrl;
-        applyAttUrl(p, r.data.signedUrl);
+    if (need.indexOf(p) < 0) need.push(p);
+  });
+  if (!need.length) return;
+  /* 批量签名：一次请求拿全部缩略图链接，避免 N 次往返 */
+  HC_SB.storage.from(BUCKET).createSignedUrls(need, 3600).then(function (r) {
+    const arr = (r && r.data) || [];
+    arr.forEach(function (x) {
+      if (x && x.signedUrl) {
+        ATT_URL[x.path] = x.signedUrl;
+        applyAttUrl(x.path, x.signedUrl);
       }
+    });
+  }).catch(function () {
+    need.forEach(function (p) {
+      HC_SB.storage.from(BUCKET).createSignedUrl(p, 3600).then(function (r) {
+        if (r && r.data && r.data.signedUrl) {
+          ATT_URL[p] = r.data.signedUrl;
+          applyAttUrl(p, r.data.signedUrl);
+        }
+      });
     });
   });
 }
