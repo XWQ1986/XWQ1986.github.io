@@ -117,12 +117,50 @@ body.nav-open .sidebar{transform:translateX(0)}
   .view{padding:20px 24px 40px;max-width:1180px}
   .search{width:220px}
 }
+/* 移动端底部标签栏 */
+.tabbar{display:none}
 @media (max-width:899px){
   html,body{overflow-x:hidden}
   .icon-btn.mobile-only{display:grid}
   .topbar-right .search{width:110px}
   .topbar-right .btn-primary{padding:7px 10px;font-size:12px}
+  .view{padding:14px 12px 90px}
+  .app{padding-bottom:0}
+
+  /* 客户行改为卡片式，触控更友好 */
+  .row{padding:12px 14px;flex-wrap:wrap;gap:8px}
+  .row-t{font-size:14px;white-space:normal;line-height:1.4}
+  .row-s{font-size:12px;white-space:normal}
+  .row-right{width:100%;flex-direction:row;align-items:center;justify-content:flex-start;text-align:left;flex-wrap:wrap;gap:6px}
+  .btn-sm{padding:7px 12px;font-size:12.5px}
+
+  /* 底部标签栏 */
+  .tabbar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:900;
+    background:#fff;border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 16px rgba(0,0,0,.05);
+  }
+  .tabbar button{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:none;border:0;padding:4px 0;font-size:10.5px;color:#8a9490;cursor:pointer;
+  }
+  .tabbar button .tb-ico{font-size:17px;line-height:1}
+  .tabbar button.active{color:var(--primary);font-weight:600}
+  .drawer{width:100%}
 }
+
+/* 上传进度浮条 */
+.uploadbar{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(16px);
+  z-index:1200;background:#1f2d2a;color:#fff;border-radius:11px;padding:11px 15px;
+  min-width:250px;max-width:86vw;opacity:0;pointer-events:none;transition:all .22s;
+  box-shadow:0 10px 28px rgba(0,0,0,.22);font-size:12.5px;
+}
+.uploadbar.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.uploadbar .ub-row{display:flex;align-items:center;gap:8px}
+.uploadbar .ub-track{height:5px;background:rgba(255,255,255,.22);border-radius:3px;margin-top:8px;overflow:hidden}
+.uploadbar .ub-fill{height:100%;width:0;background:#4ade80;transition:width .25s}
+@media (max-width:899px){ .uploadbar{bottom:76px} }
 
 /* ============ 组件 ============ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
@@ -294,6 +332,14 @@ body.nav-open .sidebar{transform:translateX(0)}
   </main>
 </div>
 
+<nav id="tabbar" class="tabbar">
+  <button data-action="nav" data-view="today"><span class="tb-ico">☀</span><span>今日</span></button>
+  <button data-action="nav" data-view="customers"><span class="tb-ico">▤</span><span>客户</span></button>
+  <button data-action="nav" data-view="tasks"><span class="tb-ico">☑</span><span>任务</span></button>
+  <button data-action="nav" data-view="constructing"><span class="tb-ico">⚒</span><span>施工</span></button>
+  <button data-action="toggle-nav"><span class="tb-ico">☰</span><span>更多</span></button>
+</nav>
+<div id="uploadbar" class="uploadbar"></div>
 <div id="drawer" class="drawer"></div>
 <div id="modal" class="modal"></div>
 <div id="toast" class="toast"></div>
@@ -784,6 +830,7 @@ const HC_CFG = window.HC_CONFIG || {};
 const CLOUD_ON = !!(HC_CFG.SUPABASE_URL && HC_CFG.SUPABASE_ANON_KEY);
 let HC_SB = null;
 let pushTimer = null;
+let cloudStamp = null;   // 云端最近一次 updated_at，用于多设备并发冲突检测
 
 /* 附件存储 */
 const BUCKET = HC_CFG.STORAGE_BUCKET || 'tenant-files';
@@ -794,6 +841,7 @@ const MAX_FILES_PER_PICK = Number(HC_CFG.MAX_FILES_PER_PICK || 20);
 let ME = null;               // { id, username, role, tenant_id }
 let ACTIVE_TENANT = null;    // 当前操作租户（超管可切换）
 let TENANT_LIST = null;      // 超管租户总览缓存
+let AUDIT_LIST = null;       // 超管审计日志缓存
 const ATT_CACHE = {};        // customerId -> attachments[]
 const ATT_URL = {};          // storage path -> signed url
 
@@ -887,16 +935,34 @@ function cloudPush() {
     const u = r && r.data ? r.data.user : null;
     if (!u) return;
     const target = ACTIVE_TENANT || u.id;
-    HC_SB.from('hc_data').upsert({
-      user_id: target,
-      payload: DB,
-      updated_at: new Date().toISOString()
-    }).then(function (res) {
-      if (res && res.error) {
-        console.warn('[云同步] 写入失败：', res.error.message);
-        toast('云端保存失败：' + res.error.message);
-      }
-    });
+    HC_SB.from('hc_data').select('updated_at').eq('user_id', target).maybeSingle()
+      .then(function (q) {
+        const remote = q && q.data ? q.data.updated_at : null;
+        /* 统一按毫秒比较，避免 +00:00 与 Z 两种写法造成误判 */
+        const same = cloudStamp && remote && new Date(remote).getTime() === new Date(cloudStamp).getTime();
+        if (cloudStamp && remote && !same) {
+          const when = String(remote).replace('T', ' ').slice(0, 19);
+          const go = confirm('检测到云端数据已于 ' + when + ' 被其他设备修改。\n\n点「确定」用本机数据覆盖；\n点「取消」放弃本次保存（建议刷新页面取最新数据）。');
+          if (!go) { toast('已取消保存，请刷新页面'); return; }
+        }
+        doCloudPush(target);
+      })
+      .catch(function () { doCloudPush(target); });
+  });
+}
+function doCloudPush(target) {
+  const stamp = new Date().toISOString();
+  cloudStamp = stamp;   // 先占位，避免自身连续保存误判冲突
+  HC_SB.from('hc_data').upsert({
+    user_id: target,
+    payload: DB,
+    updated_at: stamp
+  }).then(function (res) {
+    if (res && res.error) {
+      console.warn('[云同步] 写入失败：', res.error.message);
+      toast('云端保存失败：' + res.error.message);
+      cloudStamp = null;
+    }
   });
 }
 
@@ -919,9 +985,10 @@ function cloudPull(cb) {
     const s = r && r.data ? r.data.session : null;
     if (!s) { location.replace('login.html'); return; }
     const target = ACTIVE_TENANT || s.user.id;
-    HC_SB.from('hc_data').select('payload').eq('user_id', target).maybeSingle().then(function (res) {
+    HC_SB.from('hc_data').select('payload,updated_at').eq('user_id', target).maybeSingle().then(function (res) {
       if (res && res.data && res.data.payload && res.data.payload.customers) {
         DB = res.data.payload;
+        cloudStamp = res.data.updated_at || null;
         cb(true);
       } else {
         cb(false);
@@ -1286,6 +1353,11 @@ const VIEWS = {
     title: '租户管理',
     count: function () { return TENANT_LIST ? TENANT_LIST.length : 0; },
     render: renderTenants
+  },
+  audit: {
+    title: '审计日志',
+    count: function () { return 0; },
+    render: renderAudit
   }
 };
 
@@ -1294,13 +1366,13 @@ const NAV_GROUPS = [
   { name: '经营与治理', items: ['ai', 'customers', 'overdue'] },
   { name: '阶段视图', items: ['key', 'deposit', 'design', 'build', 'constructing', 'nearing', 'archived', 'warranty', 'sleeping', 'lost', 'escaped'] },
   { name: '资源库', items: ['planlib', 'brieflib', 'ledger', 'scripts'] },
-  { name: '系统管理', items: ['tenants'] }
+  { name: '系统管理', items: ['tenants', 'audit'] }
 ];
 const NAV_ICONS = {
   today: '☀', tasks: '☑', ai: '✧', customers: '▤', overdue: '⚠', key: '◆', deposit: '¥',
   design: '✎', build: '✚', constructing: '⚒', nearing: '◷', archived: '✓', warranty: '✚',
   sleeping: '☾', lost: '✕', escaped: '⌫', planlib: '▦', brieflib: '✍', ledger: '☰', scripts: '❝',
-  tenants: '⚙'
+  tenants: '⚙', audit: '⌾'
 };
 
 function filterBy(fn) {
@@ -2082,6 +2154,19 @@ function renderModal() {
     + '</div>'
     + '<div class="field"><label>决策人</label><input id="f_decider" class="input" placeholder="谁拍板 / 谁付钱"></div>'
     + '<div class="field"><label>下次跟进日期 *</label><input id="f_next" class="input" type="date" value="' + shift(1) + '"></div>'
+    + '<details class="mt-3"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">更多信息（可选，建档时可先留空）</summary>'
+    + '<div class="grid mt-2" style="grid-template-columns:1fr 1fr;gap:0 12px">'
+    + '<div class="field"><label>初次沟通记录</label><input id="f_first" class="input" placeholder="首次接触的关键信息"></div>'
+    + '<div class="field"><label>邀约量房日期</label><input id="f_visit" class="input" type="date"></div>'
+    + '<div class="field"><label>量房日期</label><input id="f_measure" class="input" type="date"></div>'
+    + '<div class="field"><label>定金日期</label><input id="f_deposit" class="input" type="date"></div>'
+    + '<div class="field"><label>预算下限（元）</label><input id="f_bmin" class="input" type="number" placeholder="0"></div>'
+    + '<div class="field"><label>预算上限（元）</label><input id="f_bmax" class="input" type="number" placeholder="0"></div>'
+    + '<div class="field"><label>合同金额（元）</label><input id="f_contract" class="input" type="number" placeholder="0"></div>'
+    + '<div class="field"><label>竞品情况</label><input id="f_competitor" class="input" placeholder="对比过哪家公司"></div>'
+    + '</div>'
+    + '<div class="field"><label>客户顾虑</label><input id="f_concerns" class="input" placeholder="价格 / 工期 / 环保…"></div>'
+    + '</details>'
     + '<div class="flex gap-2 mt-3"><button class="btn btn-primary" data-action="save-customer">保存</button>'
     + '<button class="btn" data-action="close-modal">取消</button></div>'
     + '</div></div>';
@@ -2209,10 +2294,13 @@ function renderTenants() {
     refreshTenants();
     return '<div class="card"><div class="card-body">正在加载租户列表…</div></div>';
   }
+  const STORAGE_QUOTA_BYTES = 1024 * 1024 * 1024;  // 单租户 1 GB 软配额
+  const STORAGE_WARN_BYTES = 800 * 1024 * 1024;    // 超过 800 MB 预警
   const totalCust = TENANT_LIST.reduce(function (s, t) { return s + Number(t.customer_count || 0); }, 0);
   const totalFile = TENANT_LIST.reduce(function (s, t) { return s + Number(t.file_count || 0); }, 0);
   const totalSize = TENANT_LIST.reduce(function (s, t) { return s + Number(t.storage_bytes || 0); }, 0);
   const active = TENANT_LIST.filter(function (t) { return t.status === 'active'; }).length;
+  const overList = TENANT_LIST.filter(function (t) { return Number(t.storage_bytes || 0) >= STORAGE_WARN_BYTES; });
 
   let html = '<div class="grid grid-4 mb-3">'
     + '<div class="card"><div class="card-body"><div class="mini text-muted">租户总数</div><div style="font-size:24px;font-weight:700">' + TENANT_LIST.length + '</div><div class="mini text-muted">启用 ' + active + ' 个</div></div></div>'
@@ -2220,6 +2308,15 @@ function renderTenants() {
     + '<div class="card"><div class="card-body"><div class="mini text-muted">附件总数</div><div style="font-size:24px;font-weight:700">' + totalFile + '</div></div></div>'
     + '<div class="card"><div class="card-body"><div class="mini text-muted">占用存储</div><div style="font-size:24px;font-weight:700">' + fmtSize(totalSize) + '</div></div></div>'
     + '</div>';
+
+  if (overList.length) {
+    html += '<div class="card mb-3" style="border-color:#f0c2c2;background:#fdf3f3"><div class="card-body">'
+      + '<div style="font-size:13px;color:#b03030;font-weight:600">⚠ 存储占用预警：'
+      + overList.map(function (t) { return esc(t.name || '未命名'); }).join('、')
+      + ' 已超过 800 MB</div>'
+      + '<div class="mini" style="color:#8a5a5a;margin-top:4px">建议提醒对应租户清理历史图纸，或压缩图片后重新上传（单租户软配额 1 GB）。</div>'
+      + '</div></div>';
+  }
 
   html += '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">租户列表</div>'
     + '<div class="card-sub">点「进入查看」可查看并编辑该租户数据（所有改动会记入审计日志）</div></div>'
@@ -2230,13 +2327,18 @@ function renderTenants() {
   TENANT_LIST.forEach(function (t) {
     const isSelf = ME && t.id === ME.tenant_id;
     const on = t.status === 'active';
+    const bytes = Number(t.storage_bytes || 0);
+    const pct = Math.min(100, (bytes / STORAGE_QUOTA_BYTES) * 100).toFixed(1);
+    const warn = bytes >= STORAGE_WARN_BYTES;
     html += '<tr>'
       + '<td><div class="font-semibold">' + esc(t.name || '未命名') + (isSelf ? ' <span class="mini text-muted">(本租户)</span>' : '') + '</div>'
       + '<div class="mini text-muted">' + t.id.slice(0, 8) + '…</div></td>'
       + '<td><span class="pill" style="' + (on ? 'background:#e6f4ec;color:#1c7c4a' : 'background:#fbe9e9;color:#b03030') + '">' + (on ? '启用' : '已停用') + '</span></td>'
       + '<td>' + Number(t.customer_count || 0) + '</td>'
       + '<td>' + Number(t.file_count || 0) + '</td>'
-      + '<td>' + fmtSize(Number(t.storage_bytes || 0)) + '</td>'
+      + '<td><div class="mini"' + (warn ? ' style="color:#b03030;font-weight:600"' : '') + '>' + fmtSize(bytes) + (warn ? ' · 偏高' : '') + '</div>'
+      + '<div style="height:5px;width:88px;background:#eef2f1;border-radius:3px;overflow:hidden;margin-top:3px">'
+      + '<div style="height:100%;width:' + pct + '%;background:' + (warn ? '#d64545' : '#1a5c4b') + '"></div></div></td>'
       + '<td class="mini">' + (t.updated_at ? String(t.updated_at).replace('T', ' ').slice(0, 16) : '—') + '</td>'
       + '<td style="text-align:right;white-space:nowrap">'
       + (isSelf ? '' : '<button class="btn btn-sm" data-action="switch-tenant" data-id="' + t.id + '">进入查看</button> ')
@@ -2291,11 +2393,87 @@ function setTenantStatus(tid, status) {
   });
 }
 
+/* ---------- 18e. 审计日志（仅超管可见） ---------- */
+const AUDIT_ACTIONS = {
+  customer_edit: '编辑客户资料',
+  follow_up: '记录跟进',
+  stage_change: '调整阶段',
+  stage_advance: '推进阶段',
+  gate_field: '填写门禁字段',
+  stage_text_update: '更新阶段资料',
+  node_date_update: '设置节点时间',
+  attachment_upload: '上传附件',
+  attachment_delete: '删除附件'
+};
+let auditLoading = false;
+function refreshAudit() {
+  if (!HC_SB || auditLoading) return;
+  auditLoading = true;
+  HC_SB.from('admin_audit').select('*').order('created_at', { ascending: false }).limit(200)
+    .then(function (r) {
+      auditLoading = false;
+      if (r && r.error) {
+        AUDIT_LIST = [];
+        toast('审计日志读取失败：' + r.error.message);
+      } else {
+        AUDIT_LIST = (r && r.data) ? r.data : [];
+      }
+      if (state.view === 'audit') render();
+    })
+    .catch(function () {
+      auditLoading = false;
+      AUDIT_LIST = [];
+      if (state.view === 'audit') render();
+    });
+}
+function auditTenantName(tid) {
+  const t = (TENANT_LIST || []).filter(function (x) { return x.id === tid; })[0];
+  if (t) return t.name || '未命名';
+  if (ME && tid === ME.tenant_id) return ME.tenant_name || '本租户';
+  return tid ? String(tid).slice(0, 8) + '…' : '—';
+}
+function renderAudit() {
+  if (!isAdmin()) return '<div class="card"><div class="card-body">仅超级管理员可访问</div></div>';
+  if (!HC_SB) return '<div class="card"><div class="card-body">未连接云端，无法查看审计日志</div></div>';
+  if (TENANT_LIST === null) refreshTenants();
+  if (AUDIT_LIST === null) {
+    refreshAudit();
+    return '<div class="card"><div class="card-body">正在加载审计日志…</div></div>';
+  }
+  let html = '<div class="card"><div class="card-head"><div class="flex-1"><div class="card-title">审计日志</div>'
+    + '<div class="card-sub">仅记录超级管理员以「进入查看」方式操作其他租户数据的动作，最多显示最近 200 条</div></div>'
+    + '<button class="btn btn-sm" data-action="refresh-audit">刷新</button></div>';
+
+  if (!AUDIT_LIST.length) {
+    html += '<div class="card-body"><div class="mini text-muted">暂无审计记录。进入其他租户并修改数据后，这里会自动留痕。</div></div></div>';
+    return html;
+  }
+  html += '<div class="card-body" style="padding:0;overflow:auto"><table class="tbl"><thead><tr>'
+    + '<th>时间</th><th>租户</th><th>客户</th><th>动作</th><th>详情</th>'
+    + '</tr></thead><tbody>';
+  AUDIT_LIST.forEach(function (a) {
+    const c = a.customer_id ? cust(a.customer_id) : null;
+    const raw = a.detail ? (typeof a.detail === 'string' ? a.detail : JSON.stringify(a.detail)) : '';
+    const detail = raw ? esc(raw.slice(0, 120)) + (raw.length > 120 ? '…' : '') : '—';
+    html += '<tr>'
+      + '<td class="mini" style="white-space:nowrap">' + (a.created_at ? String(a.created_at).replace('T', ' ').slice(0, 19) : '—') + '</td>'
+      + '<td>' + esc(auditTenantName(a.tenant_id)) + '</td>'
+      + '<td class="mini">' + esc(c ? c.name : (a.customer_id || '—')) + '</td>'
+      + '<td><span class="pill" style="background:#eef2f1;color:#1a5c4b">' + esc(AUDIT_ACTIONS[a.action] || a.action || '—') + '</span></td>'
+      + '<td class="mini" style="max-width:320px;word-break:break-all">' + detail + '</td>'
+      + '</tr>';
+  });
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
 /* ---------- 19. 渲染主循环 ---------- */
 function renderNav() {
   let html = '';
   NAV_GROUPS.forEach(function (g) {
-    const items = g.items.filter(function (k) { return k !== 'tenants' || isAdmin(); });
+    const items = g.items.filter(function (k) {
+      return (k !== 'tenants' && k !== 'audit') || isAdmin();
+    });
     if (!items.length) return;
     html += '<div class="nav-group"><div class="nav-group-t">' + g.name + '</div>';
     items.forEach(function (k) {
@@ -2323,6 +2501,9 @@ function render(noScroll) {
   }
   $('#view').innerHTML = body;
   renderNav();
+  $$('#tabbar button').forEach(function (btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-view') === state.view);
+  });
   const d = $('#drawer');
   /* 记录展开中的折叠面板，重渲染后恢复，避免上传/保存后被收起 */
   const openIdx = [];
@@ -2399,6 +2580,7 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (act === 'refresh-tenants') { TENANT_LIST = null; refreshTenants(); render(); return; }
+  if (act === 'refresh-audit') { AUDIT_LIST = null; refreshAudit(); render(); return; }
   if (act === 'switch-tenant') { switchTenant(id); return; }
   if (act === 'exit-tenant') { exitTenant(); return; }
   if (act === 'tenant-status') {
@@ -2585,12 +2767,23 @@ function saveCustomer() {
   const area = Number($('#f_area').value);
   if (!name || !community || !area) { toast('姓名 / 小区 / 面积 必填'); return; }
   const nextFollow = $('#f_next').value || shift(1);
+  const gv = function (k) { const el = document.getElementById('f_' + k); return el ? el.value.trim() : ''; };
+  const gn = function (k) { const v = gv(k); return v === '' ? 0 : Number(v); };
+  const budgetMin = gn('bmin');
+  const budgetMax = gn('bmax');
   const id = 'C' + String(Date.now()).slice(-4);
   DB.customers.push({
     id: id, name: name, phone: $('#f_phone').value.trim(), community: community, area: area,
     layout: $('#f_layout').value, houseStatus: $('#f_house').value, source: $('#f_source').value,
     intent: $('#f_intent').value, decider: $('#f_decider').value.trim(),
-    budgetMin: 0, budgetMax: 0, createdDate: TODAY, created_at: TODAY, stageEnterDate: TODAY,
+    budgetMin: budgetMin, budgetMax: budgetMax, createdDate: TODAY, created_at: TODAY, stageEnterDate: TODAY,
+    firstContact: gv('first'),
+    visitApptDate: gv('visit') || null,
+    measureDate: gv('measure') || null,
+    depositDate: gv('deposit') || null,
+    contractAmount: gn('contract'),
+    concerns: gv('concerns'),
+    competitor: gv('competitor'),
     designer: '本人', stage: 'S0', status: '正常',
     nextFollowDate: nextFollow, lastFollowDate: null,
     obsidianPath: '恒彩客户库/' + name + '-' + community + '-' + area + '㎡',
@@ -2716,6 +2909,19 @@ function compressToBlob(file, cb) {
   img.onerror = function () { URL.revokeObjectURL(url); cb(file); };
   img.src = url;
 }
+function showUploadBar(text, pct) {
+  const bar = $('#uploadbar');
+  if (!bar) return;
+  bar.innerHTML = '<div class="ub-row"><span class="flex-1">' + esc(text) + '</span><span>' + pct + '%</span></div>'
+    + '<div class="ub-track"><div class="ub-fill" style="width:' + pct + '%"></div></div>';
+  bar.classList.add('show');
+}
+function hideUploadBar(delay) {
+  setTimeout(function () {
+    const b = $('#uploadbar');
+    if (b) b.classList.remove('show');
+  }, delay || 1500);
+}
 function uploadAttachments(cid, stage, cat, input) {
   const files = Array.prototype.slice.call(input.files || []);
   input.value = '';
@@ -2725,13 +2931,20 @@ function uploadAttachments(cid, stage, cat, input) {
   const tenantId = ACTIVE_TENANT || (ME && ME.tenant_id);
   const limit = MAX_FILE_MB * 1024 * 1024;
   let done = 0, ok = 0, fail = 0;
+  showUploadBar('准备上传 ' + files.length + ' 个文件…', 0);
   const finish = function () {
     done++;
-    if (done < files.length) return;
+    const pct = Math.round(done / files.length * 100);
+    if (done < files.length) {
+      showUploadBar('上传中 ' + done + '/' + files.length, pct);
+      return;
+    }
+    showUploadBar('上传完成：成功 ' + ok + '，失败 ' + fail, 100);
     delete ATT_CACHE[cid];
     loadAttachments(cid, function () {
       render();
       toast('上传完成：成功 ' + ok + '，失败 ' + fail);
+      hideUploadBar(1600);
       if (ok > 0) auditWrite(cid, 'attachment_upload', { stage: stage, category: cat, count: ok });
     });
   };
