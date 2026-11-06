@@ -1440,7 +1440,9 @@ function customerRow(c) {
     + stageBadge(c) + intentBadge(c.intent) + sleepBadge(c) + '</div>'
     + '<div class="row-s">' + (c.nextFollowDate ? ('跟进 ' + c.nextFollowDate) : '未设跟进日')
     + (od > 0 ? ' · <span class="text-danger">逾期' + od + '天</span>' : '') + '</div>'
-    + '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '">逃单</button>'
+    + (c.escaped
+        ? '<button class="btn btn-sm" style="color:#1a5c4b;border-color:#c0d8d1" data-action="restore-customer" data-id="' + c.id + '">↩ 恢复</button>'
+        : '<button class="btn btn-sm" style="color:#d64545;border-color:#e8c4c4" data-action="mark-escaped" data-id="' + c.id + '" title="标记逃单">逃单</button>')
     + '</div></div>';
 }
 function sortByCreatedDesc(list) {
