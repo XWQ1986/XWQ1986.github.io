@@ -2551,6 +2551,7 @@ function renderTenants() {
       + '<td class="mini">' + (t.updated_at ? String(t.updated_at).replace('T', ' ').slice(0, 16) : '—') + '</td>'
       + '<td style="text-align:right;white-space:nowrap">'
       + (isSelf ? '' : '<button class="btn btn-sm" data-action="switch-tenant" data-id="' + t.id + '">进入查看</button> ')
+      + (isSelf ? '' : '<button class="btn btn-sm" data-action="admin-reset-pwd" data-id="' + t.id + '" data-name="' + esc(t.name || '未命名') + '">重置密码</button> ')
       + '<button class="btn btn-sm" data-action="tenant-status" data-id="' + t.id + '" data-status="' + (on ? 'disabled' : 'active') + '"'
       + (isSelf ? ' disabled' : '') + '>' + (on ? '停用' : '启用') + '</button>'
       + '</td></tr>';
@@ -2849,6 +2850,34 @@ document.addEventListener('click', function (e) {
   if (act === 'exit-tenant') { exitTenant(); return; }
   if (act === 'tenant-status') {
     setTenantStatus(id, (el && el.getAttribute('data-status')) || 'disabled');
+    return;
+  }
+  if (act === 'admin-reset-pwd') {
+    if (!isAdmin() || !HC_SB) return;
+    const tname = (el && el.getAttribute('data-name')) || '该租户';
+    const pwd = prompt('为「' + tname + '」设置新密码（至少 6 位）：');
+    if (pwd === null) return;
+    if (pwd.length < 6) { toast('密码至少 6 位'); return; }
+    if (!confirm('确认将「' + tname + '」的密码重置为：' + pwd + ' ？\n请线下告知对方，并提醒登录后自行修改。')) return;
+    el.disabled = true;
+    HC_SB.rpc('hc_admin_reset_password', { p_user_id: id, p_password: pwd }).then(function (r) {
+      el.disabled = false;
+      if (r.error) {
+        if (/hc_admin_reset_password|function.*does not exist/i.test(r.error.message || '')) {
+          toast('数据库函数未创建：请先在 Supabase 执行 migration_v3.sql');
+        } else {
+          toast('重置失败：' + r.error.message);
+        }
+        return;
+      }
+      const res = r.data || {};
+      if (!res.ok) {
+        toast(res.error === 'forbidden' ? '仅超级管理员可执行' : (res.error === 'weak_password' ? '密码至少 6 位' : '未找到该用户'));
+        return;
+      }
+      auditWrite(null, 'admin_reset_password', '重置租户「' + tname + '」(' + id.slice(0, 8) + '…)的登录密码');
+      toast('已重置「' + tname + '」的密码');
+    });
     return;
   }
   if (act === 'close-drawer') { state.drawerId = null; render(); return; }
