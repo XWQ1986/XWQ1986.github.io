@@ -1789,6 +1789,7 @@ function renderToday() {
     + '<button class="btn btn-primary" data-action="new-customer">+ 新增客户</button>'
     + '<button class="btn" data-action="quick-follow">快速记录跟进</button>'
     + '<button class="btn" data-action="goto-ai">生成量房报告</button>'
+    + '<button class="btn" data-action="goto-ai-cal">📅 AI 日历清单</button>'
     + '<button class="btn" data-action="export-ps1">导出建库脚本</button>'
     + '</div></div>';
 
@@ -2724,6 +2725,7 @@ function renderDrawer(id) {
     + '<button class="btn" data-action="voice-quick" data-id="' + c.id + '">🎤 语音跟进</button>'
     + '<button class="btn" data-action="copy-feishu" data-id="' + c.id + '">复制飞书链接</button>'
     + escapeBtn
+    + '<button class="btn" style="color:#b03030;border-color:#e8c4c4" data-action="delete-customer" data-id="' + c.id + '">🗑 删除客户</button>'
     + '</div>';
 
   /* 客户分类（每项一个单独按钮） */
@@ -2769,7 +2771,7 @@ function renderModal() {
     + '<div class="field"><label>客户姓名 *</label><input id="f_name" class="input" placeholder="请输入客户姓名"></div>'
     + '<div class="field"><label>联系电话</label><input id="f_phone" class="input" placeholder="请输入手机号"></div>'
     + '<div class="field"><label>小区名称 *</label><input id="f_community" class="input" placeholder="请输入小区 / 楼盘名称"></div>'
-    + '<div class="field"><label>房屋面积 *</label><input id="f_area" class="input" type="number" placeholder="建筑面积（㎡）"></div>'
+    + '<div class="field"><label>房屋面积</label><input id="f_area" class="input" type="number" placeholder="建筑面积（㎡），未知可留空，量房后补填"></div>'
     + '<div class="field"><label>户型</label><select id="f_layout" class="select"><option>3室2厅</option><option>4室2厅</option><option>平层</option><option>复式</option></select></div>'
     + '<div class="field"><label>房屋状态</label><select id="f_house" class="select"><option>现房</option><option>期房</option><option>二手房</option></select></div>'
     + '<div class="field"><label>线索来源</label><select id="f_source" class="select"><option>门店到访</option><option>老客转介</option><option>线上咨询</option><option>楼盘活动</option></select></div>'
@@ -3037,6 +3039,7 @@ function setTenantStatus(tid, status) {
 /* ---------- 18e. 审计日志（仅超管可见） ---------- */
 const AUDIT_ACTIONS = {
   customer_edit: '编辑客户资料',
+  customer_delete: '删除客户',
   follow_up: '记录跟进',
   stage_change: '调整阶段',
   stage_advance: '推进阶段',
@@ -3328,6 +3331,8 @@ document.addEventListener('click', function (e) {
   if (act === 'new-customer') { $('#modal').innerHTML = renderModal(); $('#modal').classList.add('open'); return; }
   if (act === 'close-modal') { $('#modal').classList.remove('open'); return; }
   if (act === 'reset') {
+    /* 云端模式仅超管可清空数据，普通租户隐藏并拦截 */
+    if (CLOUD_ON && !isAdmin()) { toast('仅超级管理员可执行此操作'); return; }
     const tip = CLOUD_ON
       ? '确定清空当前租户的全部数据？此操作不可恢复。'
       : '重置为演示数据？本地保存的修改将丢失。';
@@ -3480,6 +3485,7 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (act === 'goto-ai') { state.view = 'ai'; state.aiTab = 'gen'; render(); return; }
+  if (act === 'goto-ai-cal') { state.view = 'ai'; state.aiTab = 'calendar'; render(); return; }
   if (act === 'copy-script') {
     const s = SCRIPTS.filter(function (x) { return x.id === id; })[0];
     if (s) copyText(s.text);
@@ -3550,6 +3556,23 @@ document.addEventListener('click', function (e) {
   if (act === 'restore-customer') {
     const c = cust(id);
     if (c) { c.escaped = false; c.escaped_at = null; saveDB(); toast(c.name + ' 已恢复到原阶段'); render(); }
+    return;
+  }
+  if (act === 'delete-customer') {
+    const c = cust(id);
+    if (!c) return;
+    if (!confirm('确定永久删除客户「' + c.name + '」？\n将同时删除其跟进记录、方案版本、交底、变更、主材等全部关联数据，不可恢复。')) return;
+    if (!confirm('再次确认：永久删除「' + c.name + '」及其全部关联数据？')) return;
+    DB.customers = DB.customers.filter(function (x) { return x.id !== id; });
+    ['followUps', 'versions', 'briefings', 'changes', 'materials'].forEach(function (k) {
+      if (DB[k]) DB[k] = DB[k].filter(function (x) { return x.customerId !== id; });
+    });
+    delete ATT_CACHE[id]; delete ATT_URL[id];
+    state.drawerId = null;
+    saveDB();
+    auditWrite(id, 'customer_delete', { name: c.name });
+    render();
+    toast('已删除客户「' + c.name + '」');
     return;
   }
   if (act === 'record-follow') {
@@ -3631,7 +3654,7 @@ function saveCustomer() {
   const name = $('#f_name').value.trim();
   const community = $('#f_community').value.trim();
   const area = Number($('#f_area').value);
-  if (!name || !community || !area) { toast('姓名 / 小区 / 面积 必填'); return; }
+  if (!name || !community) { toast('姓名 / 小区 必填'); return; }
   const nextFollow = $('#f_next').value || shift(1);
   const gv = function (k) { const el = document.getElementById('f_' + k); return el ? el.value.trim() : ''; };
   const gn = function (k) { const v = gv(k); return v === '' ? 0 : Number(v); };
@@ -3999,11 +4022,20 @@ function renderVoiceModal() {
   const recDot = voiceState.recording
     ? '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e74c3c;margin-right:6px;animation:pulse 1s infinite"></span>录音中…'
     : '';
+  /* 浏览器内核提示：Chrome 的 Web Speech 走谷歌服务，国内连接不可用；Edge 走微软服务可用 */
+  const ua = navigator.userAgent || '';
+  const isEdge = ua.indexOf('Edg/') >= 0 || ua.indexOf('Edge/') >= 0;
+  const isChrome = ua.indexOf('Chrome/') >= 0 && !isEdge;
+  const voiceTip = isChrome
+    ? '<div style="background:#fdf1dc;border:1px solid #f0dcb0;color:#8a5a10;border-radius:9px;padding:9px 12px;font-size:12px;margin-bottom:12px;line-height:1.6">'
+      + '⚠ 当前为 Chrome 浏览器，语音转写在国内可能无法连接。建议改用 <b>Edge 浏览器</b>，或按 <b>Win+H</b> 使用系统语音输入直接口述到文本框。AI 精简功能不受影响。</div>'
+    : '';
   return '<div class="modal-panel" style="max-width:640px">'
     + '<div class="card-head"><div class="flex-1"><div class="card-title">🎤 语音录入 ' + recDot + '</div>'
-    + '<div class="card-sub">点击开始说话，说完自动解析。麦克风需要 localhost 打开（见 start.bat）。</div></div>'
+    + '<div class="card-sub">点击开始说话，说完自动解析；也可直接手动输入后用 AI 精简。</div></div>'
     + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
     + '<div class="card-body">'
+    + voiceTip
     + '<div class="flex gap-2 mb-3">' + recBtn
     + '<button class="btn" data-action="voice-parse">解析文字</button>'
     + '<button class="btn" data-action="voice-polish" title="去重、去口头语，输出书面化文本">✨ AI 精简</button></div>'
@@ -4308,7 +4340,11 @@ function boot() {
   const done = function () {
     SYNC_LOCK = false;
     const rb = document.getElementById('btnReset');
-    if (rb) rb.textContent = CLOUD_ON ? '清空全部数据' : '重置演示数据';
+    if (rb) {
+      /* 危险操作：云端模式下普通租户直接隐藏该按钮 */
+      if (CLOUD_ON && !isAdmin()) { rb.style.display = 'none'; }
+      else { rb.textContent = CLOUD_ON ? '清空全部数据' : '重置演示数据'; }
+    }
     selfTest(); render();
   };
 
