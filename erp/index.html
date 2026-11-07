@@ -122,7 +122,17 @@ body.nav-open .sidebar{transform:translateX(0)}
 @media (max-width:899px){
   html,body{overflow-x:hidden}
   .icon-btn.mobile-only{display:grid}
-  .topbar-right .search{width:110px}
+  .topbar{flex-wrap:wrap;gap:6px 10px;padding:8px 12px}
+  .topbar-title{flex:1 1 auto}
+  /* 顶部功能栏横向滚动：手机窄屏也能滑到全部按钮 */
+  .topbar-right{
+    width:100%;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    margin:0 -12px;padding:2px 12px 4px;
+  }
+  .topbar-right::-webkit-scrollbar{display:none}
+  .topbar-right > *{flex:0 0 auto}
+  .topbar-right .search{width:120px}
   .topbar-right .btn-primary{padding:7px 10px;font-size:12px}
   .view{padding:14px 12px 90px}
   .app{padding-bottom:0}
@@ -208,6 +218,16 @@ body.nav-open .sidebar{transform:translateX(0)}
 .row-t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-created{font-size:10.5px;color:#b0b0b0;margin-bottom:1px;letter-spacing:.3px}
 .row-s{font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 列表卡片：最新一条跟进预览 */
+.row-latest{
+  margin-top:6px;font-size:12px;color:#3c4b46;line-height:1.55;
+  background:#f6faf8;border-left:2px solid #cfe3da;border-radius:0 6px 6px 0;
+  padding:4px 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;word-break:break-word;
+}
+.row-latest b{color:var(--primary-2);font-weight:600}
+.row-latest .d{color:var(--muted);font-size:10.5px;margin-left:5px;font-weight:400}
+.row-latest.empty{color:#a9bab2;border-left-color:#e2e8e4;background:#fafbfa;font-size:11.5px}
 .row-right{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .empty{padding:44px 16px;text-align:center;color:var(--muted);font-size:13px}
 .section-t{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:14px;font-weight:600}
@@ -265,6 +285,35 @@ body.nav-open .sidebar{transform:translateX(0)}
 .kv .v{min-width:0;word-break:break-word}
 .grp-t{font-size:12px;font-weight:600;color:var(--primary-2);margin:16px 0 8px;padding-left:8px;border-left:3px solid var(--primary-2)}
 .sub-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fbfdfc}
+/* 日历清单 */
+.cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cal-title{font-size:15px;font-weight:600;color:var(--primary)}
+.cal-nav{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:28px;cursor:pointer;color:var(--primary-2)}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.cal-week span{text-align:center;font-size:11px;color:var(--muted);padding:2px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{
+  position:relative;min-height:46px;border:1px solid var(--line);border-radius:8px;
+  background:#fff;cursor:pointer;padding:4px 3px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;font-size:12px;color:var(--text);
+}
+.cal-day .d{font-weight:600;line-height:1.2}
+.cal-day .m{display:flex;gap:2px;margin-top:3px;font-size:9px;line-height:1}
+.cal-day .m i{width:5px;height:5px;border-radius:50%;background:var(--primary-2);display:inline-block}
+.cal-day .m i.todo{background:#e0a13c}
+.cal-day.dim{opacity:.35}
+.cal-day.today{border-color:var(--primary-2);box-shadow:0 0 0 2px rgba(26,92,75,.12)}
+.cal-day.sel{background:var(--primary);color:#fff;border-color:var(--primary)}
+.cal-day.sel .m i{background:rgba(255,255,255,.85)}
+.cal-day.sel .m i.todo{background:#ffd08a}
+.cal-sum{background:#f6faf8;border:1px solid #d9e7e1;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.cal-sum .t{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:6px}
+.cal-sum .p{font-size:12.5px;line-height:1.75;color:var(--text)}
+.cal-item{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;margin-bottom:6px}
+.cal-item .tt{font-size:11px;color:var(--muted);flex:0 0 44px}
+.cal-item .cc{font-size:12.5px;flex:1;min-width:0;word-break:break-word}
+.cal-badge{display:inline-block;font-size:10px;padding:0 6px;border-radius:8px;background:var(--soft);color:var(--primary-2);margin-left:4px}
+.cal-badge.todo{background:#fdf3e2;color:#a8761f}
 .modal{position:fixed;inset:0;z-index:70;display:none;background:rgba(10,24,20,.4);padding:16px;overflow:auto}
 .modal.open{display:block}
 .modal-panel{max-width:560px;margin:24px auto;background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
@@ -1245,11 +1294,12 @@ function overdueReminders() {
 
 /* ---------- 9. 视图定义（19 个） ---------- */
 const state = {
-  view: 'today', q: '', drawerId: null, aiTab: 'distill',
+  view: 'today', q: '', drawerId: null, aiTab: 'calendar',
   taskFilter: 'all', constructingStage: 'all',
   stageFilter: 'all', intentFilter: 'all', statusFilter: 'all', overdueFilter: 'all',
   showFilter: false,
   auditDateRange: '7d', auditTenantFilter: 'all', auditActionFilter: 'all',
+  calMonth: TODAY.slice(0, 7), calDay: TODAY,
   lastDistill: null, lastDraft: null
 };
 
@@ -1529,15 +1579,43 @@ const QUICK_FOLLOW_TYPES = [
   ['量房', '量房'], ['交底', '交底'], ['复盘', '复盘'], ['售后', '售后']
 ];
 
+/* 跟进时间戳：优先 updated_at → created_at → date */
+function fuTs(r) {
+  const s = r && (r.updated_at || r.created_at || r.date);
+  if (!s) return 0;
+  let t = new Date(s).getTime();
+  if (isNaN(t)) t = new Date(String(s).replace(/-/g, '/')).getTime();
+  return isNaN(t) ? 0 : t;
+}
+function fuList(cid) {
+  return DB.followUps.filter(function (x) { return x.customerId === cid; })
+    .slice()
+    .sort(function (a, b) {
+      const d = fuTs(b) - fuTs(a);
+      if (d !== 0) return d;
+      return String(b.id || '').localeCompare(String(a.id || ''));
+    });
+}
+function latestFollow(cid) {
+  const list = fuList(cid);
+  return list.length ? list[0] : null;
+}
+
 function customerRow(c) {
   const od = overdueDays(c);
   const createdAt = c.created_at || c.createdDate || '';
   const rowId = 'row_' + c.id;
+  const last = latestFollow(c.id);
+  const latestHtml = last
+    ? '<div class="row-latest"><b>' + esc(last.type || '跟进') + '</b><span class="d">'
+      + esc(last.date || '') + '</span><div>' + esc(String(last.content || '').slice(0, 80)) + '</div></div>'
+    : '<div class="row-latest empty">暂无跟进记录</div>';
   return '<div id="' + rowId + '" class="row" data-action="open-customer" data-id="' + c.id + '">'
     + '<div class="row-main">'
     + '<div class="row-created">' + esc(createdAt) + '</div>'
     + '<div class="row-t">' + esc(c.name) + ' · ' + esc(c.community) + ' · ' + c.area + '㎡</div>'
     + '<div class="row-s">' + c.id + ' · ' + esc(c.layout) + ' · ' + esc(c.houseStatus) + ' · ' + esc(c.source) + '</div>'
+    + latestHtml
     + '</div>'
     + '<div class="row-right">'
     + '<div class="flex gap-1 items-center">'
@@ -1574,6 +1652,7 @@ function saveQuickFollow(cid, type, content, nextDate) {
   DB.followUps.push({
     id: 'FU' + String(Date.now()).slice(-6),
     customerId: cid, date: today,
+    updated_at: new Date().toISOString(),
     type: type || '跟进',
     content: content || '(自动录入)',
     nextAction: content ? content.slice(0, 60) : '',
@@ -1924,14 +2003,16 @@ function distill(text) {
 const AI_LABELS = { need: '需求点', revise: '修改意见', dispute: '争议点', todo: '待办事项', concern: '客户顾虑' };
 
 function renderAI() {
-  const tabs = [['distill', '微信群聊天蒸馏'], ['gen', '设计辅助生成'], ['script', '话术模板调用']];
+  const tabs = [['calendar', '日历清单'], ['distill', '微信群聊天蒸馏'], ['gen', '设计辅助生成'], ['script', '话术模板调用']];
   let html = '<div class="tabs">';
   tabs.forEach(function (t) {
     html += '<button class="tab ' + (state.aiTab === t[0] ? 'active' : '') + '" data-action="ai-tab" data-val="' + t[0] + '">' + t[1] + '</button>';
   });
   html += '</div>';
 
-  if (state.aiTab === 'distill') {
+  if (state.aiTab === 'calendar') {
+    html += renderCalendar();
+  } else if (state.aiTab === 'distill') {
     html += '<div class="card mb-4"><div class="card-head"><div class="flex-1"><div class="card-title">聊天记录 → 结构化</div>'
       + '<div class="card-sub">离线规则引擎抽取；若配置 LLM 接口则自动升级（见部署说明）</div></div></div>'
       + '<div class="card-body"><textarea id="distillInput" class="textarea" placeholder="粘贴微信群聊天记录，例如：\n刘女士：客厅这个过道是不是有点窄\n刘女士：还有我想多做点储物，衣服太多了\n设计师：可以把过道收 10 公分，做一组到顶柜\n刘女士：那我老公那边得问一下，他比较在意预算\n刘女士：明天我发你几张参考图"></textarea>'
@@ -1956,6 +2037,138 @@ function renderAI() {
   }
   return html;
 }
+
+/* ===== AI 经营中心 · 日历清单 ===== */
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function calDateStr(y, m, d) { return y + '-' + pad2(m) + '-' + pad2(d); }
+function calFollowsOn(ds) {
+  return DB.followUps.filter(function (r) { return (r.date || '') === ds; })
+    .slice().sort(function (a, b) { return fuTs(b) - fuTs(a); });
+}
+function calTodosOn(ds) {
+  return DB.customers.filter(function (c) { return c.nextFollowDate === ds && !c.escaped && !c.lost; });
+}
+function daySummaryText(ds, fs, td) {
+  if (!fs.length && !td.length) return '当日暂无跟进记录，也没有待办提醒。';
+  let s = '';
+  if (fs.length) {
+    const nm = {};
+    fs.forEach(function (r) {
+      const c = cust(r.customerId);
+      const k = c ? c.name : '未关联客户';
+      nm[k] = (nm[k] || 0) + 1;
+    });
+    const names = Object.keys(nm);
+    s += '当日记录 ' + fs.length + ' 条跟进，覆盖 ' + names.length + ' 位客户（'
+      + names.slice(0, 6).join('、') + (names.length > 6 ? ' 等' : '') + '）。';
+    const types = {};
+    fs.forEach(function (r) { types[r.type || '跟进'] = 1; });
+    s += '沟通方式：' + Object.keys(types).join('、') + '。';
+  } else {
+    s += '当日尚无跟进记录。';
+  }
+  if (td.length) {
+    s += ' 当天待办 ' + td.length + ' 项：' + td.slice(0, 5).map(function (c) { return c.name; }).join('、')
+      + (td.length > 5 ? ' 等' : '') + '。';
+  }
+  return s;
+}
+
+function renderCalendar() {
+  const ps = String(state.calMonth || TODAY.slice(0, 7)).split('-');
+  const y = Number(ps[0]), m = Number(ps[1]);
+  const startDow = new Date(y, m - 1, 1).getDay();
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const prefix = y + '-' + pad2(m);
+
+  const fuMap = {}, todoMap = {};
+  DB.followUps.forEach(function (r) {
+    const d = r.date || '';
+    if (d.indexOf(prefix) === 0) fuMap[d] = (fuMap[d] || 0) + 1;
+  });
+  DB.customers.forEach(function (c) {
+    const d = c.nextFollowDate || '';
+    if (!c.escaped && !c.lost && d.indexOf(prefix) === 0) todoMap[d] = (todoMap[d] || 0) + 1;
+  });
+
+  let grid = '';
+  for (let i = 0; i < startDow; i++) grid += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = calDateStr(y, m, d);
+    const cls = 'cal-day'
+      + (ds === TODAY ? ' today' : '')
+      + (ds === state.calDay ? ' sel' : '');
+    const marks = (fuMap[ds] ? '<i></i>' : '') + (todoMap[ds] ? '<i class="todo"></i>' : '');
+    grid += '<div class="' + cls + '" data-action="cal-day" data-val="' + ds + '">'
+      + '<div class="d">' + d + '</div><div class="m">' + marks + '</div></div>';
+  }
+
+  const ds = state.calDay;
+  const fs = calFollowsOn(ds);
+  const td = calTodosOn(ds);
+
+  let html = '<div class="card mb-4"><div class="card-body">'
+    + '<div class="cal-head">'
+    + '<button class="cal-nav" data-action="cal-prev">‹</button>'
+    + '<div class="cal-title">' + y + ' 年 ' + m + ' 月</div>'
+    + '<button class="cal-nav" data-action="cal-next">›</button>'
+    + '<button class="btn btn-xs" data-action="cal-today" style="margin-left:auto">回到今天</button>'
+    + '</div>'
+    + '<div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>'
+    + '<div class="cal-grid">' + grid + '</div>'
+    + '<div class="mini text-muted mt-3"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--primary-2);margin-right:4px"></i>跟进记录　'
+    + '<i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#e0a13c;margin:0 4px 0 12px"></i>待办提醒</div>'
+    + '</div></div>';
+
+  /* 当日工作总结 */
+  html += '<div class="cal-sum"><div class="t">📄 ' + esc(ds) + ' 工作总结</div>'
+    + '<div class="p">' + esc(daySummaryText(ds, fs, td)) + '</div></div>';
+
+  /* 当日跟进明细 */
+  html += '<div class="grp-t">当日跟进（' + fs.length + '）</div>';
+  if (!fs.length) {
+    html += '<div class="sub-card mini text-muted">当日无跟进记录</div>';
+  } else {
+    fs.forEach(function (r) {
+      const c = cust(r.customerId);
+      html += '<div class="cal-item"><div class="tt">' + esc(r.type || '跟进') + '</div>'
+        + '<div class="cc"><b>' + esc(c ? c.name : '未关联') + '</b>'
+        + '<div class="mini" style="margin-top:2px">' + esc(String(r.content || '').slice(0, 90)) + '</div></div></div>';
+    });
+  }
+
+  /* 当日待办 */
+  html += '<div class="grp-t">当日待办（' + td.length + '）</div>';
+  if (!td.length) {
+    html += '<div class="sub-card mini text-muted">当日无需跟进客户</div>';
+  } else {
+    td.forEach(function (c) {
+      html += '<div class="cal-item"><div class="tt"><span class="cal-badge todo">待跟进</span></div>'
+        + '<div class="cc"><b>' + esc(c.name) + '</b> · ' + esc(c.community) + ' · ' + c.area + '㎡'
+        + '<div class="mini" style="margin-top:2px">阶段 ' + esc(c.stage) + ' · '
+        + esc(c.intent || '') + '</div></div>'
+        + '<button class="btn btn-xs" data-action="open-customer" data-id="' + c.id + '">查看</button></div>';
+    });
+  }
+
+  /* 未来 7 天计划 */
+  const base = new Date(ds.replace(/-/g, '/'));
+  let wp = '';
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(base.getTime() + i * 86400000);
+    const wds = calDateStr(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+    const list = calTodosOn(wds);
+    if (!list.length) continue;
+    wp += '<div class="cal-item"><div class="tt">' + wds.slice(5) + '</div>'
+      + '<div class="cc">' + list.map(function (c) { return esc(c.name); }).join('、')
+      + '<div class="mini" style="margin-top:2px">共 ' + list.length + ' 位客户待跟进</div></div></div>';
+  }
+  html += '<div class="grp-t">未来 7 天计划</div>';
+  html += wp || '<div class="sub-card mini text-muted">未来 7 天暂无排期</div>';
+
+  return html;
+}
+
 
 function draftMeasure(c) {
   return '# 量房报告 · ' + c.name + '（' + c.community + ' ' + c.area + '㎡）\n\n'
@@ -2180,15 +2393,18 @@ function renderDrawer(id) {
     + '<div class="card-sub">按阶段展示对应资料 · 单文件 ≤ ' + MAX_FILE_MB + 'MB · 支持 DWG/DXF</div></div></div>'
     + '<div class="card-body">' + renderStageForms(c, attBlock) + '</div></div>';
 
-  /* P3-9 跟进记录置顶 */
-  const fups = DB.followUps.filter(function (x) { return x.customerId === c.id; })
-    .sort(function (a, b) { return (b.date || '').localeCompare(a.date || ''); });
+  /* P3-9 跟进记录置顶 · 严格按更新时间倒序 */
+  const fups = fuList(c.id);
   html += '<div class="grp-t">跟进记录（' + fups.length + '）</div>';
   if (!fups.length) {
     html += '<div class="sub-card mini">暂无跟进记录 · <button class="btn btn-xs" data-action="record-follow" data-id="' + c.id + '">立即记录</button></div>';
   } else {
-    fups.forEach(function (r) {
-      html += '<div class="sub-card text-sm"><b>' + esc(r.type) + '</b> · ' + esc(r.date)
+    fups.forEach(function (r, i) {
+      const upd = r.updated_at ? String(r.updated_at).replace('T', ' ').slice(0, 16) : '';
+      html += '<div class="sub-card text-sm"' + (i === 0 ? ' style="border-color:#b8d5c7;background:#f4faf7"' : '') + '>'
+        + '<b>' + esc(r.type) + '</b> · ' + esc(r.date)
+        + (i === 0 ? ' <span class="cal-badge">最新</span>' : '')
+        + (upd ? '<span class="mini text-muted" style="margin-left:6px">更新 ' + esc(upd) + '</span>' : '')
         + '<div style="margin-top:3px">' + esc(r.content) + '</div>'
         + (r.nextAction ? '<div class="mini text-muted" style="margin-top:2px">下一步：' + esc(r.nextAction) + '</div>' : '')
         + '</div>';
@@ -2460,6 +2676,7 @@ function saveFollowRecord(id) {
   const concerns = ((document.getElementById('fu_concerns') || {}).value || '').trim();
   DB.followUps.push({
     id: 'F' + Date.now(), customerId: id, date: TODAY,
+    updated_at: new Date().toISOString(),
     type: type, content: content, nextAction: nextAction || '待跟进',
     nextFollowDate: nextDate, operator: c.designer || '本人'
   });
@@ -2955,6 +3172,17 @@ document.addEventListener('click', function (e) {
   if (act === 'filter-clear') { clearCustomerFilters(); render(); return; }
   if (act === 'audit-filter') { state[el.getAttribute('data-key')] = el.getAttribute('data-val'); render(); return; }
   if (act === 'ai-tab') { state.aiTab = el.getAttribute('data-val'); render(); return; }
+  if (act === 'cal-day') { state.calDay = el.getAttribute('data-val'); render(); return; }
+  if (act === 'cal-today') { state.calMonth = TODAY.slice(0, 7); state.calDay = TODAY; render(); return; }
+  if (act === 'cal-prev' || act === 'cal-next') {
+    const cp = String(state.calMonth).split('-');
+    let cy = Number(cp[0]), cm = Number(cp[1]) + (act === 'cal-next' ? 1 : -1);
+    if (cm < 1) { cm = 12; cy--; }
+    if (cm > 12) { cm = 1; cy++; }
+    state.calMonth = cy + '-' + pad2(cm);
+    render();
+    return;
+  }
   if (act === 'ai-distill') { doDistill(); return; }
   if (act === 'ai-backfill') { doBackfill(); return; }
   if (act === 'ai-generate') { doGenerate(); return; }
@@ -2971,6 +3199,21 @@ document.addEventListener('click', function (e) {
   if (act === 'voice-stop') { stopVoice(); return; }
   if (act === 'voice-save') { saveVoiceEntry(); return; }
   if (act === 'voice-parse') { parseVoiceText(); return; }
+  if (act === 'voice-polish') {
+    const box = $('#voiceText');
+    const src = (box ? box.value : voiceState.text) || '';
+    if (!src.trim()) { toast('没有可精简的文字'); return; }
+    const cleaned = aiPolishText(src);
+    if (!cleaned) { toast('没有可精简的文字'); return; }
+    voiceState.text = cleaned;
+    if (box) box.value = cleaned;
+    voiceState.parsed = voiceState.parsed || {};
+    voiceState.parsed.content = cleaned;
+    const cc = $('#v_content');
+    if (cc) cc.value = cleaned;
+    toast('AI 已精简：' + src.length + ' → ' + cleaned.length + ' 字');
+    return;
+  }
   if (act === 'goto-ai') { state.view = 'ai'; state.aiTab = 'gen'; render(); return; }
   if (act === 'copy-script') {
     const s = SCRIPTS.filter(function (x) { return x.id === id; })[0];
@@ -3416,6 +3659,7 @@ function doBackfill() {
   DB.followUps.push({
     id: 'F' + String(DB.followUps.length + 1).padStart(3, '0'),
     customerId: c.id, date: TODAY, type: '微信',
+    updated_at: new Date().toISOString(),
     content: '【聊天蒸馏】' + parts.join('｜'),
     nextAction: '按蒸馏结果确认需求', operator: '本人'
   });
@@ -3496,7 +3740,8 @@ function renderVoiceModal() {
     + '<button class="btn btn-sm" data-action="close-modal">关闭</button></div>'
     + '<div class="card-body">'
     + '<div class="flex gap-2 mb-3">' + recBtn
-    + '<button class="btn" data-action="voice-parse">解析文字</button></div>'
+    + '<button class="btn" data-action="voice-parse">解析文字</button>'
+    + '<button class="btn" data-action="voice-polish" title="去重、去口头语，输出书面化文本">✨ AI 精简</button></div>'
     + '<div class="field"><label>识别文字（可手动修改）</label>'
     + '<textarea id="voiceText" class="textarea" rows="4" placeholder="例如：给马先生加条跟进，今天电话确认主材下周一进场，三天后再跟进">' + esc(voiceState.text) + '</textarea></div>'
     + '<div class="grid" style="grid-template-columns:1fr 1fr;gap:0 12px">'
@@ -3581,6 +3826,42 @@ function stopVoice() {
   parseVoiceText();
 }
 
+/* 语音转写 → 书面化精简：去口头填充词、去重复句、合并输出 */
+const VOICE_FILLERS = [
+  '嗯', '啊', '呃', '额', '诶', '哦', '噢', '唔', '哎',
+  '那个', '这个', '然后呢', '然后', '就是说', '就是吧', '对吧', '你知道吧',
+  '怎么说呢', '反正', '其实', '基本上', '对对对', '好好好', '行行行', '哦哦',
+  '那什么', '你看', '我跟你说', '这么着', '接着', '再就是'
+];
+function aiPolishText(raw) {
+  let t = String(raw || '').replace(/\s+/g, '');
+  if (!t) return '';
+  // 1. 去掉口头填充词
+  VOICE_FILLERS.forEach(function (f) { t = t.split(f).join(''); });
+  // 2. 断句
+  const parts = t.split(/[。！？!?；;，,\n\r、]+/)
+    .map(function (s) { return s.trim(); })
+    .filter(function (s) { return s.length > 1; });
+  // 3. 去重：规范化后相同或互相包含的句子只保留更完整的一条
+  const kept = [];
+  parts.forEach(function (p) {
+    const norm = p.replace(/[的了呢吧啊哦啦嘛呀着过]/g, '');
+    if (norm.length < 2) return;
+    for (let i = 0; i < kept.length; i++) {
+      const k = kept[i].norm;
+      if (k === norm) return;
+      if (k.indexOf(norm) >= 0) return;
+      if (norm.indexOf(k) >= 0) { kept[i] = { text: p, norm: norm }; return; }
+    }
+    kept.push({ text: p, norm: norm });
+  });
+  // 4. 合并成书面化短句
+  let out = kept.map(function (k) { return k.text; }).join('；');
+  out = out.replace(/^[；，,。、]+/, '').replace(/[；，,、]+$/, '');
+  if (out && !/[。！？]$/.test(out)) out += '。';
+  return out;
+}
+
 /* 规则解析：从语音文字中提取客户、操作类型、内容、下一步、日期 */
 function parseVoiceText() {
   const text = ($('#voiceText') || {}).value || voiceState.text || '';
@@ -3642,6 +3923,10 @@ function parseVoiceText() {
   const nm = text.match(/(?:下次|之后|再|回头|稍后)([^。！？；\n]{2,20})/);
   if (nm) p.nextAction = nm[1].trim();
 
+  // 5. AI 精简：去重去口头语，输出书面化文本
+  const polished = aiPolishText(text);
+  if (polished) p.content = polished;
+
   voiceState.parsed = p;
   $('#modal').innerHTML = renderVoiceModal();
   if (p.customerId) $('#v_customer').value = p.customerId;
@@ -3662,6 +3947,7 @@ function saveVoiceEntry() {
     if (!content) { toast('内容不能为空'); return; }
     DB.followUps.push({
       id: 'F' + Date.now(), customerId: cid, date: TODAY,
+      updated_at: new Date().toISOString(),
       type: '电话', content: content, nextAction: nextAction || '待跟进',
       nextFollowDate: nextDate || shift(3), operator: '本人'
     });
