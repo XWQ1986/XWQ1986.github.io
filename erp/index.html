@@ -2185,8 +2185,9 @@ function renderCalendar() {
 }
 
 
-/* ===== AI 精简：豆包（火山引擎方舟） ===== */
-const AI_DEFAULT = { key: '', model: 'doubao-seed-1-6-250615', base: 'https://ark.cn-beijing.volces.com/api/v3' };
+/* ===== AI 精简：大模型（默认阿里云百炼 · 通义千问） ===== */
+/* 系统内置默认 AI 配置：阿里云百炼（通义千问），全租户开箱即用；用户可在「⚙ AI 设置」里覆盖 */
+const AI_DEFAULT = { key: 'sk-ws-H.YEHMERP.R25d.MEQCIFEV84TK00ilGXmjsmAVn0veTGF-XdAu1O3M-eyz1S1tAiA1BWneOkUz5bV4FptX56cYlG1Kuz7Nlk-veIXAtB5VZg', model: 'qwen-plus', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1' };
 function aiCfg() {
   try {
     const raw = localStorage.getItem(lsKey() + '_ai');
@@ -2265,8 +2266,9 @@ function renderAiSettings() {
     + '<button class="btn btn-xs" data-action="ai-cfg-save">保存配置</button>'
     + '<button class="btn btn-xs" data-action="ai-cfg-test">测试连接</button>'
     + '</div>'
-    + '<div class="tip">支持任何 OpenAI 兼容接口（豆包 / DeepSeek / 硅基流动 / 通义 / Moonshot 等）。'
-    + 'Key 仅保存在本机浏览器（按租户隔离），不上传服务器。未配置或调用失败时自动回退本地规则引擎。</div>'
+    + '<div class="tip">系统已内置阿里云百炼（通义千问）默认配置，<b>无需填写即可直接使用</b>。'
+    + '如需换用自己的 Key 或其他平台（豆包 / DeepSeek / 硅基流动 / 通义 / Moonshot 等），在此覆盖即可；'
+    + '自定义 Key 仅保存在本机浏览器，不上传服务器。调用失败时自动回退本地规则引擎。</div>'
     + '</div></details>';
 }
 
