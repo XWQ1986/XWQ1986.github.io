@@ -314,6 +314,14 @@ body.nav-open .sidebar{transform:translateX(0)}
 .cal-item .cc{font-size:12.5px;flex:1;min-width:0;word-break:break-word}
 .cal-badge{display:inline-block;font-size:10px;padding:0 6px;border-radius:8px;background:var(--soft);color:var(--primary-2);margin-left:4px}
 .cal-badge.todo{background:#fdf3e2;color:#a8761f}
+.cal-actions{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.ai-cfg{margin-top:14px;border:1px solid var(--line);border-radius:10px;background:#fbfdfc}
+.ai-cfg summary{cursor:pointer;padding:9px 12px;font-size:12.5px;color:var(--primary-2);font-weight:600}
+.ai-cfg .bd{padding:0 12px 12px;border-top:1px dashed var(--line)}
+.ai-cfg .fm{margin-top:9px}
+.ai-cfg .fm label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.ai-cfg input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-size:12.5px}
+.ai-cfg .tip{font-size:11px;color:var(--muted);line-height:1.7;margin-top:9px}
 .modal{position:fixed;inset:0;z-index:70;display:none;background:rgba(10,24,20,.4);padding:16px;overflow:auto}
 .modal.open{display:block}
 .modal-panel{max-width:560px;margin:24px auto;background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
@@ -2121,6 +2129,11 @@ function renderCalendar() {
     + '</div></div>';
 
   /* 当日工作总结 */
+  html += '<div class="cal-actions">'
+    + '<button class="btn btn-xs" data-action="cal-copy">📋 复制小结</button>'
+    + '<button class="btn btn-xs" data-action="cal-export-day">⬇ 导出当日</button>'
+    + '<button class="btn btn-xs" data-action="cal-export-week">⬇ 导出本周</button>'
+    + '</div>';
   html += '<div class="cal-sum"><div class="t">📄 ' + esc(ds) + ' 工作总结</div>'
     + '<div class="p">' + esc(daySummaryText(ds, fs, td)) + '</div></div>';
 
@@ -2166,7 +2179,159 @@ function renderCalendar() {
   html += '<div class="grp-t">未来 7 天计划</div>';
   html += wp || '<div class="sub-card mini text-muted">未来 7 天暂无排期</div>';
 
+  html += renderAiSettings();
+
   return html;
+}
+
+
+/* ===== AI 精简：豆包（火山引擎方舟） ===== */
+const AI_DEFAULT = { key: '', model: 'doubao-seed-1-6-250615', base: 'https://ark.cn-beijing.volces.com/api/v3' };
+function aiCfg() {
+  try {
+    const raw = localStorage.getItem(lsKey() + '_ai');
+    const o = raw ? JSON.parse(raw) : {};
+    return {
+      key: o.key || '',
+      model: o.model || AI_DEFAULT.model,
+      base: o.base || AI_DEFAULT.base
+    };
+  } catch (e) { return { key: '', model: AI_DEFAULT.model, base: AI_DEFAULT.base }; }
+}
+function aiCfgSave(cfg) {
+  try { localStorage.setItem(lsKey() + '_ai', JSON.stringify(cfg)); return true; }
+  catch (e) { return false; }
+}
+
+async function doubaoPolish(raw) {
+  const c = aiCfg();
+  if (!c.key) throw new Error('未配置 API Key');
+  const sys = '你是室内设计公司的客户跟进助理。请把设计师口述的语音转写文本整理成规范、书面的中文跟进记录。'
+    + '要求：1) 删除语气词、口头禅、重复与自我纠正；2) 合并同义重复句；'
+    + '3) 完整保留事实信息（客户称呼、时间、金额、事项、下一步）；'
+    + '4) 输出 1-4 句连贯短句，用中文标点分隔；5) 不加编号、不加解释、不改变原意；6) 只输出整理后的正文。';
+  const resp = await fetch(c.base.replace(/\/$/, '') + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + c.key },
+    body: JSON.stringify({
+      model: c.model,
+      messages: [{ role: 'system', content: sys }, { role: 'user', content: String(raw) }],
+      temperature: 0.2,
+      max_tokens: 600
+    })
+  });
+  if (!resp.ok) {
+    let t = '';
+    try { t = (await resp.text()).slice(0, 120); } catch (e) { }
+    throw new Error('接口 ' + resp.status + (t ? '：' + t : ''));
+  }
+  const j = await resp.json();
+  const msg = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+  if (!msg) throw new Error('返回内容为空');
+  return String(msg).trim().replace(/^["'“”‘’]+|["'“”‘’]+$/g, '');
+}
+
+async function aiPolishSmart(raw) {
+  const c = aiCfg();
+  if (!c.key) return { text: aiPolishText(raw), ai: false, note: '未配置豆包 Key，已用本地规则精简' };
+  try {
+    const t = await doubaoPolish(raw);
+    return { text: t || aiPolishText(raw), ai: true, note: '已由豆包 AI 整理' };
+  } catch (e) {
+    return { text: aiPolishText(raw), ai: false, note: '豆包调用失败（' + e.message + '），已用本地规则精简' };
+  }
+}
+
+function renderAiSettings() {
+  const c = aiCfg();
+  return '<details class="ai-cfg"><summary>⚙ 豆包 AI 设置（语音精简）</summary>'
+    + '<div class="bd">'
+    + '<div class="fm"><label>API Key</label><input id="aiKey" type="password" placeholder="粘贴火山方舟 API Key" value="' + esc(c.key) + '"></div>'
+    + '<div class="fm"><label>模型（接入点 ID 或模型名）</label><input id="aiModel" placeholder="doubao-seed-1-6-250615" value="' + esc(c.model) + '"></div>'
+    + '<div class="fm"><label>接口地址</label><input id="aiBase" value="' + esc(c.base) + '"></div>'
+    + '<div class="cal-actions" style="margin:10px 0 0">'
+    + '<button class="btn btn-xs" data-action="ai-cfg-save">保存配置</button>'
+    + '<button class="btn btn-xs" data-action="ai-cfg-test">测试连接</button>'
+    + '</div>'
+    + '<div class="tip">Key 仅保存在本机浏览器（按租户隔离），不上传服务器。'
+    + '若未配置或调用失败，语音精简会自动回退到本地规则引擎。</div>'
+    + '</div></details>';
+}
+
+/* ===== 日历清单导出 ===== */
+function dlFile(name, text) {
+  const blob = new Blob(['\ufeff' + text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 600);
+}
+function buildDayReport(ds) {
+  const fs = calFollowsOn(ds);
+  const td = calTodosOn(ds);
+  let s = '恒彩设计部 · 客户跟进日报\n';
+  s += '日期：' + ds + '\n';
+  s += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
+  s += '────────────────────\n\n';
+  s += '【一、当日总结】\n' + daySummaryText(ds, fs, td) + '\n\n';
+  s += '【二、跟进明细】(' + fs.length + ')\n';
+  if (!fs.length) s += '  当日无跟进记录\n';
+  fs.forEach(function (r, i) {
+    const c = cust(r.customerId);
+    s += (i + 1) + '. ' + (c ? c.name + '（' + c.community + ' ' + c.area + '㎡）' : '未关联客户')
+      + ' · ' + (r.type || '跟进') + ' · ' + (r.date || '') + '\n';
+    s += '   内容：' + (r.content || '') + '\n';
+    if (r.nextAction) s += '   下一步：' + r.nextAction + '\n';
+  });
+  s += '\n【三、当日待办】(' + td.length + ')\n';
+  if (!td.length) s += '  无\n';
+  td.forEach(function (c, i) {
+    s += (i + 1) + '. ' + c.name + ' · ' + c.community + ' · ' + c.area + '㎡ · 阶段 ' + c.stage + '\n';
+  });
+  const base = new Date(ds.replace(/-/g, '/'));
+  let wk = '';
+  for (let i = 1; i <= 7; i++) {
+    const dt = new Date(base.getTime() + i * 86400000);
+    const wds = calDateStr(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+    const list = calTodosOn(wds);
+    if (list.length) wk += '  ' + wds + '  ' + list.map(function (c) { return c.name; }).join('、') + '\n';
+  }
+  s += '\n【四、未来 7 天计划】\n' + (wk || '  暂无排期\n');
+  s += '\n────────────────────\n恒彩设计部客户管理中心\n';
+  return s;
+}
+function buildWeekReport(ds) {
+  const base = new Date(ds.replace(/-/g, '/'));
+  const days = [];
+  let totalFu = 0, totalTodo = 0;
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(base.getTime() + i * 86400000);
+    const wds = calDateStr(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+    const fs = calFollowsOn(wds), td = calTodosOn(wds);
+    totalFu += fs.length; totalTodo += td.length;
+    days.push({ ds: wds, fs: fs, td: td });
+  }
+  let s = '恒彩设计部 · 周度工作计划（自 ' + ds + ' 起 7 天）\n';
+  s += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
+  s += '────────────────────\n';
+  s += '本周共记录跟进 ' + totalFu + ' 条，待办 ' + totalTodo + ' 项\n';
+  s += '────────────────────\n\n';
+  days.forEach(function (d) {
+    if (!d.fs.length && !d.td.length) return;
+    s += '▌' + d.ds + '\n';
+    d.fs.forEach(function (r) {
+      const c = cust(r.customerId);
+      s += '  · [跟进] ' + (c ? c.name : '未关联') + '（' + (r.type || '') + '）：' + String(r.content || '').slice(0, 60) + '\n';
+    });
+    d.td.forEach(function (c) {
+      s += '  □ [待办] ' + c.name + ' · ' + c.community + ' · 阶段 ' + c.stage + '\n';
+    });
+    s += '\n';
+  });
+  s += '────────────────────\n恒彩设计部客户管理中心\n';
+  return s;
 }
 
 
@@ -3174,6 +3339,41 @@ document.addEventListener('click', function (e) {
   if (act === 'ai-tab') { state.aiTab = el.getAttribute('data-val'); render(); return; }
   if (act === 'cal-day') { state.calDay = el.getAttribute('data-val'); render(); return; }
   if (act === 'cal-today') { state.calMonth = TODAY.slice(0, 7); state.calDay = TODAY; render(); return; }
+  if (act === 'cal-copy') {
+    copyText(buildDayReport(state.calDay));
+    return;
+  }
+  if (act === 'cal-export-day') {
+    dlFile('客户跟进日报_' + state.calDay + '.txt', buildDayReport(state.calDay));
+    toast('已导出当日小结');
+    return;
+  }
+  if (act === 'cal-export-week') {
+    dlFile('周度工作计划_' + state.calDay + '.txt', buildWeekReport(state.calDay));
+    toast('已导出未来 7 天计划');
+    return;
+  }
+  if (act === 'ai-cfg-save') {
+    const k = ($('#aiKey') || {}).value || '';
+    const m = ($('#aiModel') || {}).value || '';
+    const bs = ($('#aiBase') || {}).value || '';
+    aiCfgSave({ key: k.trim(), model: m.trim() || AI_DEFAULT.model, base: bs.trim() || AI_DEFAULT.base });
+    toast(k.trim() ? '已保存，语音精简将使用豆包 AI' : '已清空 Key，回退本地规则精简');
+    render();
+    return;
+  }
+  if (act === 'ai-cfg-test') {
+    const k = ($('#aiKey') || {}).value || '';
+    const m = ($('#aiModel') || {}).value || '';
+    const bs = ($('#aiBase') || {}).value || '';
+    if (!k.trim()) { toast('请先填写 API Key'); return; }
+    aiCfgSave({ key: k.trim(), model: m.trim() || AI_DEFAULT.model, base: bs.trim() || AI_DEFAULT.base });
+    toast('正在测试豆包连接…');
+    doubaoPolish('嗯，今天给马先生打了电话，就是说确认一下主材进场时间，然后他说下周一进场。')
+      .then(function (t) { toast('连接成功：' + String(t).slice(0, 40)); })
+      .catch(function (e) { toast('连接失败：' + e.message); });
+    return;
+  }
   if (act === 'cal-prev' || act === 'cal-next') {
     const cp = String(state.calMonth).split('-');
     let cy = Number(cp[0]), cm = Number(cp[1]) + (act === 'cal-next' ? 1 : -1);
@@ -3203,14 +3403,27 @@ document.addEventListener('click', function (e) {
     const box = $('#voiceText');
     const src = (box ? box.value : voiceState.text) || '';
     if (!src.trim()) { toast('没有可精简的文字'); return; }
+    if (aiCfg().key) {
+      toast('AI 整理中…');
+      aiPolishSmart(src).then(function (r) {
+        voiceState.text = r.text;
+        if (box) box.value = r.text;
+        voiceState.parsed = voiceState.parsed || {};
+        voiceState.parsed.content = r.text;
+        const cc = $('#v_content');
+        if (cc) cc.value = r.text;
+        toast(r.note + '：' + src.length + ' → ' + r.text.length + ' 字');
+      });
+      return;
+    }
     const cleaned = aiPolishText(src);
     if (!cleaned) { toast('没有可精简的文字'); return; }
     voiceState.text = cleaned;
     if (box) box.value = cleaned;
     voiceState.parsed = voiceState.parsed || {};
     voiceState.parsed.content = cleaned;
-    const cc = $('#v_content');
-    if (cc) cc.value = cleaned;
+    const cc2 = $('#v_content');
+    if (cc2) cc2.value = cleaned;
     toast('AI 已精简：' + src.length + ' → ' + cleaned.length + ' 字');
     return;
   }
@@ -3932,6 +4145,21 @@ function parseVoiceText() {
   if (p.customerId) $('#v_customer').value = p.customerId;
   $('#v_action').value = p.action;
   toast('解析完成：' + (VOICE_ACTIONS.filter(function(a){return a.id===p.action;})[0]||{}).label);
+
+  // 已配置豆包：再用大模型做一次语义级精简
+  if (aiCfg().key) {
+    const box0 = $('#v_content');
+    if (box0) box0.value = 'AI 整理中…';
+    aiPolishSmart(text).then(function (r) {
+      voiceState.parsed.content = r.text;
+      const keepC = ($('#v_customer') || {}).value || p.customerId;
+      const keepA = ($('#v_action') || {}).value || p.action;
+      $('#modal').innerHTML = renderVoiceModal();
+      if (keepC) $('#v_customer').value = keepC;
+      if (keepA) $('#v_action').value = keepA;
+      toast(r.note);
+    });
+  }
 }
 
 function saveVoiceEntry() {
