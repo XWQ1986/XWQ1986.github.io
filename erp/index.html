@@ -2233,28 +2233,40 @@ async function doubaoPolish(raw) {
 
 async function aiPolishSmart(raw) {
   const c = aiCfg();
-  if (!c.key) return { text: aiPolishText(raw), ai: false, note: '未配置豆包 Key，已用本地规则精简' };
+  if (!c.key) return { text: aiPolishText(raw), ai: false, note: '未配置 AI Key，已用本地规则精简' };
   try {
     const t = await doubaoPolish(raw);
-    return { text: t || aiPolishText(raw), ai: true, note: '已由豆包 AI 整理' };
+    return { text: t || aiPolishText(raw), ai: true, note: '已由 AI 整理' };
   } catch (e) {
-    return { text: aiPolishText(raw), ai: false, note: '豆包调用失败（' + e.message + '），已用本地规则精简' };
+    return { text: aiPolishText(raw), ai: false, note: 'AI 调用失败（' + e.message + '），已用本地规则精简' };
   }
 }
 
+const AI_PRESETS = [
+  { id: 'ark', name: '豆包', base: 'https://ark.cn-beijing.volces.com/api/v3', model: 'doubao-seed-1-6-250615' },
+  { id: 'deepseek', name: 'DeepSeek', base: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+  { id: 'siliconflow', name: '硅基流动', base: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-7B-Instruct' },
+  { id: 'dashscope', name: '通义千问', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
+  { id: 'moonshot', name: 'Moonshot', base: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' }
+];
 function renderAiSettings() {
   const c = aiCfg();
-  return '<details class="ai-cfg"><summary>⚙ 豆包 AI 设置（语音精简）</summary>'
+  let chips = '';
+  AI_PRESETS.forEach(function (p) {
+    chips += '<button class="btn btn-xs" data-action="ai-preset" data-val="' + p.id + '">' + p.name + '</button>';
+  });
+  return '<details class="ai-cfg"><summary>⚙ AI 设置（语音精简 · OpenAI 兼容接口）</summary>'
     + '<div class="bd">'
-    + '<div class="fm"><label>API Key</label><input id="aiKey" type="password" placeholder="粘贴火山方舟 API Key" value="' + esc(c.key) + '"></div>'
-    + '<div class="fm"><label>模型（接入点 ID 或模型名）</label><input id="aiModel" placeholder="doubao-seed-1-6-250615" value="' + esc(c.model) + '"></div>'
+    + '<div class="cal-actions" style="margin-top:10px">' + chips + '</div>'
+    + '<div class="fm"><label>API Key</label><input id="aiKey" type="password" placeholder="粘贴 API Key（sk-...）" value="' + esc(c.key) + '"></div>'
+    + '<div class="fm"><label>模型</label><input id="aiModel" placeholder="模型名或接入点 ID" value="' + esc(c.model) + '"></div>'
     + '<div class="fm"><label>接口地址</label><input id="aiBase" value="' + esc(c.base) + '"></div>'
     + '<div class="cal-actions" style="margin:10px 0 0">'
     + '<button class="btn btn-xs" data-action="ai-cfg-save">保存配置</button>'
     + '<button class="btn btn-xs" data-action="ai-cfg-test">测试连接</button>'
     + '</div>'
-    + '<div class="tip">Key 仅保存在本机浏览器（按租户隔离），不上传服务器。'
-    + '若未配置或调用失败，语音精简会自动回退到本地规则引擎。</div>'
+    + '<div class="tip">支持任何 OpenAI 兼容接口（豆包 / DeepSeek / 硅基流动 / 通义 / Moonshot 等）。'
+    + 'Key 仅保存在本机浏览器（按租户隔离），不上传服务器。未配置或调用失败时自动回退本地规则引擎。</div>'
     + '</div></details>';
 }
 
@@ -3351,6 +3363,15 @@ document.addEventListener('click', function (e) {
   if (act === 'cal-export-week') {
     dlFile('周度工作计划_' + state.calDay + '.txt', buildWeekReport(state.calDay));
     toast('已导出未来 7 天计划');
+    return;
+  }
+  if (act === 'ai-preset') {
+    const pid = el.getAttribute('data-val');
+    const pre = AI_PRESETS.filter(function (x) { return x.id === pid; })[0];
+    if (!pre) return;
+    if ($('#aiBase')) $('#aiBase').value = pre.base;
+    if ($('#aiModel')) $('#aiModel').value = pre.model;
+    toast('已切换为 ' + pre.name + '，请填写对应的 API Key 后点「测试连接」');
     return;
   }
   if (act === 'ai-cfg-save') {
