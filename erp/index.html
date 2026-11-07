@@ -109,6 +109,12 @@ body.nav-open .sidebar{transform:translateX(0)}
   display:none;place-items:center;cursor:pointer;font-size:16px;
 }
 .view{padding:14px;flex:1}
+/* 云端同步加载态：页面加载即存在，数据到达后被 render() 覆盖，无需手动移除 */
+.sync-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 20px;text-align:center}
+.sync-spin{width:34px;height:34px;border-radius:50%;border:3px solid #dce8e2;border-top-color:#1a5c4b;animation:syncrot 0.9s linear infinite}
+@keyframes syncrot{to{transform:rotate(360deg)}}
+.sync-txt{margin-top:16px;font-size:14px;font-weight:600;color:#1a5c4b}
+.sync-sub{margin-top:6px;font-size:12px;color:#8aa39a}
 @media (min-width:900px){
   body.nav-open .sidebar{transform:none}
   .sidebar{transform:none;width:240px}
@@ -400,7 +406,13 @@ body.nav-open .sidebar{transform:translateX(0)}
         <button class="btn btn-primary btn-sm" data-action="new-customer">+ 客户</button>
       </div>
     </header>
-    <section id="view" class="view"></section>
+    <section id="view" class="view">
+      <div class="sync-loading">
+        <div class="sync-spin"></div>
+        <div class="sync-txt">正在同步云端数据…</div>
+        <div class="sync-sub">首次加载需 3–8 秒，请稍候</div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1310,6 +1322,14 @@ const state = {
   calMonth: TODAY.slice(0, 7), calDay: TODAY,
   lastDistill: null, lastDraft: null
 };
+/* 云端同步锁：启动/切换租户拉取数据期间为 true，锁定一切操作避免空数据视图被误触 */
+let SYNC_LOCK = true;
+function showSyncLoading(txt) {
+  const v = $('#view');
+  if (v) v.innerHTML = '<div class="sync-loading"><div class="sync-spin"></div>'
+    + '<div class="sync-txt">' + (txt || '正在同步云端数据…') + '</div>'
+    + '<div class="sync-sub">数据量大时需 3–8 秒，请稍候</div></div>';
+}
 
 function custList() {
   let list = DB.customers.filter(function (c) { return !c.escaped; });
@@ -2964,7 +2984,10 @@ function switchTenant(tid) {
   DB = emptyDB();
   state.drawerId = null;
   state.view = 'today';
+  SYNC_LOCK = true;
+  showSyncLoading('正在读取该租户数据…');
   cloudPull(function (st) {
+    SYNC_LOCK = false;
     if (st === 'error') {
       ACTIVE_TENANT = ME.tenant_id;
       DB = emptyDB();
@@ -2986,7 +3009,10 @@ function exitTenant() {
   DB = emptyDB();
   state.drawerId = null;
   state.view = 'tenants';
+  SYNC_LOCK = true;
+  showSyncLoading('正在返回本租户数据…');
   cloudPull(function (st) {
+    SYNC_LOCK = false;
     if (st !== 'ok') DB = emptyDB();
     render();
     toast(st === 'error' ? '读取本租户数据失败，请刷新页面重试' : '已退出，返回本租户');
@@ -3244,6 +3270,9 @@ document.addEventListener('click', function (e) {
   if (!el) return;
   const act = el.getAttribute('data-action');
   const id = el.getAttribute('data-id');
+
+  /* 数据同步期间锁定操作，避免在空数据视图上误触 */
+  if (SYNC_LOCK) { toast('数据同步中，请稍候…'); return; }
 
   if (act === 'toggle-nav') { document.body.classList.toggle('nav-open'); return; }
   if (act === 'nav') {
@@ -4277,6 +4306,7 @@ function exportJSON() {
 
 function boot() {
   const done = function () {
+    SYNC_LOCK = false;
     const rb = document.getElementById('btnReset');
     if (rb) rb.textContent = CLOUD_ON ? '清空全部数据' : '重置演示数据';
     selfTest(); render();
