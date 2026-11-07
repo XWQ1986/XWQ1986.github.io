@@ -2193,11 +2193,11 @@ function aiCfg() {
     const raw = localStorage.getItem(lsKey() + '_ai');
     const o = raw ? JSON.parse(raw) : {};
     return {
-      key: o.key || '',
+      key: o.key || AI_DEFAULT.key,
       model: o.model || AI_DEFAULT.model,
       base: o.base || AI_DEFAULT.base
     };
-  } catch (e) { return { key: '', model: AI_DEFAULT.model, base: AI_DEFAULT.base }; }
+  } catch (e) { return { key: AI_DEFAULT.key, model: AI_DEFAULT.model, base: AI_DEFAULT.base }; }
 }
 function aiCfgSave(cfg) {
   try { localStorage.setItem(lsKey() + '_ai', JSON.stringify(cfg)); return true; }
