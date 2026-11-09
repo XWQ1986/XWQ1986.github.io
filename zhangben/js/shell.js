@@ -70,6 +70,17 @@
     return '';
   }
 
+  /* 当前登录账号是否为管理员（以用户表为准，避免会话被篡改） */
+  function sessionRole() {
+    var user = sessionUser();
+    if (!user) return '';
+    try {
+      var users = JSON.parse(localStorage.getItem('zhangben_users') || '{}');
+      if (users[user] && users[user].role) return users[user].role;
+    } catch (e) {}
+    return '';
+  }
+
   /* 顶部条显示昵称，不直接暴露登录邮箱 */
   function displayName() {
     var user = sessionUser();
@@ -119,7 +130,7 @@
             icon('user', 'ic-sm') + accountText +
           '</button>' +
           '<div class="account-menu" id="accountMenu" role="menu" hidden>' +
-            '<div class="am-user"><b>' + displayName() + '</b><span>普通用户账号</span></div>' +
+            '<div class="am-user"><b>' + displayName() + '</b><span>' + (sessionRole() === 'admin' ? '管理员账号' : '普通用户账号') + '</span></div>' +
             '<section class="douyin-card" aria-label="抖音关注">' +
               '<div class="dc-head"><span class="dc-logo">' + icon('video', 'ic-sm') + '</span>' +
                 '<div><b>关注我的抖音</b><span>装修避坑和选品经验</span></div></div>' +
@@ -129,6 +140,7 @@
               '</div>' +
             '</section>' +
             '<a class="am-link" href="enterprise.html">企业版 · 开通</a>' +
+            (sessionRole() === 'admin' ? '<a class="am-link" href="admin.html">管理后台</a>' : '') +
             '<a class="am-link" href="account.html">账号管理</a>' +
             '<button class="am-link danger" type="button" id="logoutBtn">退出登录</button>' +
           '</div>' +

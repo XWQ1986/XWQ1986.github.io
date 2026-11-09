@@ -8,8 +8,19 @@
       var defaultUser = '15668681555@163.com';
       var defaultPwd = '123456Aa.';
       var _users = {};
-      _users[defaultUser] = { email: defaultUser, password: defaultPwd, nickname: '王建国' };
+      _users[defaultUser] = { email: defaultUser, password: defaultPwd, nickname: '王建国', role: 'admin', status: 'active', createdAt: new Date().toISOString() };
       localStorage.setItem('zhangben_users', JSON.stringify(_users));
+    }
+  } catch (err) {}
+
+  /* ---- 旧数据迁移：早期注册的演示账号没有角色字段，补为管理员 ---- */
+  try {
+    var _migUsers = JSON.parse(localStorage.getItem('zhangben_users') || '{}');
+    var _demo = '15668681555@163.com';
+    if (_migUsers[_demo] && !_migUsers[_demo].role) {
+      _migUsers[_demo].role = 'admin';
+      _migUsers[_demo].status = _migUsers[_demo].status || 'active';
+      localStorage.setItem('zhangben_users', JSON.stringify(_migUsers));
     }
   } catch (err) {}
 
@@ -98,9 +109,13 @@
       showMsg(msgError, '账号或密码不正确。如未注册，请先创建账号。');
       return;
     }
+    if (u.status === 'disabled') {
+      showMsg(msgError, '该账号已被管理员停用，请联系管理员。');
+      return;
+    }
     var remember = document.getElementById('rememberMe').checked;
     var store = remember ? localStorage : sessionStorage;
-    store.setItem('zhangben_session', JSON.stringify({ user: name, ts: Date.now() }));
+    store.setItem('zhangben_session', JSON.stringify({ user: name, role: u.role || 'user', ts: Date.now() }));
     showMsg(msgOk, '登录成功，正在进入主页……');
     setTimeout(function () { location.href = 'index.html'; }, 600);
   });
