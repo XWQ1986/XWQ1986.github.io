@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 水电知识</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 水电知识（对齐原版 知识百科.html） */
+    .knowledge-head { margin: 0; }
+    .knowledge-head h1 { margin: 0 0 4px; font-size: 28px; font-weight: 600; line-height: 1.35; }
+    .knowledge-subtitle { margin: 0 0 24px; color: #70767B; font-size: 14px; }
+
+    .knowledge-overview { display: flex; gap: 8px; margin: 0 0 18px; }
+    .knowledge-overview span {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #FFF7D6;
+      color: #6C5B24;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .knowledge-card {
+      margin-bottom: 10px;
+      border: 1px solid #E9ECEC;
+      border-radius: 16px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .knowledge-card-hd {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) 20px;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .knowledge-card-hd:hover { background: #FFFDF0; }
+    .knowledge-index { font-size: 11px; font-weight: 850; color: #6C5B24; }
+    .knowledge-copy h3 { margin: 0; font-size: 15px; font-weight: 600; color: #292D2E; }
+    .knowledge-copy small { display: block; margin-top: 5px; color: #70767B; font-size: 12px; }
+    .knowledge-arrow { color: #A0AEC0; font-size: 12px; transition: transform .2s; }
+    .knowledge-arrow.open { transform: rotate(90deg); }
+
+    .knowledge-body { display: none; padding: 0 20px 20px; color: #4A5568; font-size: 14px; line-height: 1.8; }
+    .knowledge-body.open { display: block; }
+    .knowledge-body h4 { margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #EDF2F7; color: #292D2E; font-size: 14px; }
+    .knowledge-body h4:first-child { margin-top: 0; }
+    .knowledge-body ul { margin: 0; padding-left: 20px; }
+    .knowledge-body li { margin-bottom: 6px; }
+    .knowledge-body p { margin: 0 0 10px; }
+    .highlight { padding: 2px 6px; border-radius: 4px; background: #FFF0EA; color: #E45B3F; font-weight: 600; }
+    .warn { padding: 2px 6px; border-radius: 4px; background: #FFF5F5; color: #C53030; font-weight: 600; }
+    .warn-block { padding: 12px; margin: 12px 0; border-radius: 8px; background: #FFF5F5; color: #C53030; font-weight: 600; }
+    .tip-box { margin: 12px 0; padding: 12px 16px; border-left: 3px solid #48BB78; border-radius: 0 8px 8px 0; background: #F0FFF4; font-size: 13px; }
+    .tip-box strong { color: #276749; }
+    .formula { margin: 10px 0; padding: 12px 16px; border: 1px solid #E2E8F0; border-radius: 8px; background: #F7FAFC; color: #2D3748; font-family: monospace; font-size: 14px; text-align: center; }
+
+    .knowledge-table-hint { display: none; }
+    .knowledge-table-scroll { max-width: 100%; margin: 10px 0; overflow-x: auto; }
+    .knowledge-table-scroll table { min-width: 480px; margin: 0; }
+    .knowledge-table-scroll table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .knowledge-table-scroll th { padding: 8px 12px; border-bottom: 2px solid #E2E8F0; background: #F7FAFC; color: #4A5568; font-weight: 600; text-align: left; }
+    .knowledge-table-scroll td { padding: 8px 12px; border-bottom: 1px solid #EDF2F7; }
+
+    @media (max-width: 520px) {
+      .knowledge-table-hint { display: block; margin: 8px 0; color: #687176; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="knowledge-head">
+      <h1>水电知识</h1>
+      <p class="knowledge-subtitle">电路基础知识 · 空开漏保选择 · 回路设计原则</p>
+    </header>
+
+    <section class="knowledge-overview">
+      <span>电路安全</span><span>水路施工</span><span>验收留档</span>
+    </section>
+
+    <!-- 01 电线基础知识 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">01</span>
+        <span class="knowledge-copy">
+          <h3>电线基础知识</h3>
+          <small>认识线材、线径与家庭用线标准</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>铜线 vs 铝线</h4>
+        <ul>
+          <li>家庭装修<span class="highlight">必须使用铜线</span>，铝线导电差、易氧化、接头易发热</li>
+          <li>铜线导电率是铝线的1.6倍，同样截面积铜线承载电流更大</li>
+        </ul>
+        <h4>常见线径规格（墙内穿管暗敷）</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>线径</th><th>可承受功率</th><th>建议空开</th><th>适用场景</th></tr>
+              <tr><td><strong>1.5mm²</strong></td><td>≈ 2200W</td><td>C10 / C16</td><td>照明回路</td></tr>
+              <tr><td><strong>2.5mm²</strong></td><td>≈ 3300W</td><td>C16</td><td>普通插座、挂机空调</td></tr>
+              <tr><td><strong>4mm²</strong></td><td>≈ 5280W</td><td>C25</td><td>厨房、卫生间、柜机空调</td></tr>
+              <tr><td><strong>6mm²</strong></td><td>≈ 7920W</td><td>C32</td><td>入户主线、大功率专线</td></tr>
+              <tr><td><strong>10mm²</strong></td><td>≈ 11000W</td><td>C40</td><td>即热式热水器、中央空调专线</td></tr>
+              <tr><td><strong>16mm²</strong></td><td>≈ 15400W</td><td>C63</td><td>大户型入户总进线</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>为什么穿管后载流量会降低？</h4>
+        <p>电线穿管后散热条件变差，管内多根线缆互相加热，载流量需要打折。上表数值<span class="highlight">已经按穿管暗敷折减（约为明敷的 70%~80%）</span>，直接按表选型即可，不需要再折减一次。</p>
+        <div class="tip-box"><strong>选购建议：</strong>认准国标BV线，认准CCC认证，线径足米足方。不要贪便宜买非标线。</div>
+      </div>
+    </div>
+
+    <!-- 02 电流功率计算 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">02</span>
+        <span class="knowledge-copy">
+          <h3>电流功率计算</h3>
+          <small>掌握功率、电流与线径的换算关系</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>基本公式</h4>
+        <div class="formula">功率 = 电压 × 电流 → P = U × I</div>
+        <div class="formula">电流 = 功率 ÷ 电压 → I = P ÷ U</div>
+        <p>家庭用电为单相220V，所以：</p>
+        <div class="formula">电流(A) = 功率(W) ÷ 220</div>
+        <h4>常用计算示例</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>电器</th><th>功率</th><th>电流</th><th>建议线径</th></tr>
+              <tr><td>LED灯 ×10</td><td>200W</td><td>0.9A</td><td>1.5mm²</td></tr>
+              <tr><td>挂机空调</td><td>1200W</td><td>5.5A</td><td>2.5mm²</td></tr>
+              <tr><td>电磁炉</td><td>2200W</td><td>10A</td><td>2.5mm²</td></tr>
+              <tr><td>电热水器</td><td>3000W</td><td>13.6A</td><td>4mm²</td></tr>
+              <tr><td>即热小厨宝</td><td>3000W</td><td>13.6A</td><td>4mm²</td></tr>
+              <tr><td>柜机空调</td><td>2500W</td><td>11.4A</td><td>4mm²</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>功率因数说明</h4>
+        <p>纯电阻负载（灯泡、热水器）功率因数≈1，上述公式直接适用。感性负载（电机类）功率因数约0.8，实际电流会稍大，但家用一般按上述简化计算即可。</p>
+        <div class="tip-box"><strong>快速估算：</strong>220V下，1A ≈ 220W。记住这个关系，看到功率就能快速算出电流。</div>
+      </div>
+    </div>
+
+    <!-- 03 空气开关 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">03</span>
+        <span class="knowledge-copy">
+          <h3>空气开关（空开/断路器）</h3>
+          <small>了解空开规格及其保护范围</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>空开的两个保护功能</h4>
+        <ul>
+          <li><strong>短路保护：</strong>短路时电流趋近无穷大，空开瞬间跳闸</li>
+          <li><strong>过载保护：</strong>电流超过额定值一定时间后跳闸，超过越多跳得越快</li>
+        </ul>
+        <h4>C曲线含义</h4>
+        <p>家用空开一般是C型（C curve），含义是：</p>
+        <ul>
+          <li>C6：额定6A，瞬时脱扣电流 60~90A</li>
+          <li>C16：额定16A，瞬时脱扣电流 160~240A</li>
+          <li>C25：额定25A，瞬时脱扣电流 250~375A</li>
+        </ul>
+        <p>即短路时电流达到额定的10~15倍才会瞬间跳闸。</p>
+        <h4>空开选择原则</h4>
+        <ul>
+          <li><span class="highlight">空开额定电流 ≤ 线径安全载流量</span></li>
+          <li>空开额定电流 ≥ 回路正常工作电流的1.1倍（避免频繁跳闸）</li>
+          <li>举例：4mm²线（载流24A）→ 选C25（25A ≤ 24A需注意，实际C25是常见搭配）</li>
+        </ul>
+        <div class="warn-block">⚠️ 空开配大了不安全！线路过载时它不跳闸，电线持续发热，绝缘老化，最终导致漏电或短路。</div>
+        <h4>常见空开规格</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>规格</th><th>额定电流</th><th>额定功率(220V)</th><th>典型用途</th></tr>
+              <tr><td>C6</td><td>6A</td><td>1320W</td><td>小功率照明</td></tr>
+              <tr><td>C10</td><td>10A</td><td>2200W</td><td>照明回路</td></tr>
+              <tr><td>C16</td><td>16A</td><td>3520W</td><td>普通插座</td></tr>
+              <tr><td>C25</td><td>25A</td><td>5500W</td><td>厨房/卫生间</td></tr>
+              <tr><td>C32</td><td>32A</td><td>7040W</td><td>入户/大功率</td></tr>
+              <tr><td>C40</td><td>40A</td><td>8800W</td><td>入户总开</td></tr>
+              <tr><td>C50</td><td>50A</td><td>11000W</td><td>入户总开</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 漏电保护器 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">04</span>
+        <span class="knowledge-copy">
+          <h3>️ 漏电保护器（漏保）</h3>
+          <small>区分漏保功能与必要安装位置</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>工作原理</h4>
+        <p>漏保检测火线和零线的电流差。正常时进出电流相等（差值为0）。一旦漏电，部分电流通过人体或设备外壳流入大地，火线和零线电流不等，差值超过<span class="highlight">30mA</span>时漏保跳闸。</p>
+        <h4>哪些回路必须装漏保？</h4>
+        <ul>
+          <li><span class="warn">卫生间</span>（潮湿环境，人体触电风险高）</li>
+          <li><span class="warn">厨房</span>（用水频繁，电器多）</li>
+          <li><span class="warn">所有插座回路</span>（人可能接触到）</li>
+          <li><span class="warn">热水器专用回路</span>（水+电，高风险）</li>
+          <li>阳台洗衣机插座</li>
+        </ul>
+        <h4>漏保 vs 空开区别</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>功能</th><th>空开</th><th>漏保</th></tr>
+              <tr><td>短路保护</td><td>✅ 有</td><td>✅ 有</td></tr>
+              <tr><td>过载保护</td><td>✅ 有</td><td>✅ 有</td></tr>
+              <tr><td>漏电保护</td><td>❌ 无</td><td>✅ 有（30mA）</td></tr>
+              <tr><td>外观</td><td>较窄</td><td>较宽（多一个测试按钮）</td></tr>
+              <tr><td>价格</td><td>便宜</td><td>较贵</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>漏保安装位置</h4>
+        <ul>
+          <li><strong>方案一（推荐）：</strong>各回路单独装漏保，哪个回路漏电跳哪个，不影响其他回路</li>
+          <li><strong>方案二：</strong>总开关装漏保，漏电时全屋断电，排查困难</li>
+          <li><strong>方案三：</strong>总开漏保 + 各回路空开，经济但不精准</li>
+        </ul>
+        <div class="tip-box"><strong>建议：</strong>潮湿区域（卫生间、厨房）的回路务必单独装漏保。每月按一次漏保上的"测试"按钮，确认它能正常跳闸。</div>
+      </div>
+    </div>
+
+    <!-- 05 回路设计原则 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">05</span>
+        <span class="knowledge-copy">
+          <h3>回路设计原则</h3>
+          <small>规划安全、清晰、便于维护的回路</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>为什么要分回路？</h4>
+        <ul>
+          <li>一条回路故障不影响其他区域用电</li>
+          <li>不同区域用电需求不同，线径和空开可以针对性配置</li>
+          <li>便于检修和后期维护</li>
+        </ul>
+        <h4>回路划分建议</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>回路</th><th>建议线径</th><th>建议空开</th><th>是否漏保</th><th>说明</th></tr>
+              <tr><td>照明</td><td>1.5mm²</td><td>C16</td><td>可不装</td><td>功率低，无触电风险</td></tr>
+              <tr><td>普通插座</td><td>2.5mm²</td><td>C16</td><td>✅ 装</td><td>日常用电</td></tr>
+              <tr><td>厨房</td><td>4mm²</td><td>C25</td><td>✅ 装</td><td>电器多、功率大</td></tr>
+              <tr><td>卫生间</td><td>4mm²</td><td>C25</td><td>✅ 装</td><td>潮湿+大功率</td></tr>
+              <tr><td>空调（挂机）</td><td>2.5mm²</td><td>C16</td><td>可不装</td><td>专用回路</td></tr>
+              <tr><td>空调（柜机）</td><td>4mm²</td><td>C25</td><td>可不装</td><td>专用回路</td></tr>
+              <tr><td>热水器</td><td>4mm²</td><td>C25</td><td>✅ 装</td><td>水+电高风险</td></tr>
+              <tr><td>冰箱</td><td>1.5mm²</td><td>C16</td><td>可不装</td><td>功率极低</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>为什么不能清一色C32？</h4>
+        <p>很多电工图省事，全屋配C32空开。这很危险：</p>
+        <ul>
+          <li>C32额定功率7040W，而2.5mm²线只能承受3300W</li>
+          <li>如果2.5mm²的线配C32空开，线路过载时（比如4000W），空开不跳闸</li>
+          <li>电线持续发热 → 绝缘老化 → 漏电/短路 → 火灾风险</li>
+        </ul>
+        <div class="warn-block">⚠️ 核心原则：空开的额定电流不能超过线径的承载能力。线径决定空开，空开保护线径。</div>
+        <h4>常见误区</h4>
+        <ul>
+          <li><strong>误区1：</strong>"空开配大更安全" → 错！配大了等于守门员睡着了</li>
+          <li><strong>误区2：</strong>"冰箱要用4平方线" → 错！冰箱功率100~200W，1.5mm²绑绑有余</li>
+          <li><strong>误区3：</strong>"电工说怎么配就怎么配" → 不完全对，只有你最清楚自己的用电习惯</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 06 线管与布线规范 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">06</span>
+        <span class="knowledge-copy">
+          <h3>线管与布线规范</h3>
+          <small>核对强弱电、穿管与接线规范</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>线管选择</h4>
+        <ul>
+          <li>PVC线管（阻燃管）：家用最常见，16mm和20mm两种直径</li>
+          <li>照明用16mm管，插座用20mm管</li>
+          <li>管壁厚度不小于1.5mm</li>
+        </ul>
+        <h4>穿线率要求</h4>
+        <p>线管内电线截面积总和不超过管内截面积的<span class="highlight">40%</span>。这是为了保证散热和后期换线。</p>
+        <ul>
+          <li>16mm管：最多穿3根2.5mm²线</li>
+          <li>20mm管：最多穿3根4mm²线</li>
+        </ul>
+        <h4>强弱电间距</h4>
+        <p>强电（220V）和弱电（网线、电视线）线管间距不小于<span class="highlight">30cm</span>，交叉处用锡箔纸包裹弱电管做屏蔽。</p>
+        <h4>布线原则</h4>
+        <ul>
+          <li><strong>横平竖直：</strong>便于后期定位和检修</li>
+          <li><strong>活线工艺：</strong>先布管后穿线，后期可换线</li>
+          <li><strong>转弯用大弯：</strong>不用90度直角弯，用两个45度弯，方便抽线</li>
+          <li><strong>线管固定：</strong>每隔60~80cm用管卡固定</li>
+        </ul>
+        <h4>接线规范</h4>
+        <ul>
+          <li>所有接头必须在接线盒内，不能在线管中间接线</li>
+          <li>接头采用搪锡或压接端子，不能简单拧在一起</li>
+          <li>地线不能省略，所有插座必须有地线</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 07 水路基础知识 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">07</span>
+        <span class="knowledge-copy">
+          <h3>水路基础知识</h3>
+          <small>了解水管、打压和排水施工要点</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>水管材质选择</h4>
+        <ul>
+          <li><strong>PPR管：</strong>家装主流，耐高温、耐腐蚀、寿命长（50年）</li>
+          <li>冷水管壁厚2.8mm，热水管壁厚3.4mm</li>
+          <li>建议冷热水管统一用热水管，更耐用</li>
+        </ul>
+        <h4>管径选择</h4>
+        <p class="knowledge-table-hint">左右滑动查看完整表格</p>
+        <div class="knowledge-table-scroll" tabindex="0" role="region" aria-label="知识参考表，可横向滚动">
+          <table>
+            <tbody>
+              <tr><th>管径</th><th>用途</th></tr>
+              <tr><td>DN20（4分管）</td><td>一般用水点</td></tr>
+              <tr><td>DN25（6分管）</td><td>入户主管、热水器进水</td></tr>
+              <tr><td>DN32（1寸管）</td><td>入户总管</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>冷热水管间距</h4>
+        <p>冷热水管间距不小于<span class="highlight">15cm</span>，热水管在左，冷水管在右（面对墙面）。</p>
+        <h4>打压测试</h4>
+        <p>水路完工后必须做打压测试：</p>
+        <ul>
+          <li>打压到<span class="highlight">0.8MPa</span>（8公斤）</li>
+          <li>保持<span class="highlight">30分钟</span></li>
+          <li>压力下降不超过0.05MPa为合格</li>
+        </ul>
+        <h4>下水管坡度</h4>
+        <p>下水管要有一定坡度（1%~3%），保证污水自然流出，不积水。</p>
+      </div>
+    </div>
+
+    <!-- 08 验收注意事项 -->
+    <div class="knowledge-card">
+      <div class="knowledge-card-hd">
+        <span class="knowledge-index">08</span>
+        <span class="knowledge-copy">
+          <h3>水电验收注意事项</h3>
+          <small>按项目逐项完成水电验收</small>
+        </span>
+        <span class="knowledge-arrow">▶</span>
+      </div>
+      <div class="knowledge-body">
+        <h4>电路验收</h4>
+        <ul>
+          <li>线径与设计一致（现场量线径）</li>
+          <li>空开/漏保安装正确，回路标识清晰</li>
+          <li>用验电笔检查所有插座：左零右火上接地</li>
+          <li>漏保测试按钮能正常跳闸</li>
+          <li>线管穿线率不超过40%</li>
+          <li>强弱电间距≥30cm</li>
+          <li>所有接头在接线盒内</li>
+        </ul>
+        <h4>水路验收</h4>
+        <ul>
+          <li>打压测试0.8MPa保持30分钟</li>
+          <li>冷热水管间距≥15cm</li>
+          <li>下水通畅，无积水</li>
+          <li>热水管保温处理</li>
+        </ul>
+        <h4>通用验收</h4>
+        <ul>
+          <li>开槽横平竖直，不破坏承重结构</li>
+          <li>现场拍照存档（后期挂画打孔参考）</li>
+          <li>索要水电施工图纸</li>
+        </ul>
+        <div class="tip-box"><strong>重要：</strong>验收时一定要在场，逐项检查。水电是隐蔽工程，封槽后发现问题代价很大。</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    shell.renderNav('water');
+    document.querySelectorAll('.knowledge-card-hd').forEach(function (hd) {
+      hd.addEventListener('click', function () {
+        hd.parentElement.querySelector('.knowledge-body').classList.toggle('open');
+        hd.querySelector('.knowledge-arrow').classList.toggle('open');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,891 @@
+<html lang="zh-CN" data-inspector-id="html:ed903da4:0"><head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="only light">
+  <meta name="darkreader-lock">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>装修小账本企业版</title>
+  <link rel="stylesheet" href="enterprise.css?v=20261107-a11y">
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="assets/icons/icons.css?v=20261023">
+  <script src="assets/icons/image-fallback.js?v=20261023" defer=""></script>
+</head>
+<body data-inspector-id="html:ed903da4:1">
+  <div class="app-shell" data-inspector-id="html:ed903da4:2">
+    <aside class="sidebar hidden" id="sidebar" data-inspector-id="html:ed903da4:3">
+      <a class="brand" href="enterprise.html" aria-label="装修小账本企业版驾驶舱" data-inspector-id="html:ed903da4:4">
+        <span class="brand-mark" aria-hidden="true" data-inspector-id="html:ed903da4:5">
+          <svg viewBox="0 0 24 24" role="img" data-inspector-id="html:ed903da4:6"><path d="M5 3h13a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5zM3 3v18M8 7h8M8 12h8M8 17h5" data-inspector-id="html:ed903da4:7"></path></svg>
+        </span>
+        <span class="brand-copy" data-inspector-id="html:ed903da4:8"><b data-inspector-id="html:ed903da4:9">装修小账本</b><small data-inspector-id="html:ed903da4:10">企业版</small></span>
+      </a>
+
+      <div class="workspace-card" data-inspector-id="html:ed903da4:11">
+        <span class="workspace-logo" id="organizationInitial" data-inspector-id="html:ed903da4:12"><img class="xz-icon" src="assets/icons/building.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:13"></span>
+        <div data-inspector-id="html:ed903da4:14"><b id="organizationName" data-inspector-id="html:ed903da4:15">正在读取企业…</b><small data-inspector-id="html:ed903da4:16">企业工作空间</small></div>
+        <span class="workspace-check" data-inspector-id="html:ed903da4:17"><img class="xz-icon" src="assets/icons/check.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:18"></span>
+      </div>
+      <div class="workspace-switch" data-inspector-id="html:ed903da4:19">
+        <label for="workspaceSelect" data-inspector-id="html:ed903da4:20">切换工作空间</label>
+        <select id="workspaceSelect" aria-label="切换个人或企业空间" data-inspector-id="html:ed903da4:21"></select>
+      </div>
+
+      <nav aria-label="企业版导航" data-inspector-id="html:ed903da4:22">
+        <section class="nav-group" data-inspector-id="html:ed903da4:23"><p class="nav-label in-nav" data-inspector-id="html:ed903da4:24">核心工作</p>
+          <button class="nav-item active" data-view="dashboard" data-nav-key="dashboard" data-inspector-id="html:ed903da4:25"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:26"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:27"><path d="m3 10 9-7 9 7M5 9v11h14V9M9 20v-7h6v7" data-inspector-id="html:ed903da4:28"></path></svg></span><span data-inspector-id="html:ed903da4:29">工作台</span></button>
+          <button class="nav-item" data-view="tasks" data-nav-key="tasks" data-inspector-id="html:ed903da4:30"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:31"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:32"><rect x="4" y="3" width="16" height="18" rx="3" data-inspector-id="html:ed903da4:33"></rect><path d="m8 11 3 3 6-7" data-inspector-id="html:ed903da4:34"></path></svg></span><span data-inspector-id="html:ed903da4:35">待办中心</span><em id="taskNavCount" data-inspector-id="html:ed903da4:36">0</em></button>
+        </section>
+        <section class="nav-group" data-inspector-id="html:ed903da4:37"><p class="nav-label in-nav" data-inspector-id="html:ed903da4:38">项目执行</p>
+          <button class="nav-item" data-view="projects" data-nav-key="projects" data-project-intent="overview" data-inspector-id="html:ed903da4:39"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:40"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:41"><rect x="3" y="3" width="6" height="6" rx="1.5" data-inspector-id="html:ed903da4:42"></rect><rect x="15" y="3" width="6" height="6" rx="1.5" data-inspector-id="html:ed903da4:43"></rect><rect x="3" y="15" width="6" height="6" rx="1.5" data-inspector-id="html:ed903da4:44"></rect><rect x="15" y="15" width="6" height="6" rx="1.5" data-inspector-id="html:ed903da4:45"></rect></svg></span><span data-inspector-id="html:ed903da4:46">施工项目</span><em id="projectNavCount" data-inspector-id="html:ed903da4:47">0</em></button>
+          <button class="nav-item" data-view="issues" data-nav-key="issues" data-inspector-id="html:ed903da4:48"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:49"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:50"><rect x="4" y="3" width="16" height="18" rx="3" data-inspector-id="html:ed903da4:51"></rect><path d="M12 7v6m0 4h.01" data-inspector-id="html:ed903da4:52"></path></svg></span><span data-inspector-id="html:ed903da4:53">质量整改</span><em id="issueNavCount" data-inspector-id="html:ed903da4:54">0</em></button>
+          <button class="nav-item workforce-only" data-view="workforce" data-nav-key="workforce" data-inspector-id="html:ed903da4:55"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:56"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:57"><circle cx="9" cy="7" r="3" data-inspector-id="html:ed903da4:58"></circle><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-17a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3" data-inspector-id="html:ed903da4:59"></path></svg></span><span data-inspector-id="html:ed903da4:60">人员调配</span><em id="workerNavCount" data-inspector-id="html:ed903da4:61">0</em></button>
+        </section>
+        <section class="nav-group" data-inspector-id="html:ed903da4:62"><p class="nav-label in-nav" data-inspector-id="html:ed903da4:63">经营协同</p>
+          <button class="nav-item" data-view="operations" data-nav-key="operations" data-inspector-id="html:ed903da4:64"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:65"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:66"><rect x="3" y="5" width="18" height="15" rx="3" data-inspector-id="html:ed903da4:67"></rect><path d="m8 9 4 4 4-4m-4 4v5m-4-3h8" data-inspector-id="html:ed903da4:68"></path></svg></span><span data-inspector-id="html:ed903da4:69">收款与供应</span><em id="operationNavCount" data-inspector-id="html:ed903da4:70">0</em></button>
+          <button class="nav-item" data-view="clients" data-nav-key="client" data-inspector-id="html:ed903da4:71"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:72"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:73"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4" data-inspector-id="html:ed903da4:74"></path></svg></span><span data-inspector-id="html:ed903da4:75">客户交付</span><em id="clientNavCount" data-inspector-id="html:ed903da4:76">0</em></button>
+          <button class="nav-item" data-view="photos" data-nav-key="assets" data-inspector-id="html:ed903da4:77"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:78"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:79"><rect x="3" y="3" width="18" height="18" rx="3" data-inspector-id="html:ed903da4:80"></rect><circle cx="8" cy="8" r="1.5" data-inspector-id="html:ed903da4:81"></circle><path d="m3 17 5-5 4 4 4-6 5 7" data-inspector-id="html:ed903da4:82"></path></svg></span><span data-inspector-id="html:ed903da4:83">影像资料</span><em id="photoNavCount" data-inspector-id="html:ed903da4:84">0</em></button>
+        </section>
+        <section class="nav-group" data-inspector-id="html:ed903da4:85"><p class="nav-label in-nav" data-inspector-id="html:ed903da4:86">企业设置</p>
+          <button class="nav-item report-admin-only" data-view="reports" data-nav-key="reports" data-inspector-id="html:ed903da4:87"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:88"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:89"><rect x="5" y="3" width="14" height="18" rx="2" data-inspector-id="html:ed903da4:90"></rect><path d="M8 7h8M8 11h8M8 15h5" data-inspector-id="html:ed903da4:91"></path></svg></span><span data-inspector-id="html:ed903da4:92">报告与表头</span></button>
+          <button class="nav-item" data-view="members" data-nav-key="members" data-inspector-id="html:ed903da4:93"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:94"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:95"><circle cx="9" cy="7" r="3" data-inspector-id="html:ed903da4:96"></circle><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-17a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3" data-inspector-id="html:ed903da4:97"></path></svg></span><span data-inspector-id="html:ed903da4:98">团队与权限</span></button>
+          <button class="nav-item" data-view="activity" data-nav-key="activity" data-inspector-id="html:ed903da4:99"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:100"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:101"><rect x="5" y="3" width="14" height="18" rx="2" data-inspector-id="html:ed903da4:102"></rect><path d="M8 7h8M8 11h8M8 15h5" data-inspector-id="html:ed903da4:103"></path></svg></span><span data-inspector-id="html:ed903da4:104">操作记录</span></button>
+          <button class="nav-item" data-view="storage" data-nav-key="storage" data-inspector-id="html:ed903da4:105"><span class="nav-icon" aria-hidden="true" data-inspector-id="html:ed903da4:106"><svg viewBox="0 0 24 24" data-inspector-id="html:ed903da4:107"><rect x="3" y="4" width="18" height="16" rx="3" data-inspector-id="html:ed903da4:108"></rect><path d="M3 9h18M7 15h4" data-inspector-id="html:ed903da4:109"></path></svg></span><span data-inspector-id="html:ed903da4:110">套餐与存储</span></button>
+        </section>
+      </nav>
+
+      <div class="sidebar-foot" data-inspector-id="html:ed903da4:111">
+        <span class="account-avatar" id="accountInitial" data-inspector-id="html:ed903da4:112"><img class="xz-icon" src="assets/icons/user.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:113"></span>
+        <div data-inspector-id="html:ed903da4:114"><b id="identityText" data-inspector-id="html:ed903da4:115">正在读取账号…</b><a href="home.html" data-inspector-id="html:ed903da4:116">切换到个人版</a></div>
+      </div>
+    </aside>
+
+    <header class="topbar" data-inspector-id="html:ed903da4:117">
+      <div class="topbar-title" data-inspector-id="html:ed903da4:118"><small id="topbarKicker" data-inspector-id="html:ed903da4:119">企业工作台</small><b id="topbarTitle" data-inspector-id="html:ed903da4:120">企业驾驶舱</b></div>
+      <div class="top-actions" data-inspector-id="html:ed903da4:121">
+        <button class="subscription-chip" id="subscriptionChip" type="button" data-view="storage" data-nav-key="storage" title="查看套餐与到期时间" data-inspector-id="html:ed903da4:122">
+          <b id="subscriptionPlanLabel" data-inspector-id="html:ed903da4:123">企业版</b><small id="subscriptionExpiryLabel" data-inspector-id="html:ed903da4:124">正在读取有效期</small>
+        </button>
+        <span class="sync-status" id="syncStatus" role="status" aria-live="polite" data-inspector-id="html:ed903da4:125">已更新 01:39</span>
+        <label class="global-search" data-inspector-id="html:ed903da4:126"><span aria-hidden="true" data-inspector-id="html:ed903da4:127"><img class="xz-icon" src="assets/icons/search.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:128"></span><input id="globalSearch" type="search" aria-label="全局搜索项目、客户或地址" placeholder="搜索项目、客户或地址" data-inspector-id="html:ed903da4:129"></label>
+        <button class="icon-button notice-button" id="noticeButton" type="button" data-notice-dialog="" aria-haspopup="dialog" aria-controls="noticeDialog" aria-label="查看操作提醒" data-inspector-id="html:ed903da4:130"><img class="xz-icon" src="assets/icons/bell.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:131"><em id="noticeCount" data-inspector-id="html:ed903da4:132">0</em></button>
+        <button class="primary owner-only top-new-project" data-open="projectDialog" data-inspector-id="html:ed903da4:133">新建项目</button>
+      </div>
+    </header>
+
+    <main class="main" data-inspector-id="html:ed903da4:134">
+      <div class="toast" id="toast" role="status" aria-live="polite" data-inspector-id="html:ed903da4:135"></div>
+      <div class="mobile-app-notice" data-inspector-id="html:ed903da4:136"><b data-inspector-id="html:ed903da4:137">手机端已有企业版小程序</b><span data-inspector-id="html:ed903da4:138">手机使用时建议优先在“装修小账本”小程序中切换到企业空间，操作照片和现场任务更顺手。</span><button type="button" aria-label="关闭提示" onclick="this.parentElement.remove()" data-inspector-id="html:ed903da4:139"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:140"></button></div>
+
+      <section class="state-card hidden" id="loadingState" data-inspector-id="html:ed903da4:141">
+        <div class="loader" data-inspector-id="html:ed903da4:142"></div>
+        <h1 data-inspector-id="html:ed903da4:143">正在加载企业工作台</h1>
+      </section>
+
+      <section class="state-card hidden" id="connectionState" data-inspector-id="html:ed903da4:144">
+        <span class="state-icon" data-inspector-id="html:ed903da4:145">!</span>
+        <h1 data-inspector-id="html:ed903da4:146">企业工作台暂时连接不上</h1>
+        <p data-inspector-id="html:ed903da4:147">请检查网络后重试，重新连接不会影响已经保存的项目、照片和施工记录。</p>
+        <button class="primary" type="button" id="retryEnterprise" data-inspector-id="html:ed903da4:148">重新连接</button>
+      </section>
+
+      <section class="state-card" id="disabledState" data-inspector-id="html:ed903da4:149">
+        <span class="state-icon" data-inspector-id="html:ed903da4:150"><img class="xz-icon" src="assets/icons/building.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:151"></span>
+        <h1 id="disabledTitle" data-inspector-id="html:ed903da4:152">当前账号尚未开通企业版</h1>
+        <p id="disabledDescription" data-inspector-id="html:ed903da4:153">企业负责人需先由装修小账本管理员开通资格；企业成员可在下方输入收到的邀请码加入。个人版继续永久免费。</p>
+        <form id="joinInvitationForm" class="inline-form" data-inspector-id="html:ed903da4:154">
+          <label data-inspector-id="html:ed903da4:155"><span data-inspector-id="html:ed903da4:156">已有企业邀请码</span><input name="inviteCode" maxlength="256" placeholder="粘贴企业负责人发来的邀请码" required="" data-inspector-id="html:ed903da4:157"></label>
+          <button class="primary" type="submit" data-inspector-id="html:ed903da4:158">加入企业</button>
+        </form>
+        <p class="state-help" data-inspector-id="html:ed903da4:159">已有企业账号但当前账号不对？<a href="account.html" data-inspector-id="html:ed903da4:160">前往账号中心切换登录</a>；负责人开通或续费请联系装修小账本管理员。</p>
+      </section>
+
+      <section class="state-card hidden" id="setupState" data-inspector-id="html:ed903da4:161">
+        <span class="state-icon" data-inspector-id="html:ed903da4:162"><img class="xz-icon" src="assets/icons/building.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:163"></span>
+        <h1 data-inspector-id="html:ed903da4:164">创建你的企业工作空间</h1>
+        <p data-inspector-id="html:ed903da4:165">创建后即可邀请项目经理、建立项目、上传现场照片并生成客户进度链接。</p>
+        <form id="organizationForm" class="inline-form" data-inspector-id="html:ed903da4:166">
+          <label data-inspector-id="html:ed903da4:167"><span data-inspector-id="html:ed903da4:168">企业名称</span><input name="name" maxlength="100" placeholder="例如：安居装饰工程有限公司" required="" data-inspector-id="html:ed903da4:169"></label>
+          <button class="primary" type="submit" data-inspector-id="html:ed903da4:170">创建企业空间</button>
+        </form>
+      </section>
+
+      <div id="enterpriseApp" class="hidden" data-inspector-id="html:ed903da4:171">
+        <div class="access-banner hidden" id="accessBanner" data-inspector-id="html:ed903da4:172"></div>
+        <section class="view active" id="view-dashboard" data-inspector-id="html:ed903da4:173">
+          <section class="dashboard-hero" data-inspector-id="html:ed903da4:174">
+            <div class="hero-copy" data-inspector-id="html:ed903da4:175">
+              <p class="eyebrow" data-inspector-id="html:ed903da4:176">企业运营概览</p>
+              <h1 data-inspector-id="html:ed903da4:177"><span id="greetingText" data-inspector-id="html:ed903da4:178">上午好。</span><br data-inspector-id="html:ed903da4:179"><span id="dashboardTitle" data-inspector-id="html:ed903da4:180">正在汇总今日事项…</span></h1>
+              <p id="dashboardSummary" data-inspector-id="html:ed903da4:181">数据来自真实项目进度、现场日志、整改记录和客户反馈。</p>
+              <div class="hero-tags" data-inspector-id="html:ed903da4:182"><span data-inspector-id="html:ed903da4:183">项目进度</span><span data-inspector-id="html:ed903da4:184">现场审核</span><span data-inspector-id="html:ed903da4:185">整改闭环</span><span data-inspector-id="html:ed903da4:186">客户同步</span></div>
+              <button class="dashboard-report-entry text-button" type="button" data-business-reports="" data-inspector-id="html:ed903da4:187">查看经营报表　→</button>
+            </div>
+            <button class="hero-action" type="button" data-view="tasks" data-nav-key="tasks" data-inspector-id="html:ed903da4:188">
+              <span data-inspector-id="html:ed903da4:189">ⓘ　今日需要处理</span><b id="heroTaskSummary" data-inspector-id="html:ed903da4:190">正在读取待办</b><em data-inspector-id="html:ed903da4:191">进入今日闭环　→</em>
+            </button>
+          </section>
+          <details class="metric-disclosure dashboard-metric-disclosure" data-inspector-id="html:ed903da4:192">
+            <summary data-inspector-id="html:ed903da4:193"><span data-inspector-id="html:ed903da4:194"><b data-inspector-id="html:ed903da4:195">运营关键指标</b><small data-inspector-id="html:ed903da4:196">项目、整改、收款与材料风险</small></span><em data-inspector-id="html:ed903da4:197">展开全部指标</em></summary>
+            <div class="metric-grid" id="metricGrid" data-inspector-id="html:ed903da4:198"></div>
+          </details>
+          <div class="content-grid" data-inspector-id="html:ed903da4:199">
+            <section class="panel" data-inspector-id="html:ed903da4:200">
+              <div class="panel-head" data-inspector-id="html:ed903da4:201"><div data-inspector-id="html:ed903da4:202"><h2 data-inspector-id="html:ed903da4:203">项目脉搏</h2><p data-inspector-id="html:ed903da4:204">节点完成情况、当前负责人和施工风险一屏掌握。</p></div><button class="text-button" data-view-target="projects" data-inspector-id="html:ed903da4:205">全部项目　→</button></div>
+              <div class="project-grid" id="dashboardProjects" data-inspector-id="html:ed903da4:206"></div>
+            </section>
+            <section class="panel queue-panel" id="taskQueuePanel" data-inspector-id="html:ed903da4:207">
+              <div class="panel-head" data-inspector-id="html:ed903da4:208"><div data-inspector-id="html:ed903da4:209"><h2 data-inspector-id="html:ed903da4:210">今日优先 Top 3</h2><p data-inspector-id="html:ed903da4:211">只展示今天最需要先处理的三项；完整事项请进入待办中心。</p></div></div>
+              <div id="actionQueue" data-inspector-id="html:ed903da4:212"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-tasks" data-inspector-id="html:ed903da4:213">
+          <div class="page-head" data-inspector-id="html:ed903da4:214">
+            <div data-inspector-id="html:ed903da4:215"><p class="eyebrow" data-inspector-id="html:ed903da4:216">执行与审批</p><h1 data-inspector-id="html:ed903da4:217">待办与审批中心</h1><p data-inspector-id="html:ed903da4:218">每一条事项都对应具体项目和处理页面，按逾期、审核、整改与客户反馈统一排序。</p></div>
+            <button class="ghost" type="button" id="refreshTaskCenter" data-inspector-id="html:ed903da4:219">刷新待办</button>
+          </div>
+          <div class="task-center-metrics" id="taskCenterMetrics" data-inspector-id="html:ed903da4:220"></div>
+          <div class="filter-row task-filter-row" data-inspector-id="html:ed903da4:221">
+            <input id="taskSearch" type="search" aria-label="搜索待办事项或项目" placeholder="搜索事项或项目" data-inspector-id="html:ed903da4:222">
+            <select id="taskTypeFilter" aria-label="筛选待办类型" data-inspector-id="html:ed903da4:223">
+              <option value="all" data-inspector-id="html:ed903da4:224">全部类型</option>
+              <option value="pending_log" data-inspector-id="html:ed903da4:225">现场审核</option>
+              <option value="issue" data-inspector-id="html:ed903da4:226">问题整改</option>
+              <option value="milestone" data-inspector-id="html:ed903da4:227">施工节点</option>
+              <option value="progress_delay" data-inspector-id="html:ed903da4:228">进度风险</option>
+              <option value="payment_due" data-inspector-id="html:ed903da4:229">逾期收款</option>
+              <option value="material_delay" data-inspector-id="html:ed903da4:230">材料延期</option>
+              <option value="client_response" data-inspector-id="html:ed903da4:231">客户反馈</option>
+            </select>
+            <select id="taskPriorityFilter" aria-label="筛选待办优先级" data-inspector-id="html:ed903da4:232">
+              <option value="all" data-inspector-id="html:ed903da4:233">全部优先级</option>
+              <option value="danger" data-inspector-id="html:ed903da4:234">逾期 / 紧急</option>
+              <option value="attention" data-inspector-id="html:ed903da4:235">需关注</option>
+              <option value="normal" data-inspector-id="html:ed903da4:236">常规</option>
+            </select>
+            <select id="taskSort" aria-label="待办排序方式" data-inspector-id="html:ed903da4:237">
+              <option value="priority" data-inspector-id="html:ed903da4:238">按紧急程度排序</option>
+              <option value="due" data-inspector-id="html:ed903da4:239">按截止时间排序</option>
+              <option value="project" data-inspector-id="html:ed903da4:240">按项目归类</option>
+            </select>
+          </div>
+          <div class="task-table-labels" data-inspector-id="html:ed903da4:241"><span data-inspector-id="html:ed903da4:242">待办事项</span><span data-inspector-id="html:ed903da4:243">所属项目</span><span data-inspector-id="html:ed903da4:244">截止 / 创建</span><span data-inspector-id="html:ed903da4:245">优先级</span><span data-inspector-id="html:ed903da4:246">操作</span></div>
+          <div class="task-center-list" id="taskCenterList" data-inspector-id="html:ed903da4:247"></div>
+        </section>
+
+        <section class="view" id="view-projects" data-inspector-id="html:ed903da4:248">
+          <div class="page-head" data-inspector-id="html:ed903da4:249">
+            <div data-inspector-id="html:ed903da4:250"><p class="eyebrow" id="projectDirectoryEyebrow" data-inspector-id="html:ed903da4:251">项目管理</p><h1 id="projectDirectoryTitle" data-inspector-id="html:ed903da4:252">所有施工项目</h1><p id="projectDirectoryDescription" data-inspector-id="html:ed903da4:253">先配置施工计划，再按节点添加现场、整改、验收并同步客户。</p></div>
+            <div class="page-head-actions" data-inspector-id="html:ed903da4:254"><button class="primary owner-only mobile-new-project" type="button" data-open="projectDialog" data-inspector-id="html:ed903da4:255">新建项目</button><button class="secondary" type="button" id="toggleProjectOrder" hidden="" data-inspector-id="html:ed903da4:256">调整项目顺序</button></div>
+          </div>
+          <div class="filter-row project-filter-row" data-inspector-id="html:ed903da4:257">
+            <input id="projectSearch" type="search" aria-label="搜索项目、客户、地址、合同号或负责人" placeholder="搜索项目、客户、地址、合同号或负责人" data-inspector-id="html:ed903da4:258">
+            <select id="projectStatusFilter" aria-label="按项目状态筛选" data-inspector-id="html:ed903da4:259"><option value="" data-inspector-id="html:ed903da4:260">全部状态</option><option value="normal" data-inspector-id="html:ed903da4:261">正常</option><option value="attention" data-inspector-id="html:ed903da4:262">需关注</option><option value="delayed" data-inspector-id="html:ed903da4:263">已滞后</option></select>
+            <select id="projectDesignerFilter" aria-label="按设计负责人筛选" data-inspector-id="html:ed903da4:264"><option value="" data-inspector-id="html:ed903da4:265">全部设计师</option></select>
+            <select id="projectSiteManagerFilter" aria-label="按施工负责人筛选" data-inspector-id="html:ed903da4:266"><option value="" data-inspector-id="html:ed903da4:267">全部施工负责人（工长）</option></select>
+          </div>
+          <div class="project-table-labels" data-inspector-id="html:ed903da4:268"><span data-inspector-id="html:ed903da4:269">项目信息</span><span data-inspector-id="html:ed903da4:270">负责人</span><span data-inspector-id="html:ed903da4:271">进度</span><span data-inspector-id="html:ed903da4:272">现场 / 问题</span><span data-inspector-id="html:ed903da4:273">状态</span><span data-inspector-id="html:ed903da4:274">操作</span></div>
+          <div class="project-grid wide" id="allProjects" data-inspector-id="html:ed903da4:275"></div>
+        </section>
+
+        <section class="view" id="view-operations" data-inspector-id="html:ed903da4:276">
+          <div class="page-head operations-head" data-inspector-id="html:ed903da4:277">
+            <div data-inspector-id="html:ed903da4:278"><p class="eyebrow" data-inspector-id="html:ed903da4:279">经营与施工协同</p><h1 data-inspector-id="html:ed903da4:280">收款与供应中心</h1><p data-inspector-id="html:ed903da4:281">按项目集中查看合同、回款、增减项和材料到场风险；发现异常后直接进入项目处理。</p></div>
+            <div class="page-head-actions" data-inspector-id="html:ed903da4:282"><button class="secondary" type="button" data-business-reports="" data-inspector-id="html:ed903da4:283">经营报表</button><button class="ghost" type="button" id="refreshOperations" data-inspector-id="html:ed903da4:284">刷新经营数据</button></div>
+          </div>
+          <details class="metric-disclosure operations-metric-disclosure" data-inspector-id="html:ed903da4:285">
+            <summary data-inspector-id="html:ed903da4:286"><span data-inspector-id="html:ed903da4:287"><b data-inspector-id="html:ed903da4:288">经营关键指标</b><small data-inspector-id="html:ed903da4:289">合同、回款、现金与毛利概览</small></span><em data-inspector-id="html:ed903da4:290">展开全部指标</em></summary>
+            <div class="operations-metrics" id="operationsMetrics" data-inspector-id="html:ed903da4:291"></div>
+          </details>
+          <div class="filter-row operations-filter-row" data-inspector-id="html:ed903da4:292"><input id="operationsSearch" type="search" aria-label="搜索经营项目、客户或负责人" placeholder="搜索项目、客户或负责人" data-inspector-id="html:ed903da4:293"><select id="operationsRiskFilter" data-inspector-id="html:ed903da4:294"><option value="all" data-inspector-id="html:ed903da4:295">全部项目</option><option value="danger" data-inspector-id="html:ed903da4:296">仅看逾期风险</option><option value="attention" data-inspector-id="html:ed903da4:297">待确认 / 即将到场</option><option value="normal" data-inspector-id="html:ed903da4:298">暂无风险</option></select><select id="operationsSort" aria-label="经营项目排序" data-inspector-id="html:ed903da4:299"><option value="risk" data-inspector-id="html:ed903da4:300">风险优先</option><option value="receivable" data-inspector-id="html:ed903da4:301">应收金额优先</option><option value="material" data-inspector-id="html:ed903da4:302">材料延期优先</option><option value="cash" data-inspector-id="html:ed903da4:303">现金余额从低到高</option></select></div>
+          <div class="operations-table-labels" data-inspector-id="html:ed903da4:304"><span data-inspector-id="html:ed903da4:305">项目与负责人</span><span data-inspector-id="html:ed903da4:306">合同 / 回款</span><span data-inspector-id="html:ed903da4:307">逾期收款</span><span data-inspector-id="html:ed903da4:308">材料到场</span><span data-inspector-id="html:ed903da4:309">风险状态</span><span data-inspector-id="html:ed903da4:310">操作</span></div>
+          <div class="operations-list" id="operationsList" data-inspector-id="html:ed903da4:311"></div>
+        </section>
+
+        <section class="view" id="view-photos" data-inspector-id="html:ed903da4:312">
+          <div class="page-head" data-inspector-id="html:ed903da4:313">
+            <div data-inspector-id="html:ed903da4:314"><p class="eyebrow" data-inspector-id="html:ed903da4:315">企业影像资料</p><h1 data-inspector-id="html:ed903da4:316">企业照片中心</h1><p data-inspector-id="html:ed903da4:317">点击照片可放大；照片右上角“删除”会移入回收站，误删后可随时恢复。</p></div>
+            <div class="page-head-actions" data-inspector-id="html:ed903da4:318"><div class="asset-tabs" data-inspector-id="html:ed903da4:319"><button class="active" type="button" data-view="photos" data-nav-key="assets" data-inspector-id="html:ed903da4:320">全部照片</button><button type="button" data-view="trash" data-nav-key="assets" data-inspector-id="html:ed903da4:321">回收站 <em id="trashNavCount" data-inspector-id="html:ed903da4:322">0</em></button></div><button class="ghost" type="button" id="refreshPhotoLibrary" data-inspector-id="html:ed903da4:323">刷新照片</button></div>
+          </div>
+          <div class="photo-library-metrics" id="photoLibraryMetrics" data-inspector-id="html:ed903da4:324"></div>
+          <div class="filter-row photo-filter-row" data-inspector-id="html:ed903da4:325">
+            <input id="photoSearch" type="search" aria-label="搜索照片所属项目、节点、说明或上传人" placeholder="搜索项目、节点、说明或上传人" data-inspector-id="html:ed903da4:326">
+            <select id="photoProjectFilter" aria-label="按项目筛选照片" data-inspector-id="html:ed903da4:327"><option value="all" data-inspector-id="html:ed903da4:328">全部项目</option></select>
+            <select id="photoTypeFilter" aria-label="按照片类型筛选" data-inspector-id="html:ed903da4:329"><option value="all" data-inspector-id="html:ed903da4:330">全部类型</option><option value="site_log" data-inspector-id="html:ed903da4:331">现场日志</option><option value="issue" data-inspector-id="html:ed903da4:332">问题整改</option><option value="milestone_acceptance" data-inspector-id="html:ed903da4:333">节点验收</option></select>
+            <select id="photoStatusFilter" aria-label="按照片状态筛选" data-inspector-id="html:ed903da4:334"><option value="all" data-inspector-id="html:ed903da4:335">全部状态</option><option value="published" data-inspector-id="html:ed903da4:336">已发布给客户</option><option value="approved" data-inspector-id="html:ed903da4:337">仅企业内部</option><option value="pending" data-inspector-id="html:ed903da4:338">待处理</option><option value="completed" data-inspector-id="html:ed903da4:339">已完成</option><option value="closed" data-inspector-id="html:ed903da4:340">已关闭</option></select>
+            <span class="filter-result" id="photoFilterResult" data-inspector-id="html:ed903da4:341"></span>
+          </div>
+          <div class="photo-library-grid" id="photoLibraryGrid" data-inspector-id="html:ed903da4:342"></div>
+        </section>
+
+        <section class="view" id="view-trash" data-inspector-id="html:ed903da4:343">
+          <div class="page-head" data-inspector-id="html:ed903da4:344">
+            <div data-inspector-id="html:ed903da4:345"><p class="eyebrow" data-inspector-id="html:ed903da4:346">可恢复删除</p><h1 data-inspector-id="html:ed903da4:347">图片回收站</h1><p data-inspector-id="html:ed903da4:348">删除的现场与整改照片会保留原项目和节点归属；恢复后自动回到原记录，回收站图片仍占用企业存储空间。</p></div>
+            <div class="page-head-actions" data-inspector-id="html:ed903da4:349"><div class="asset-tabs" data-inspector-id="html:ed903da4:350"><button type="button" data-view="photos" data-nav-key="assets" data-inspector-id="html:ed903da4:351">全部照片</button><button class="active" type="button" data-view="trash" data-nav-key="assets" data-inspector-id="html:ed903da4:352">回收站</button></div><button class="ghost" type="button" id="refreshMediaTrash" data-inspector-id="html:ed903da4:353">刷新回收站</button></div>
+          </div>
+          <div class="trash-summary" id="mediaTrashSummary" data-inspector-id="html:ed903da4:354"></div>
+          <div class="trash-grid" id="mediaTrashGrid" data-inspector-id="html:ed903da4:355"></div>
+          <div class="section-head asset-recovery-head" data-inspector-id="html:ed903da4:356"><div data-inspector-id="html:ed903da4:357"><p class="eyebrow" data-inspector-id="html:ed903da4:358">整条日志恢复</p><h2 data-inspector-id="html:ed903da4:359">已删除现场日志</h2><p data-inspector-id="html:ed903da4:360">恢复日志会恢复内部照片和原现场日期，不会自动重新发布给客户。</p></div></div>
+          <div class="recovery-list" id="siteLogTrashGrid" data-inspector-id="html:ed903da4:361"><p class="muted" data-inspector-id="html:ed903da4:362">正在读取…</p></div>
+          <div class="section-head asset-recovery-head" data-inspector-id="html:ed903da4:363"><div data-inspector-id="html:ed903da4:364"><p class="eyebrow" data-inspector-id="html:ed903da4:365">历史照片找回</p><h2 data-inspector-id="html:ed903da4:366">待归档照片 <span class="badge attention" id="unlinkedMediaCount" data-inspector-id="html:ed903da4:367">0</span></h2><p data-inspector-id="html:ed903da4:368">这里列出文件仍在、但没有有效业务记录的照片。确认项目、节点和现场日期后才能归档。</p></div></div>
+          <div class="recovery-list" id="unlinkedMediaGrid" data-inspector-id="html:ed903da4:369"><p class="muted" data-inspector-id="html:ed903da4:370">正在读取…</p></div>
+        </section>
+
+        <section class="view" id="view-issues" data-inspector-id="html:ed903da4:371">
+          <div class="page-head" data-inspector-id="html:ed903da4:372">
+            <div data-inspector-id="html:ed903da4:373"><p class="eyebrow" data-inspector-id="html:ed903da4:374">质量整改统筹</p><h1 data-inspector-id="html:ed903da4:375">问题整改中心</h1><p data-inspector-id="html:ed903da4:376">集中查看全部有权限项目的整改任务、负责人、截止时间和复核状态；进入任务后继续上传整改照片并完成闭环。</p></div>
+            <button class="ghost" type="button" id="refreshIssueCenter" data-inspector-id="html:ed903da4:377">刷新整改</button>
+          </div>
+          <div class="issue-center-metrics" id="issueCenterMetrics" data-inspector-id="html:ed903da4:378"></div>
+          <div class="filter-row issue-filter-row" data-inspector-id="html:ed903da4:379">
+            <input id="issueSearch" type="search" aria-label="搜索整改问题、项目或负责人" placeholder="搜索问题、项目或负责人" data-inspector-id="html:ed903da4:380">
+            <select id="issueStatusFilter" aria-label="筛选整改状态" data-inspector-id="html:ed903da4:381">
+              <option value="open" data-inspector-id="html:ed903da4:382">全部未关闭</option>
+              <option value="overdue" data-inspector-id="html:ed903da4:383">已逾期</option>
+              <option value="pending" data-inspector-id="html:ed903da4:384">待处理</option>
+              <option value="in_progress" data-inspector-id="html:ed903da4:385">整改中</option>
+              <option value="review" data-inspector-id="html:ed903da4:386">待复核</option>
+              <option value="closed" data-inspector-id="html:ed903da4:387">已关闭</option>
+              <option value="canceled" data-inspector-id="html:ed903da4:388">已撤销</option>
+              <option value="all" data-inspector-id="html:ed903da4:389">全部记录</option>
+            </select>
+            <select id="issueSort" aria-label="整改任务排序方式" data-inspector-id="html:ed903da4:390">
+              <option value="action" data-inspector-id="html:ed903da4:391">按下一动作排序</option>
+              <option value="due" data-inspector-id="html:ed903da4:392">按截止时间排序</option>
+              <option value="project" data-inspector-id="html:ed903da4:393">按项目归类</option>
+            </select>
+          </div>
+          <div class="issue-table-labels" data-inspector-id="html:ed903da4:394"><span data-inspector-id="html:ed903da4:395">整改问题</span><span data-inspector-id="html:ed903da4:396">所属项目</span><span data-inspector-id="html:ed903da4:397">负责人 / 截止</span><span data-inspector-id="html:ed903da4:398">状态</span><span data-inspector-id="html:ed903da4:399">操作</span></div>
+          <div class="issue-center-list" id="issueCenterList" data-inspector-id="html:ed903da4:400"></div>
+        </section>
+
+        <section class="view" id="view-clients" data-inspector-id="html:ed903da4:401">
+          <div class="page-head" data-inspector-id="html:ed903da4:402">
+            <div data-inspector-id="html:ed903da4:403"><p class="eyebrow" data-inspector-id="html:ed903da4:404">客户交付统筹</p><h1 data-inspector-id="html:ed903da4:405">客户交付中心</h1><p data-inspector-id="html:ed903da4:406">集中查看客户账号绑定、进度发布、客户查看和待回应意见；进入项目后继续发布或处理。</p></div>
+            <button class="ghost" type="button" id="refreshClientCenter" data-inspector-id="html:ed903da4:407">刷新交付状态</button>
+          </div>
+          <div class="client-center-metrics" id="clientCenterMetrics" data-inspector-id="html:ed903da4:408"></div>
+          <div class="filter-row client-filter-row" data-inspector-id="html:ed903da4:409">
+            <input id="clientSearch" type="search" aria-label="搜索客户、项目或装修地址" placeholder="搜索客户、项目或装修地址" data-inspector-id="html:ed903da4:410">
+            <select id="clientStatusFilter" aria-label="筛选客户交付状态" data-inspector-id="html:ed903da4:411">
+              <option value="all" data-inspector-id="html:ed903da4:412">全部状态</option>
+              <option value="attention" data-inspector-id="html:ed903da4:413">有客户意见</option>
+              <option value="waiting_view" data-inspector-id="html:ed903da4:414">待客户查看</option>
+              <option value="active" data-inspector-id="html:ed903da4:415">客户已查看</option>
+              <option value="shared_link" data-inspector-id="html:ed903da4:416">备用链接访问</option>
+              <option value="unpublished" data-inspector-id="html:ed903da4:417">尚未发布</option>
+              <option value="unbound" data-inspector-id="html:ed903da4:418">尚未开通访问</option>
+            </select>
+          </div>
+          <div class="client-table-labels" data-inspector-id="html:ed903da4:419"><span data-inspector-id="html:ed903da4:420">客户与项目</span><span data-inspector-id="html:ed903da4:421">绑定状态</span><span data-inspector-id="html:ed903da4:422">最近交付</span><span data-inspector-id="html:ed903da4:423">客户反馈</span><span data-inspector-id="html:ed903da4:424">操作</span></div>
+          <div class="client-center-list" id="clientCenterList" data-inspector-id="html:ed903da4:425"></div>
+        </section>
+
+        <section class="view" id="view-workforce" data-inspector-id="html:ed903da4:426">
+          <div class="page-head" data-inspector-id="html:ed903da4:427">
+            <div data-inspector-id="html:ed903da4:428"><p class="eyebrow" data-inspector-id="html:ed903da4:429">人员与工地排班</p><h1 data-inspector-id="html:ed903da4:430">工人调配中心</h1><p data-inspector-id="html:ed903da4:431">清楚掌握每位工人当前在哪个工地、连续工作几天和下一段安排；重复派工会自动拦截。</p></div>
+            <div class="page-head-actions" data-inspector-id="html:ed903da4:432"><button class="secondary" type="button" data-open="workerDialog" data-inspector-id="html:ed903da4:433">新增工人</button><button class="primary" type="button" data-open="assignmentDialog" data-inspector-id="html:ed903da4:434">安排工地</button></div>
+          </div>
+          <div class="workforce-metrics" id="workforceMetrics" data-inspector-id="html:ed903da4:435"></div>
+          <section class="panel workforce-board-panel" data-inspector-id="html:ed903da4:436">
+            <div class="panel-head" data-inspector-id="html:ed903da4:437"><div data-inspector-id="html:ed903da4:438"><p class="section-kicker" data-inspector-id="html:ed903da4:439">14-DAY DISPATCH</p><h2 data-inspector-id="html:ed903da4:440">未来 14 天派工板</h2><p data-inspector-id="html:ed903da4:441">横向查看每位工人的工地分配，空白日期代表可调配。</p></div><div class="workforce-range" data-inspector-id="html:ed903da4:442"><button class="ghost" type="button" id="workforcePrev" data-inspector-id="html:ed903da4:443">← 前 14 天</button><input id="workforceStartDate" type="date" aria-label="排班开始日期" data-inspector-id="html:ed903da4:444"><button class="ghost" type="button" id="workforceToday" data-inspector-id="html:ed903da4:445">今天</button><button class="ghost" type="button" id="workforceNext" data-inspector-id="html:ed903da4:446">后 14 天 →</button></div></div>
+            <div class="filter-row workforce-filter-row" data-inspector-id="html:ed903da4:447"><input id="workerSearch" type="search" aria-label="搜索工人、工种或工地" placeholder="搜索工人、工种或工地" data-inspector-id="html:ed903da4:448"><select id="workerTradeFilter" aria-label="筛选工种" data-inspector-id="html:ed903da4:449"><option value="all" data-inspector-id="html:ed903da4:450">全部工种</option></select><select id="workerStatusFilter" aria-label="筛选工人状态" data-inspector-id="html:ed903da4:451"><option value="active" data-inspector-id="html:ed903da4:452">在岗工人</option><option value="available" data-inspector-id="html:ed903da4:453">今日可调配</option><option value="assigned" data-inspector-id="html:ed903da4:454">今日已派工</option><option value="all" data-inspector-id="html:ed903da4:455">全部工人</option></select></div>
+            <div class="workforce-board-scroll" data-inspector-id="html:ed903da4:456"><div class="workforce-board" id="workforceBoard" data-inspector-id="html:ed903da4:457"></div></div>
+          </section>
+          <section class="panel workforce-list-panel" data-inspector-id="html:ed903da4:458">
+            <div class="panel-head" data-inspector-id="html:ed903da4:459"><div data-inspector-id="html:ed903da4:460"><p class="section-kicker" data-inspector-id="html:ed903da4:461">ASSIGNMENT LIST</p><h2 data-inspector-id="html:ed903da4:462">派工明细</h2><p data-inspector-id="html:ed903da4:463">按工人查看工地、施工内容、开始与结束日期。</p></div><button class="ghost" type="button" id="refreshWorkforce" data-inspector-id="html:ed903da4:464">刷新排班</button></div>
+            <div class="workforce-table-labels" data-inspector-id="html:ed903da4:465"><span data-inspector-id="html:ed903da4:466">工人 / 工种</span><span data-inspector-id="html:ed903da4:467">安排工地</span><span data-inspector-id="html:ed903da4:468">施工内容</span><span data-inspector-id="html:ed903da4:469">派工日期</span><span data-inspector-id="html:ed903da4:470">天数</span><span data-inspector-id="html:ed903da4:471">操作</span></div>
+            <div class="workforce-assignment-list" id="workforceAssignmentList" data-inspector-id="html:ed903da4:472"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-members" data-inspector-id="html:ed903da4:473">
+          <div class="page-head" data-inspector-id="html:ed903da4:474">
+            <div data-inspector-id="html:ed903da4:475"><p class="eyebrow" data-inspector-id="html:ed903da4:476">组织与权限</p><h1 data-inspector-id="html:ed903da4:477">企业成员</h1><p data-inspector-id="html:ed903da4:478">岗位自动带入常用项目大项；企业负责人还可为每位成员单独设置施工执行、合同收款、成本管理和客户交付权限。</p></div>
+            <button class="primary owner-only" id="inviteMemberButton" data-open="inviteDialog" data-inspector-id="html:ed903da4:479">邀请成员</button>
+          </div>
+          <section class="team-plan-notice" id="teamPlanNotice" hidden="" data-inspector-id="html:ed903da4:480"><div data-inspector-id="html:ed903da4:481"><b data-inspector-id="html:ed903da4:482">当前为企业会员基础版</b><p data-inspector-id="html:ed903da4:483">基础版仅限企业负责人单人使用；邀请成员、设置成员角色和权限属于企业会员团队版。</p></div><button class="secondary" type="button" data-team-plan-upgrade="" data-inspector-id="html:ed903da4:484">联系作者开通团队版</button></section>
+          <section class="panel" data-inspector-id="html:ed903da4:485">
+            <div class="member-list" id="memberList" data-inspector-id="html:ed903da4:486"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-reports" data-inspector-id="html:ed903da4:487">
+          <div class="page-head" data-inspector-id="html:ed903da4:488">
+            <div data-inspector-id="html:ed903da4:489"><p class="eyebrow" data-inspector-id="html:ed903da4:490">企业设置</p><h1 data-inspector-id="html:ed903da4:491">客户报告与表头</h1><p data-inspector-id="html:ed903da4:492">统一设置公司 Logo、企业名称、报告标语及负责人显示岗位，保存后网页和小程序的客户文件同时使用。</p></div>
+          </div>
+          <form id="reportBrandingSettingsForm" class="panel report-branding-form report-branding-settings-form report-admin-only" data-inspector-id="html:ed903da4:493">
+            <div class="report-branding-head" data-inspector-id="html:ed903da4:494"><div data-inspector-id="html:ed903da4:495"><b data-inspector-id="html:ed903da4:496">企业报告抬头</b><small data-inspector-id="html:ed903da4:497">适用于施工计划表、计划 / 实际进度表、收款计划表、项目报告和节点验收报告。</small></div><button class="primary" type="submit" data-inspector-id="html:ed903da4:498">保存报告设置</button></div>
+            <div class="report-branding-grid" data-inspector-id="html:ed903da4:499">
+              <label data-inspector-id="html:ed903da4:500"><span data-inspector-id="html:ed903da4:501">抬头样式</span><select name="brandMode" data-inspector-id="html:ed903da4:502"><option value="text" data-inspector-id="html:ed903da4:503">企业文字</option><option value="logo" data-inspector-id="html:ed903da4:504">公司 Logo</option></select></label>
+              <label data-inspector-id="html:ed903da4:505"><span data-inspector-id="html:ed903da4:506">企业抬头文字</span><input name="brandText" maxlength="100" placeholder="例如：东莞荆东装饰" data-inspector-id="html:ed903da4:507"></label>
+              <label data-inspector-id="html:ed903da4:508"><span data-inspector-id="html:ed903da4:509">负责人岗位名称</span><input name="managerTitle" maxlength="30" placeholder="例如：项目经理 / 工长" data-inspector-id="html:ed903da4:510"></label>
+              <label data-inspector-id="html:ed903da4:511"><span data-inspector-id="html:ed903da4:512">报告显示人员</span><select name="managerSource" data-inspector-id="html:ed903da4:513"><option value="site_manager" data-inspector-id="html:ed903da4:514">项目经理 / 工长</option><option value="manager" data-inspector-id="html:ed903da4:515">项目总负责人</option><option value="designer" data-inspector-id="html:ed903da4:516">设计师</option></select></label>
+              <label class="span-2" data-inspector-id="html:ed903da4:517"><span data-inspector-id="html:ed903da4:518">报告标语</span><input name="tagline" maxlength="160" placeholder="例如：专业施工 · 透明交付 · 节点验收" data-inspector-id="html:ed903da4:519"></label>
+              <label class="span-2 report-export-option" data-inspector-id="html:ed903da4:520"><input name="includeIssueRecords" type="checkbox" checked="" data-inspector-id="html:ed903da4:521"><span data-inspector-id="html:ed903da4:522">默认显示问题整改闭环</span><small data-inspector-id="html:ed903da4:523">开启后，有整改记录时写入节点验收报告；每次导出前仍可临时调整。</small></label>
+              <label class="span-2 report-export-option" data-inspector-id="html:ed903da4:524"><input name="includeCustomerSyncRecords" type="checkbox" data-inspector-id="html:ed903da4:525"><span data-inspector-id="html:ed903da4:526">导出客户同步明细</span><small data-inspector-id="html:ed903da4:527">默认关闭；开启后，有同步记录时才会写入节点验收报告。</small></label>
+              <label class="span-2 report-logo-field" data-inspector-id="html:ed903da4:528"><span data-inspector-id="html:ed903da4:529">公司 Logo（JPG / PNG / WebP，建议透明背景）</span><input id="reportSettingsLogoInput" name="logo" type="file" accept="image/jpeg,image/png,image/webp" data-inspector-id="html:ed903da4:530"><small id="reportSettingsLogoHint" data-inspector-id="html:ed903da4:531">选择 Logo 抬头时需要上传图片；保留为空不会替换现有 Logo。</small></label>
+            </div>
+            <div class="report-settings-preview" id="reportSettingsPreview" aria-live="polite" data-inspector-id="html:ed903da4:532"></div>
+          </form>
+          <section class="panel report-settings-note" data-inspector-id="html:ed903da4:533"><b data-inspector-id="html:ed903da4:534">保存后会统一到哪里？</b><p data-inspector-id="html:ed903da4:535">施工进度计划表、计划 / 实际进度表、合同收款计划表、项目进度与验收报告、节点验收图文报告都会自动使用这套表头。</p></section>
+        </section>
+
+        <section class="view" id="view-activity" data-inspector-id="html:ed903da4:536">
+          <div class="page-head" data-inspector-id="html:ed903da4:537"><div data-inspector-id="html:ed903da4:538"><p class="eyebrow" data-inspector-id="html:ed903da4:539">权限与过程追溯</p><h1 data-inspector-id="html:ed903da4:540">操作记录中心</h1><p data-inspector-id="html:ed903da4:541">查看谁在什么时间修改了施工计划、收款、增减项、材料、整改和客户发布。</p></div><button class="ghost" id="refreshActivity" type="button" data-inspector-id="html:ed903da4:542">刷新记录</button></div>
+          <div class="filter-row activity-filter-row" data-inspector-id="html:ed903da4:543"><input id="activitySearch" type="search" aria-label="搜索操作人、项目或操作内容" placeholder="搜索操作人、项目或操作内容" data-inspector-id="html:ed903da4:544"><select id="activityProjectFilter" data-inspector-id="html:ed903da4:545"><option value="all" data-inspector-id="html:ed903da4:546">全部项目</option></select><select id="activityTypeFilter" aria-label="筛选操作类型" data-inspector-id="html:ed903da4:547"><option value="all" data-inspector-id="html:ed903da4:548">全部操作</option><option value="project" data-inspector-id="html:ed903da4:549">项目与计划</option><option value="finance" data-inspector-id="html:ed903da4:550">收款与成本</option><option value="site" data-inspector-id="html:ed903da4:551">现场与整改</option><option value="client" data-inspector-id="html:ed903da4:552">客户交付</option><option value="organization" data-inspector-id="html:ed903da4:553">企业与权限</option></select></div>
+          <div class="activity-table-labels" data-inspector-id="html:ed903da4:554"><span data-inspector-id="html:ed903da4:555">操作内容</span><span data-inspector-id="html:ed903da4:556">所属项目</span><span data-inspector-id="html:ed903da4:557">操作人</span><span data-inspector-id="html:ed903da4:558">操作时间</span></div>
+          <div class="activity-list" id="activityList" data-inspector-id="html:ed903da4:559"></div>
+        </section>
+
+        <section class="view" id="view-storage" data-inspector-id="html:ed903da4:560">
+          <div class="page-head" data-inspector-id="html:ed903da4:561">
+            <div data-inspector-id="html:ed903da4:562"><p class="eyebrow" data-inspector-id="html:ed903da4:563">照片与存储</p><h1 data-inspector-id="html:ed903da4:564">企业存储空间</h1><p data-inspector-id="html:ed903da4:565">现场日志、整改前后照片都计入企业额度，客户查看不会重复占用。</p></div>
+          </div>
+          <section class="panel storage-panel" id="storagePanel" data-inspector-id="html:ed903da4:566"></section>
+        </section>
+
+        <section class="view project-workspace" id="view-project" data-inspector-id="html:ed903da4:567">
+          <button class="back-button" id="backToProjects" data-inspector-id="html:ed903da4:568">← 返回项目列表</button>
+          <div class="project-hero" id="projectHero" data-inspector-id="html:ed903da4:569"></div>
+          <nav class="cost-subnav" id="projectCostSubnav" aria-label="成本管理二级导航" data-inspector-id="html:ed903da4:570">
+            <button type="button" onclick="document.querySelector('.enterprise-cost-panel')?.scrollIntoView({behavior:'smooth',block:'start'})" data-inspector-id="html:ed903da4:571">成本概览</button>
+            <button type="button" onclick="document.querySelector('.enterprise-material-panel')?.scrollIntoView({behavior:'smooth',block:'start'})" data-inspector-id="html:ed903da4:572">材料采购</button>
+            <button type="button" onclick="document.querySelector('.cost-entry-list')?.scrollIntoView({behavior:'smooth',block:'start'})" data-inspector-id="html:ed903da4:573">支出明细</button>
+            <button class="cost-subnav-tool" type="button" data-supplier-directory="" data-inspector-id="html:ed903da4:574">厂家档案</button>
+          </nav>
+          <section class="project-tab active" id="project-tab-overview" data-inspector-id="html:ed903da4:575"></section>
+          <section class="project-tab" id="project-tab-logs" data-inspector-id="html:ed903da4:576"></section>
+          <section class="project-tab" id="project-tab-issues" data-inspector-id="html:ed903da4:577"></section>
+          <section class="project-tab" id="project-tab-client" data-inspector-id="html:ed903da4:578"></section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="noticeDialog" class="notice-dialog" aria-labelledby="noticeDialogTitle" data-inspector-id="html:ed903da4:579">
+    <div class="notice-dialog-card" data-inspector-id="html:ed903da4:580">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:581"><div data-inspector-id="html:ed903da4:582"><h2 id="noticeDialogTitle" data-inspector-id="html:ed903da4:583">操作提醒</h2><p id="noticeDialogSummary" data-inspector-id="html:ed903da4:584">正在读取需要处理的事项</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:585"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:586"></button></div>
+      <div class="notice-dialog-list" id="noticeDialogList" data-inspector-id="html:ed903da4:587"></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:588"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:589">稍后处理</button><button class="primary" type="button" data-notice-all="" data-inspector-id="html:ed903da4:590">查看全部待办</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="projectDialog" class="project-wizard-dialog" data-inspector-id="html:ed903da4:591">
+    <form method="dialog" class="dialog-form project-wizard-form" id="projectForm" data-inspector-id="html:ed903da4:592">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:593"><div data-inspector-id="html:ed903da4:594"><h2 data-inspector-id="html:ed903da4:595">新建企业项目</h2><p id="projectWizardDescription" data-inspector-id="html:ed903da4:596">先完善项目资料，再一次配置施工计划和收款计划。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:597"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:598"></button></div>
+      <div class="project-wizard-steps" data-inspector-id="html:ed903da4:599"><button class="active" type="button" data-project-wizard-step="1" data-inspector-id="html:ed903da4:600"><i data-inspector-id="html:ed903da4:601">1</i><span data-inspector-id="html:ed903da4:602">项目资料</span></button><button type="button" data-project-wizard-step="2" data-inspector-id="html:ed903da4:603"><i data-inspector-id="html:ed903da4:604">2</i><span data-inspector-id="html:ed903da4:605">施工计划</span></button><button type="button" data-project-wizard-step="3" data-inspector-id="html:ed903da4:606"><i data-inspector-id="html:ed903da4:607">3</i><span data-inspector-id="html:ed903da4:608">收款计划</span></button></div>
+      <div class="project-wizard-error-summary hidden" id="projectWizardErrorSummary" role="alert" tabindex="-1" data-inspector-id="html:ed903da4:609"></div>
+      <section class="project-wizard-panel active" data-project-wizard-panel="1" data-inspector-id="html:ed903da4:610">
+        <div class="form-grid" data-inspector-id="html:ed903da4:611">
+          <label class="span-2" data-inspector-id="html:ed903da4:612"><span data-inspector-id="html:ed903da4:613">项目名称 *</span><input name="name" maxlength="100" placeholder="例如：锦绣花园 3-2-1201" required="" data-inspector-id="html:ed903da4:614"></label>
+          <label data-inspector-id="html:ed903da4:615"><span data-inspector-id="html:ed903da4:616">客户称呼</span><input name="customerName" maxlength="100" placeholder="陈先生" data-inspector-id="html:ed903da4:617"></label>
+          <label data-inspector-id="html:ed903da4:618"><span data-inspector-id="html:ed903da4:619">建筑面积（㎡）</span><input name="area" type="number" min="0" max="100000" value="0" data-inspector-id="html:ed903da4:620"></label>
+          <label class="span-2" data-inspector-id="html:ed903da4:621"><span data-inspector-id="html:ed903da4:622">项目地址</span><input name="location" maxlength="200" placeholder="小区、楼栋或施工地址" data-inspector-id="html:ed903da4:623"></label>
+          <label data-inspector-id="html:ed903da4:624"><span data-inspector-id="html:ed903da4:625">项目总负责人 *</span><select name="managerMemberId" id="projectManagerSelect" required="" data-inspector-id="html:ed903da4:626"></select><small data-inspector-id="html:ed903da4:627">拥有项目审批、发布、经营和施工流程最高权限。</small></label>
+          <label data-inspector-id="html:ed903da4:628"><span data-inspector-id="html:ed903da4:629">设计负责人</span><select name="designerMemberId" id="projectDesignerSelect" data-inspector-id="html:ed903da4:630"><option value="" data-inspector-id="html:ed903da4:631">暂不指定</option></select></label>
+          <label data-inspector-id="html:ed903da4:632"><span data-inspector-id="html:ed903da4:633">施工负责人（工长）</span><select name="siteManagerMemberId" id="projectSiteManagerSelect" data-inspector-id="html:ed903da4:634"><option value="" data-inspector-id="html:ed903da4:635">暂不指定</option></select><small data-inspector-id="html:ed903da4:636">负责现场协调、施工记录与日常跟进。</small></label>
+          <label data-inspector-id="html:ed903da4:637"><span data-inspector-id="html:ed903da4:638">项目成本预算（元）</span><input name="costBudget" type="number" min="0" max="1000000000" step="0.01" value="0" data-inspector-id="html:ed903da4:639"></label>
+          <label data-inspector-id="html:ed903da4:640"><span data-inspector-id="html:ed903da4:641">合同金额（元）</span><input name="contractAmount" type="number" min="0" max="1000000000" step="0.01" value="0" data-inspector-id="html:ed903da4:642"></label>
+          <label data-inspector-id="html:ed903da4:643"><span data-inspector-id="html:ed903da4:644">合同号</span><input name="contractNo" maxlength="80" placeholder="可选，用于项目筛选" data-inspector-id="html:ed903da4:645"></label>
+          <label data-inspector-id="html:ed903da4:646"><span data-inspector-id="html:ed903da4:647">签约月份</span><input name="signedMonth" type="month" data-inspector-id="html:ed903da4:648"></label>
+          <label data-inspector-id="html:ed903da4:649"><span data-inspector-id="html:ed903da4:650">已收定金（元）</span><input name="depositAmount" type="number" min="0" max="1000000000" step="0.01" value="0" data-inspector-id="html:ed903da4:651"><small data-inspector-id="html:ed903da4:652">首期按比例收款时自动抵扣</small></label>
+        </div>
+      </section>
+      <section class="project-wizard-panel" data-project-wizard-panel="2" data-inspector-id="html:ed903da4:653">
+        <div class="wizard-plan-toolbar" data-inspector-id="html:ed903da4:654"><label data-inspector-id="html:ed903da4:655"><span data-inspector-id="html:ed903da4:656">计划开工日期 *</span><input id="projectWizardStartDate" type="date" data-inspector-id="html:ed903da4:657"></label><div data-inspector-id="html:ed903da4:658"><b id="projectWizardPlanSummary" data-inspector-id="html:ed903da4:659">8 个标准节点</b><span id="projectWizardPlanRule" data-inspector-id="html:ed903da4:660">可调整节点名称、工期和最低照片数</span></div><button class="secondary" type="button" id="projectWizardAddNode" data-inspector-id="html:ed903da4:661">自定义节点</button></div>
+        <div class="construction-plan-preset-bar project-wizard-preset-bar" data-inspector-id="html:ed903da4:662">
+          <div data-inspector-id="html:ed903da4:663"><b data-inspector-id="html:ed903da4:664">选择施工计划模板</b><small data-inspector-id="html:ed903da4:665">引用后复制到本项目，仍可逐项调整，不会修改企业预设</small></div>
+          <select id="projectWizardPresetSelect" aria-label="选择新项目施工计划模板" data-inspector-id="html:ed903da4:666"><option value="" data-inspector-id="html:ed903da4:667">系统标准施工流程 · 8 个节点</option></select>
+          <button class="secondary" type="button" data-project-wizard-preset-apply="" data-inspector-id="html:ed903da4:668">应用模板</button>
+          <button class="ghost" type="button" data-project-wizard-preset-reset="" data-inspector-id="html:ed903da4:669">恢复系统标准</button>
+          <span class="project-wizard-preset-hint" id="projectWizardPresetHint" data-inspector-id="html:ed903da4:670">当前使用系统标准施工流程</span>
+        </div>
+        <div class="construction-plan-labels" data-inspector-id="html:ed903da4:671"><span data-inspector-id="html:ed903da4:672">顺序 / 节点名称</span><span data-inspector-id="html:ed903da4:673">预计工期</span><span data-inspector-id="html:ed903da4:674">最低照片</span><span data-inspector-id="html:ed903da4:675">节点状态</span><span data-inspector-id="html:ed903da4:676">计划日期（可调整）</span><span data-inspector-id="html:ed903da4:677">操作</span></div>
+        <div class="construction-plan-list" id="projectWizardPlanList" data-inspector-id="html:ed903da4:678"></div>
+      </section>
+      <section class="project-wizard-panel" data-project-wizard-panel="3" data-inspector-id="html:ed903da4:679">
+        <div class="wizard-payment-head" data-inspector-id="html:ed903da4:680"><div data-inspector-id="html:ed903da4:681"><b data-inspector-id="html:ed903da4:682">按合同设置收款计划</b><span data-inspector-id="html:ed903da4:683">支持按百分比自动换算，或直接填写每一期实际应收金额。</span></div><button class="secondary" type="button" id="projectWizardAddPayment" data-inspector-id="html:ed903da4:684">增加收款节点</button></div>
+        <fieldset class="payment-plan-mode-switch wizard-payment-mode" data-inspector-id="html:ed903da4:685"><legend data-inspector-id="html:ed903da4:686">计划计算方式</legend><label data-inspector-id="html:ed903da4:687"><input type="radio" name="wizardCalculationMode" value="percentage" checked="" data-inspector-id="html:ed903da4:688"><span data-inspector-id="html:ed903da4:689">按百分比</span><small data-inspector-id="html:ed903da4:690">合同总价自动换算</small></label><label data-inspector-id="html:ed903da4:691"><input type="radio" name="wizardCalculationMode" value="amount" data-inspector-id="html:ed903da4:692"><span data-inspector-id="html:ed903da4:693">自定义金额</span><small data-inspector-id="html:ed903da4:694">直接填写每期应收</small></label><label data-inspector-id="html:ed903da4:695"><input type="radio" name="wizardCalculationMode" value="split" data-inspector-id="html:ed903da4:696"><span data-inspector-id="html:ed903da4:697">人辅 / 主材分开</span><small data-inspector-id="html:ed903da4:698">两类分别设置比例或金额</small></label></fieldset>
+        <div class="payment-split-settings" id="projectWizardPaymentSplitSettings" hidden="" data-inspector-id="html:ed903da4:699">
+          <div data-inspector-id="html:ed903da4:700"><b data-inspector-id="html:ed903da4:701">人辅收款</b><label data-inspector-id="html:ed903da4:702"><span data-inspector-id="html:ed903da4:703">人辅合同金额</span><input name="wizardLaborAuxiliaryAmount" type="number" min="0" step="0.01" data-inspector-id="html:ed903da4:704"></label><label data-inspector-id="html:ed903da4:705"><span data-inspector-id="html:ed903da4:706">计算方式</span><select name="wizardLaborAuxiliaryMode" data-inspector-id="html:ed903da4:707"><option value="percentage" data-inspector-id="html:ed903da4:708">按组内比例</option><option value="amount" data-inspector-id="html:ed903da4:709">自定义金额</option></select></label></div>
+          <div data-inspector-id="html:ed903da4:710"><b data-inspector-id="html:ed903da4:711">主材收款</b><label data-inspector-id="html:ed903da4:712"><span data-inspector-id="html:ed903da4:713">主材合同金额</span><input name="wizardMainMaterialAmount" type="number" min="0" step="0.01" data-inspector-id="html:ed903da4:714"></label><label data-inspector-id="html:ed903da4:715"><span data-inspector-id="html:ed903da4:716">计算方式</span><select name="wizardMainMaterialMode" data-inspector-id="html:ed903da4:717"><option value="percentage" data-inspector-id="html:ed903da4:718">按组内比例</option><option value="amount" data-inspector-id="html:ed903da4:719">自定义金额</option></select></label></div>
+          <small data-inspector-id="html:ed903da4:720">两项合计须等于合同总额；已收定金优先抵扣人辅组首期。</small>
+        </div>
+        <div class="wizard-payment-labels" data-inspector-id="html:ed903da4:721"><span data-inspector-id="html:ed903da4:722">收款节点</span><span id="projectWizardValueLabel" data-inspector-id="html:ed903da4:723">合同占比</span><span data-inspector-id="html:ed903da4:724">计划金额</span><span data-inspector-id="html:ed903da4:725">计划日期</span><span data-inspector-id="html:ed903da4:726">操作</span></div>
+        <div class="wizard-payment-list" id="projectWizardPaymentList" data-inspector-id="html:ed903da4:727"></div>
+      </section>
+      <div class="dialog-actions project-wizard-actions" data-inspector-id="html:ed903da4:728"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:729">取消</button><span data-inspector-id="html:ed903da4:730"></span><button class="secondary hidden" type="button" id="projectWizardPrev" data-inspector-id="html:ed903da4:731">上一步</button><button class="primary" type="button" id="projectWizardNext" data-inspector-id="html:ed903da4:732">下一步：施工计划</button><button class="primary hidden" type="submit" id="projectWizardSubmit" data-inspector-id="html:ed903da4:733">创建项目并保存全部计划</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="projectEditDialog" data-inspector-id="html:ed903da4:734">
+    <form method="dialog" class="dialog-form" id="projectEditForm" data-inspector-id="html:ed903da4:735">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:736"><div data-inspector-id="html:ed903da4:737"><h2 data-inspector-id="html:ed903da4:738">编辑项目资料</h2><p data-inspector-id="html:ed903da4:739">进度从独立流程维护；成本预算仅企业负责人和管理员可见。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:740"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:741"></button></div>
+      <div class="form-grid" data-inspector-id="html:ed903da4:742">
+        <label class="span-2" data-inspector-id="html:ed903da4:743"><span data-inspector-id="html:ed903da4:744">项目名称 *</span><input name="name" maxlength="100" required="" data-inspector-id="html:ed903da4:745"></label>
+        <label data-inspector-id="html:ed903da4:746"><span data-inspector-id="html:ed903da4:747">客户称呼</span><input name="customerName" maxlength="100" data-inspector-id="html:ed903da4:748"></label>
+        <label data-inspector-id="html:ed903da4:749"><span data-inspector-id="html:ed903da4:750">建筑面积（㎡）</span><input name="area" type="number" min="0" max="100000" step="0.01" data-inspector-id="html:ed903da4:751"></label>
+        <label class="span-2" data-inspector-id="html:ed903da4:752"><span data-inspector-id="html:ed903da4:753">项目地址</span><input name="location" maxlength="200" data-inspector-id="html:ed903da4:754"></label>
+        <label data-inspector-id="html:ed903da4:755"><span data-inspector-id="html:ed903da4:756">项目总负责人 *</span><select name="managerMemberId" id="projectEditManagerSelect" required="" data-inspector-id="html:ed903da4:757"></select><small data-inspector-id="html:ed903da4:758">拥有该项目的最高审批权限。</small></label>
+        <label data-inspector-id="html:ed903da4:759"><span data-inspector-id="html:ed903da4:760">设计负责人</span><select name="designerMemberId" id="projectEditDesignerSelect" data-inspector-id="html:ed903da4:761"><option value="" data-inspector-id="html:ed903da4:762">暂不指定</option></select></label>
+        <label data-inspector-id="html:ed903da4:763"><span data-inspector-id="html:ed903da4:764">施工负责人（工长）</span><select name="siteManagerMemberId" id="projectEditSiteManagerSelect" data-inspector-id="html:ed903da4:765"><option value="" data-inspector-id="html:ed903da4:766">暂不指定</option></select><small data-inspector-id="html:ed903da4:767">负责现场协调与施工过程跟进。</small></label>
+        <label data-inspector-id="html:ed903da4:768"><span data-inspector-id="html:ed903da4:769">项目成本预算（元）</span><input name="costBudget" type="number" min="0" max="1000000000" step="0.01" data-inspector-id="html:ed903da4:770"></label>
+        <label data-inspector-id="html:ed903da4:771"><span data-inspector-id="html:ed903da4:772">合同金额（元）</span><input name="contractAmount" type="number" min="0" max="1000000000" step="0.01" data-inspector-id="html:ed903da4:773"></label>
+        <label data-inspector-id="html:ed903da4:774"><span data-inspector-id="html:ed903da4:775">合同号</span><input name="contractNo" maxlength="80" data-inspector-id="html:ed903da4:776"></label>
+        <label data-inspector-id="html:ed903da4:777"><span data-inspector-id="html:ed903da4:778">签约月份</span><input name="signedMonth" type="month" data-inspector-id="html:ed903da4:779"></label>
+        <label data-inspector-id="html:ed903da4:780"><span data-inspector-id="html:ed903da4:781">已收定金（元）</span><input name="depositAmount" type="number" min="0" max="1000000000" step="0.01" data-inspector-id="html:ed903da4:782"></label>
+      </div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:783"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:784">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:785">保存项目</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="constructionPlanDialog" class="wide-dialog" data-inspector-id="html:ed903da4:786">
+    <form method="dialog" class="dialog-form construction-plan-form" id="constructionPlanForm" data-inspector-id="html:ed903da4:787">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:788"><div data-inspector-id="html:ed903da4:789"><h2 data-inspector-id="html:ed903da4:790">编辑施工计划</h2><p data-inspector-id="html:ed903da4:791">系统会先按顺序生成日期；每个节点都可单独调整开始日期，支持交叉施工和空档期。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:792"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:793"></button></div>
+      <div class="construction-plan-toolbar" data-inspector-id="html:ed903da4:794">
+        <label data-inspector-id="html:ed903da4:795"><span data-inspector-id="html:ed903da4:796">项目计划开工日 *</span><input name="startDate" type="date" required="" data-inspector-id="html:ed903da4:797"></label>
+        <div class="construction-plan-summary" id="constructionPlanSummary" data-inspector-id="html:ed903da4:798"></div>
+        <button class="secondary" type="button" data-plan-add="" data-inspector-id="html:ed903da4:799">新增自定义节点</button>
+      </div>
+      <div class="construction-plan-preset-bar" data-inspector-id="html:ed903da4:800">
+        <div data-inspector-id="html:ed903da4:801"><b data-inspector-id="html:ed903da4:802">企业施工计划预设</b><small data-inspector-id="html:ed903da4:803">保存常用节点、工期和最低照片数，新项目可直接套用</small></div>
+        <select id="constructionPlanPresetSelect" aria-label="选择企业施工计划预设" data-inspector-id="html:ed903da4:804"><option value="" data-inspector-id="html:ed903da4:805">选择企业预设</option></select>
+        <button class="secondary" type="button" data-plan-preset-apply="" data-inspector-id="html:ed903da4:806">应用预设</button>
+        <button class="ghost danger-text" type="button" data-plan-preset-delete="" data-inspector-id="html:ed903da4:807">删除预设</button>
+        <input id="constructionPlanPresetName" type="text" maxlength="100" placeholder="输入预设名称，如：精装标准流程" aria-label="预设名称" data-inspector-id="html:ed903da4:808">
+        <button class="secondary" type="button" data-plan-preset-save="" data-inspector-id="html:ed903da4:809">保存当前方案为预设</button>
+      </div>
+        <div class="construction-plan-labels" data-inspector-id="html:ed903da4:810"><span data-inspector-id="html:ed903da4:811">顺序 / 节点名称</span><span data-inspector-id="html:ed903da4:812">预计工期</span><span data-inspector-id="html:ed903da4:813">最低照片</span><span data-inspector-id="html:ed903da4:814">节点状态</span><span data-inspector-id="html:ed903da4:815">计划日期（可调整）</span><span data-inspector-id="html:ed903da4:816">操作</span></div>
+      <div class="construction-plan-list" id="constructionPlanList" data-inspector-id="html:ed903da4:817"></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:818"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:819">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:820">保存施工计划</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="costDialog" class="compact-dialog" data-inspector-id="html:ed903da4:821">
+    <form method="dialog" class="dialog-form compact" id="costForm" data-inspector-id="html:ed903da4:822">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:823"><div data-inspector-id="html:ed903da4:824"><h2 id="costDialogTitle" data-inspector-id="html:ed903da4:825">设置支出节点</h2><p id="costDialogDescription" data-inspector-id="html:ed903da4:826">先设置费用总额，再按施工阶段增加支出分项；总额只计入一次，分项负责记录实际付款。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:827"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:828"></button></div>
+      <label data-inspector-id="html:ed903da4:829"><span data-inspector-id="html:ed903da4:830">记录类型</span><select name="entryType" id="costEntryType" data-inspector-id="html:ed903da4:831"><option value="item" data-inspector-id="html:ed903da4:832">支出分项</option><option value="group" data-inspector-id="html:ed903da4:833">费用总项</option></select></label>
+      <label data-cost-parent-field="" data-inspector-id="html:ed903da4:834"><span data-inspector-id="html:ed903da4:835">所属费用总项</span><select name="parentId" id="costParentSelect" data-inspector-id="html:ed903da4:836"><option value="" data-inspector-id="html:ed903da4:837">不归入费用总项</option></select><small data-inspector-id="html:ed903da4:838">例如把“水电阶段款、泥木阶段款”归入“分包费”。</small></label>
+      <label data-cost-item-field="" data-inspector-id="html:ed903da4:839"><span data-inspector-id="html:ed903da4:840">关联施工节点</span><select name="milestoneId" id="costMilestoneSelect" data-inspector-id="html:ed903da4:841"><option value="" data-inspector-id="html:ed903da4:842">暂不关联节点</option></select></label>
+      <label data-inspector-id="html:ed903da4:843"><span data-inspector-id="html:ed903da4:844">支出节点名称 *</span><input name="title" maxlength="120" required="" placeholder="例如：水电材料首付款" data-inspector-id="html:ed903da4:845"></label>
+      <label data-inspector-id="html:ed903da4:846"><span data-inspector-id="html:ed903da4:847">费用类别 *</span><select name="category" required="" data-inspector-id="html:ed903da4:848"><option value="materials" data-inspector-id="html:ed903da4:849">材料费</option><option value="labor" data-inspector-id="html:ed903da4:850">人工费</option><option value="subcontract" data-inspector-id="html:ed903da4:851">分包费</option><option value="design" data-inspector-id="html:ed903da4:852">设计费</option><option value="transport" data-inspector-id="html:ed903da4:853">运输费</option><option value="contingency" data-inspector-id="html:ed903da4:854">不可预见费</option><option value="other" data-inspector-id="html:ed903da4:855">其他</option></select></label>
+      <label data-inspector-id="html:ed903da4:856"><span id="costAmountLabel" data-inspector-id="html:ed903da4:857">预计支出金额（元）*</span><input name="plannedAmount" type="number" min="0.01" max="1000000000" step="0.01" required="" data-inspector-id="html:ed903da4:858"></label>
+      <label data-cost-item-field="" data-inspector-id="html:ed903da4:859"><span data-inspector-id="html:ed903da4:860">预计支出日期 *</span><input name="plannedDate" type="date" required="" data-inspector-id="html:ed903da4:861"><small data-inspector-id="html:ed903da4:862">关联施工节点后自动带入该节点的计划完成日期，仍可手动调整。</small></label>
+      <label data-cost-item-field="" data-inspector-id="html:ed903da4:863"><span data-inspector-id="html:ed903da4:864">供应商 / 收款方</span><input name="vendor" maxlength="120" data-inspector-id="html:ed903da4:865"></label>
+      <label data-inspector-id="html:ed903da4:866"><span data-inspector-id="html:ed903da4:867">费用说明</span><textarea name="description" maxlength="300" data-inspector-id="html:ed903da4:868"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:869"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:870">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:871">保存支出节点</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="costConfirmDialog" class="compact-dialog" data-inspector-id="html:ed903da4:872">
+    <form method="dialog" class="dialog-form compact" id="costConfirmForm" data-inspector-id="html:ed903da4:873">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:874"><div data-inspector-id="html:ed903da4:875"><h2 data-inspector-id="html:ed903da4:876">确认实际支出</h2><p id="costConfirmDescription" data-inspector-id="html:ed903da4:877">确认后计入实际成本，并更新当前账面毛利。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:878"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:879"></button></div>
+      <input name="planId" type="hidden" data-inspector-id="html:ed903da4:880">
+      <label data-inspector-id="html:ed903da4:881"><span data-inspector-id="html:ed903da4:882">实际支出金额（元）*</span><input name="actualAmount" type="number" min="0.01" max="1000000000" step="0.01" required="" data-inspector-id="html:ed903da4:883"></label>
+      <label data-inspector-id="html:ed903da4:884"><span data-inspector-id="html:ed903da4:885">实际支出日期 *</span><input name="actualDate" type="date" required="" data-inspector-id="html:ed903da4:886"></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:887"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:888">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:889">确认已支出</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="costStatementDialog" class="wide-dialog cost-statement-dialog" data-inspector-id="html:ed903da4:890">
+    <form class="dialog-form" id="costStatementForm" data-inspector-id="html:ed903da4:891">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:892"><div data-inspector-id="html:ed903da4:893"><h2 data-inspector-id="html:ed903da4:894">导出项目成本对账单</h2><p data-inspector-id="html:ed903da4:895">勾选本次需要与工人、工长或材料商核对的支出项目，系统会自动汇总应付、实付和待付金额。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:896"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:897"></button></div>
+      <div class="cost-statement-fields" data-inspector-id="html:ed903da4:898">
+        <label data-inspector-id="html:ed903da4:899"><span data-inspector-id="html:ed903da4:900">对账对象</span><input name="counterparty" maxlength="120" placeholder="例如：张师傅 / 某某材料商" data-inspector-id="html:ed903da4:901"></label>
+        <label data-inspector-id="html:ed903da4:902"><span data-inspector-id="html:ed903da4:903">对账说明</span><textarea name="note" maxlength="500" placeholder="可填写结算范围、扣款或补充约定" data-inspector-id="html:ed903da4:904"></textarea></label>
+      </div>
+      <div class="cost-statement-toolbar" data-inspector-id="html:ed903da4:905">
+        <label class="cost-statement-select-all" data-inspector-id="html:ed903da4:906"><input id="costStatementSelectAll" type="checkbox" checked="" data-inspector-id="html:ed903da4:907"> <span data-inspector-id="html:ed903da4:908">全选本页明细</span></label>
+        <span id="costStatementSelectionCount" data-inspector-id="html:ed903da4:909">已选择 0 项</span>
+      </div>
+      <div class="cost-statement-summary" aria-label="本次对账汇总" data-inspector-id="html:ed903da4:910">
+        <span data-inspector-id="html:ed903da4:911"><small data-inspector-id="html:ed903da4:912">应付金额</small><b id="costStatementPayable" data-inspector-id="html:ed903da4:913">¥0.00</b></span>
+        <span data-inspector-id="html:ed903da4:914"><small data-inspector-id="html:ed903da4:915">实付金额</small><b id="costStatementPaid" data-inspector-id="html:ed903da4:916">¥0.00</b></span>
+        <span data-inspector-id="html:ed903da4:917"><small data-inspector-id="html:ed903da4:918">待付金额</small><b id="costStatementUnpaid" data-inspector-id="html:ed903da4:919">¥0.00</b></span>
+      </div>
+      <div class="cost-statement-list" id="costStatementItems" data-inspector-id="html:ed903da4:920"></div>
+      <p class="form-hint" data-inspector-id="html:ed903da4:921">导出的 PDF 会附带明细合计，以及收款方与付款方的签字 / 盖章确认区域。</p>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:922"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:923">取消</button><button class="secondary" type="button" data-cost-statement-preview="" data-inspector-id="html:ed903da4:924">预览对账单</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:925">导出 PDF</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="paymentDialog" class="compact-dialog" data-inspector-id="html:ed903da4:926">
+    <form method="dialog" class="dialog-form compact" id="paymentForm" data-inspector-id="html:ed903da4:927">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:928"><div data-inspector-id="html:ed903da4:929"><h2 data-inspector-id="html:ed903da4:930">新增收款节点</h2><p data-inspector-id="html:ed903da4:931">按合同约定登记应收日期，逾期后自动进入首页待办。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:932"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:933"></button></div>
+      <label data-inspector-id="html:ed903da4:934"><span data-inspector-id="html:ed903da4:935">收款节点 *</span><input name="name" maxlength="100" required="" placeholder="例如：水电验收款" data-inspector-id="html:ed903da4:936"></label>
+      <label data-inspector-id="html:ed903da4:937"><span data-inspector-id="html:ed903da4:938">金额（元）*</span><input name="amount" type="number" min="0.01" max="1000000000" step="0.01" required="" data-inspector-id="html:ed903da4:939"></label>
+      <label data-inspector-id="html:ed903da4:940"><span data-inspector-id="html:ed903da4:941">计划收款日期 *</span><input name="dueDate" type="date" required="" data-inspector-id="html:ed903da4:942"></label>
+      <input name="status" type="hidden" value="pending" data-inspector-id="html:ed903da4:943">
+      <label data-inspector-id="html:ed903da4:944"><span data-inspector-id="html:ed903da4:945">备注</span><textarea name="note" maxlength="500" data-inspector-id="html:ed903da4:946"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:947"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:948">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:949">保存收款节点</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="paymentPlanDialog" class="wide-dialog" data-inspector-id="html:ed903da4:950">
+    <form method="dialog" class="dialog-form construction-plan-form" id="paymentPlanForm" data-inspector-id="html:ed903da4:951">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:952"><div data-inspector-id="html:ed903da4:953"><h2 data-inspector-id="html:ed903da4:954">编辑合同收款计划</h2><p data-inspector-id="html:ed903da4:955">收款节点关联施工节点后，计划日期自动同步为该节点的验收日期。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:956"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:957"></button></div>
+      <fieldset class="payment-plan-mode-switch" data-inspector-id="html:ed903da4:958"><legend data-inspector-id="html:ed903da4:959">计划计算方式</legend><label data-inspector-id="html:ed903da4:960"><input type="radio" name="calculationMode" value="percentage" checked="" data-inspector-id="html:ed903da4:961"><span data-inspector-id="html:ed903da4:962">按百分比</span><small data-inspector-id="html:ed903da4:963">合同总价自动换算</small></label><label data-inspector-id="html:ed903da4:964"><input type="radio" name="calculationMode" value="amount" data-inspector-id="html:ed903da4:965"><span data-inspector-id="html:ed903da4:966">自定义金额</span><small data-inspector-id="html:ed903da4:967">直接填写每期应收</small></label><label data-inspector-id="html:ed903da4:968"><input type="radio" name="calculationMode" value="split" data-inspector-id="html:ed903da4:969"><span data-inspector-id="html:ed903da4:970">人辅 / 主材分开</span><small data-inspector-id="html:ed903da4:971">两类分别设置比例或金额</small></label></fieldset>
+      <div class="payment-split-settings" id="paymentPlanSplitSettings" hidden="" data-inspector-id="html:ed903da4:972">
+        <div data-inspector-id="html:ed903da4:973"><b data-inspector-id="html:ed903da4:974">人辅收款</b><label data-inspector-id="html:ed903da4:975"><span data-inspector-id="html:ed903da4:976">人辅合同金额</span><input name="laborAuxiliaryAmount" type="number" min="0" step="0.01" data-inspector-id="html:ed903da4:977"></label><label data-inspector-id="html:ed903da4:978"><span data-inspector-id="html:ed903da4:979">计算方式</span><select name="laborAuxiliaryMode" data-inspector-id="html:ed903da4:980"><option value="percentage" data-inspector-id="html:ed903da4:981">按组内比例</option><option value="amount" data-inspector-id="html:ed903da4:982">自定义金额</option></select></label></div>
+        <div data-inspector-id="html:ed903da4:983"><b data-inspector-id="html:ed903da4:984">主材收款</b><label data-inspector-id="html:ed903da4:985"><span data-inspector-id="html:ed903da4:986">主材合同金额</span><input name="mainMaterialAmount" type="number" min="0" step="0.01" data-inspector-id="html:ed903da4:987"></label><label data-inspector-id="html:ed903da4:988"><span data-inspector-id="html:ed903da4:989">计算方式</span><select name="mainMaterialMode" data-inspector-id="html:ed903da4:990"><option value="percentage" data-inspector-id="html:ed903da4:991">按组内比例</option><option value="amount" data-inspector-id="html:ed903da4:992">自定义金额</option></select></label></div>
+        <small data-inspector-id="html:ed903da4:993">两项合计须等于合同总额；已收定金优先抵扣人辅组首期。</small>
+      </div>
+      <div class="payment-plan-formula" id="paymentPlanFormula" data-inspector-id="html:ed903da4:994"></div>
+      <div class="construction-plan-toolbar payment-plan-toolbar" data-inspector-id="html:ed903da4:995"><div class="construction-plan-summary" id="paymentPlanSummary" data-inspector-id="html:ed903da4:996"></div><button class="secondary" type="button" data-payment-plan-add="" data-inspector-id="html:ed903da4:997">增加收款节点</button></div>
+      <div class="payment-plan-editor-labels" data-inspector-id="html:ed903da4:998"><span data-inspector-id="html:ed903da4:999">顺序 / 收款节点</span><span id="paymentPlanValueLabel" data-inspector-id="html:ed903da4:1000">合同占比</span><span data-inspector-id="html:ed903da4:1001">节点目标金额</span><span data-inspector-id="html:ed903da4:1002">本期应收</span><span data-inspector-id="html:ed903da4:1003">计划日期</span><span data-inspector-id="html:ed903da4:1004">排序 / 删除</span></div>
+      <div class="construction-plan-list" id="paymentPlanList" data-inspector-id="html:ed903da4:1005"></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1006"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1007">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1008">保存完整收款计划</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="paymentReceiptDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1009">
+    <form method="dialog" class="dialog-form compact" id="paymentReceiptForm" data-inspector-id="html:ed903da4:1010">
+      <input name="paymentPlanId" type="hidden" data-inspector-id="html:ed903da4:1011">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1012"><div data-inspector-id="html:ed903da4:1013"><h2 data-inspector-id="html:ed903da4:1014">登记本次到账</h2><p id="paymentReceiptHint" data-inspector-id="html:ed903da4:1015">支持同一收款节点分多次到账，并保存收款凭证。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1016"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1017"></button></div>
+      <label data-inspector-id="html:ed903da4:1018"><span data-inspector-id="html:ed903da4:1019">本次到账金额（元）*</span><input name="amount" type="number" min="0.01" step="0.01" required="" data-inspector-id="html:ed903da4:1020"></label>
+      <label data-inspector-id="html:ed903da4:1021"><span data-inspector-id="html:ed903da4:1022">到账日期 *</span><input name="receivedDate" type="date" required="" data-inspector-id="html:ed903da4:1023"></label>
+      <label data-inspector-id="html:ed903da4:1024"><span data-inspector-id="html:ed903da4:1025">收款方式</span><select name="method" data-inspector-id="html:ed903da4:1026"><option value="bank" data-inspector-id="html:ed903da4:1027">银行转账</option><option value="wechat" data-inspector-id="html:ed903da4:1028">微信</option><option value="alipay" data-inspector-id="html:ed903da4:1029">支付宝</option><option value="cash" data-inspector-id="html:ed903da4:1030">现金</option><option value="other" data-inspector-id="html:ed903da4:1031">其他</option></select></label>
+      <label data-inspector-id="html:ed903da4:1032"><span data-inspector-id="html:ed903da4:1033">流水号 / 凭证编号</span><input name="reference" maxlength="100" data-inspector-id="html:ed903da4:1034"></label>
+      <label data-inspector-id="html:ed903da4:1035"><span data-inspector-id="html:ed903da4:1036">收款凭证图片</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" data-upload-files="" data-inspector-id="html:ed903da4:1037"></label><div class="upload-preview" data-upload-preview="" hidden="" data-inspector-id="html:ed903da4:1038"></div>
+      <label data-inspector-id="html:ed903da4:1039"><span data-inspector-id="html:ed903da4:1040">备注</span><textarea name="note" maxlength="500" data-inspector-id="html:ed903da4:1041"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1042"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1043">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1044">保存到账记录</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="changeOrderDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1045">
+    <form method="dialog" class="dialog-form compact" id="changeOrderForm" data-inspector-id="html:ed903da4:1046">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1047"><div data-inspector-id="html:ed903da4:1048"><h2 data-inspector-id="html:ed903da4:1049">新增合同增减项</h2><p data-inspector-id="html:ed903da4:1050">内部确认且客户已确认后，才计入调整后合同额。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1051"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1052"></button></div>
+      <label data-inspector-id="html:ed903da4:1053"><span data-inspector-id="html:ed903da4:1054">事项名称 *</span><input name="title" maxlength="160" required="" placeholder="例如：厨房新增插座" data-inspector-id="html:ed903da4:1055"></label>
+      <label data-inspector-id="html:ed903da4:1056"><span data-inspector-id="html:ed903da4:1057">类型</span><select name="kind" data-inspector-id="html:ed903da4:1058"><option value="increase" data-inspector-id="html:ed903da4:1059">增加</option><option value="decrease" data-inspector-id="html:ed903da4:1060">减少</option></select></label>
+      <label data-inspector-id="html:ed903da4:1061"><span data-inspector-id="html:ed903da4:1062">金额（元）*</span><input name="amount" type="number" min="0.01" max="1000000000" step="0.01" required="" data-inspector-id="html:ed903da4:1063"></label>
+      <label data-inspector-id="html:ed903da4:1064"><span data-inspector-id="html:ed903da4:1065">内部状态</span><select name="status" data-inspector-id="html:ed903da4:1066"><option value="pending" data-inspector-id="html:ed903da4:1067">待确认</option><option value="approved" data-inspector-id="html:ed903da4:1068">内部已确认</option><option value="rejected" data-inspector-id="html:ed903da4:1069">已驳回</option></select></label>
+      <label class="check-row" data-inspector-id="html:ed903da4:1070"><input name="customerConfirmed" type="checkbox" data-inspector-id="html:ed903da4:1071"><span data-inspector-id="html:ed903da4:1072">客户已确认此增减项</span></label>
+      <label data-inspector-id="html:ed903da4:1073"><span data-inspector-id="html:ed903da4:1074">工期影响（天）</span><input name="scheduleImpactDays" type="number" min="-365" max="365" value="0" data-inspector-id="html:ed903da4:1075"></label>
+      <label data-inspector-id="html:ed903da4:1076"><span data-inspector-id="html:ed903da4:1077">客户确认说明</span><textarea name="confirmationNote" maxlength="500" placeholder="确认方式、确认日期或其他依据" data-inspector-id="html:ed903da4:1078"></textarea></label>
+      <label data-inspector-id="html:ed903da4:1079"><span data-inspector-id="html:ed903da4:1080">确认单 / 签字图片</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" data-upload-files="" data-inspector-id="html:ed903da4:1081"></label><div class="upload-preview" data-upload-preview="" hidden="" data-inspector-id="html:ed903da4:1082"></div>
+      <label data-inspector-id="html:ed903da4:1083"><span data-inspector-id="html:ed903da4:1084">变更说明</span><textarea name="note" maxlength="500" data-inspector-id="html:ed903da4:1085"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1086"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1087">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1088">保存增减项</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="materialDialog" data-inspector-id="html:ed903da4:1089">
+    <form method="dialog" class="dialog-form material-dialog-form" id="materialForm" data-inspector-id="html:ed903da4:1090">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1091"><div data-inspector-id="html:ed903da4:1092"><h2 id="materialDialogTitle" data-inspector-id="html:ed903da4:1093">新增材料与厂家调配</h2><p data-inspector-id="html:ed903da4:1094">材料应付、实付和待付会自动同步到下方“项目成本”，无需重复录入。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1095"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1096"></button></div>
+      <div class="material-form-sections" data-inspector-id="html:ed903da4:1097">
+        <fieldset class="material-form-section" data-inspector-id="html:ed903da4:1098"><legend data-inspector-id="html:ed903da4:1099"><b data-inspector-id="html:ed903da4:1100">基础信息</b><small data-inspector-id="html:ed903da4:1101">材料、厂家与项目归属</small></legend><div class="form-grid" data-inspector-id="html:ed903da4:1102">
+          <label data-inspector-id="html:ed903da4:1103"><span data-inspector-id="html:ed903da4:1104">材料名称 *</span><input name="name" maxlength="120" required="" placeholder="例如：客厅地砖" data-inspector-id="html:ed903da4:1105"></label><label data-inspector-id="html:ed903da4:1106"><span data-inspector-id="html:ed903da4:1107">关联施工节点</span><select name="milestoneId" id="materialMilestoneSelect" data-inspector-id="html:ed903da4:1108"><option value="" data-inspector-id="html:ed903da4:1109">暂不关联</option></select></label>
+          <label data-inspector-id="html:ed903da4:1110"><span data-inspector-id="html:ed903da4:1111">所属费用总项</span><select name="costGroupId" id="materialCostGroupSelect" data-inspector-id="html:ed903da4:1112"><option value="" data-inspector-id="html:ed903da4:1113">不归入费用总项</option></select><small data-inspector-id="html:ed903da4:1114">选择后，本材料会作为该费用总项下的分项，金额和付款自动联动。</small></label><label data-inspector-id="html:ed903da4:1115"><span data-inspector-id="html:ed903da4:1116">调配负责人</span><select name="purchaserMemberId" id="materialPurchaserSelect" data-inspector-id="html:ed903da4:1117"><option value="" data-inspector-id="html:ed903da4:1118">暂不指定</option></select></label>
+          <label data-inspector-id="html:ed903da4:1119"><span data-inspector-id="html:ed903da4:1120">厂家名称 *</span><input name="supplier" maxlength="120" required="" placeholder="例如：某某全屋定制工厂" data-inspector-id="html:ed903da4:1121"></label>
+          <label data-inspector-id="html:ed903da4:1122"><span data-inspector-id="html:ed903da4:1123">厂家电话</span><input name="supplierPhone" maxlength="30" data-inspector-id="html:ed903da4:1124"></label><div class="material-quantity-fields" data-inspector-id="html:ed903da4:1125"><label data-inspector-id="html:ed903da4:1126"><span data-inspector-id="html:ed903da4:1127">数量</span><input name="quantity" type="number" min="0.01" step="0.01" value="1" required="" data-inspector-id="html:ed903da4:1128"></label><label data-inspector-id="html:ed903da4:1129"><span data-inspector-id="html:ed903da4:1130">单位</span><input name="unit" maxlength="30" value="项" required="" data-inspector-id="html:ed903da4:1131"></label></div>
+        </div></fieldset>
+        <fieldset class="material-form-section" data-inspector-id="html:ed903da4:1132"><legend data-inspector-id="html:ed903da4:1133"><b data-inspector-id="html:ed903da4:1134">金额与付款</b><small data-inspector-id="html:ed903da4:1135">付款数据会同步到项目成本</small></legend><div class="form-grid" data-inspector-id="html:ed903da4:1136">
+          <label data-inspector-id="html:ed903da4:1137"><span data-inspector-id="html:ed903da4:1138">材料金额（元）</span><input name="purchaseAmount" type="number" min="0" step="0.01" value="0" data-inspector-id="html:ed903da4:1139"></label><label data-inspector-id="html:ed903da4:1140"><span data-inspector-id="html:ed903da4:1141">付款状态</span><select name="paymentStatus" data-inspector-id="html:ed903da4:1142"><option value="unpaid" data-inspector-id="html:ed903da4:1143">未付款</option><option value="partial" data-inspector-id="html:ed903da4:1144">部分付款</option><option value="paid" data-inspector-id="html:ed903da4:1145">已付清</option></select></label>
+          <label data-material-paid-field="" data-inspector-id="html:ed903da4:1146"><span data-inspector-id="html:ed903da4:1147">已支付金额（元）</span><input name="paidAmount" type="number" min="0" step="0.01" value="0" data-inspector-id="html:ed903da4:1148"><small data-inspector-id="html:ed903da4:1149">未付款自动为 0；已付清自动等于材料金额。</small></label>
+          <label data-material-paid-date-field="" hidden="" data-inspector-id="html:ed903da4:1150"><span data-inspector-id="html:ed903da4:1151">实际支出日期 *</span><input name="paidDate" type="date" data-inspector-id="html:ed903da4:1152"><small data-inspector-id="html:ed903da4:1153">用于项目成本和付款明细，以实际付款日期为准。</small></label>
+        </div></fieldset>
+        <fieldset class="material-form-section" data-inspector-id="html:ed903da4:1154"><legend data-inspector-id="html:ed903da4:1155"><b data-inspector-id="html:ed903da4:1156">采购与履约</b><small data-inspector-id="html:ed903da4:1157">采购物流与厂家履约分别记录</small></legend><div class="form-grid" data-inspector-id="html:ed903da4:1158">
+          <label data-inspector-id="html:ed903da4:1159"><span data-inspector-id="html:ed903da4:1160">采购物流状态</span><select name="status" data-inspector-id="html:ed903da4:1161"><option value="planned" data-inspector-id="html:ed903da4:1162">待采购</option><option value="ordered" data-inspector-id="html:ed903da4:1163">已下单</option><option value="in_transit" data-inspector-id="html:ed903da4:1164">运输中</option><option value="arrived" data-inspector-id="html:ed903da4:1165">已到场</option><option value="accepted" data-inspector-id="html:ed903da4:1166">已验收</option></select></label>
+          <label data-inspector-id="html:ed903da4:1167"><span data-inspector-id="html:ed903da4:1168">厂家履约状态 *</span><select name="manufacturerStatus" required="" data-inspector-id="html:ed903da4:1169"><option value="unordered" data-inspector-id="html:ed903da4:1170">未下单</option><option value="measured" data-inspector-id="html:ed903da4:1171">已测量</option><option value="ordered" data-inspector-id="html:ed903da4:1172">已下单</option><option value="arrived" data-inspector-id="html:ed903da4:1173">已送货</option><option value="installed" data-inspector-id="html:ed903da4:1174">已安装</option><option value="other" data-inspector-id="html:ed903da4:1175">例外 / 不适用</option></select></label>
+          <label data-inspector-id="html:ed903da4:1176"><span data-inspector-id="html:ed903da4:1177">计划到场日期 *</span><input name="plannedArrivalDate" type="date" required="" data-inspector-id="html:ed903da4:1178"></label><details class="material-delay-field" data-inspector-id="html:ed903da4:1179"><summary data-inspector-id="html:ed903da4:1180">补充延期原因（延期时填写）</summary><label data-inspector-id="html:ed903da4:1181"><span data-inspector-id="html:ed903da4:1182">延期原因</span><input name="delayReason" maxlength="300" placeholder="说明延期原因与下一步处理" data-inspector-id="html:ed903da4:1183"></label></details>
+          <label class="span-2" data-inspector-id="html:ed903da4:1184"><span data-inspector-id="html:ed903da4:1185">到场 / 验收图片</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" data-upload-files="" data-inspector-id="html:ed903da4:1186"></label><div class="upload-preview span-2" data-upload-preview="" hidden="" data-inspector-id="html:ed903da4:1187"></div>
+          <label class="span-2" data-inspector-id="html:ed903da4:1188"><span data-inspector-id="html:ed903da4:1189">备注</span><textarea name="note" maxlength="500" data-inspector-id="html:ed903da4:1190"></textarea></label>
+        </div></fieldset>
+      </div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1191"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1192">取消</button><button class="primary" type="submit" id="materialDialogSubmit" data-inspector-id="html:ed903da4:1193">保存材料计划</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="materialPaymentDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1194">
+    <form method="dialog" class="dialog-form compact" id="materialPaymentForm" data-inspector-id="html:ed903da4:1195">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1196"><div data-inspector-id="html:ed903da4:1197"><h2 data-inspector-id="html:ed903da4:1198">确认材料支出</h2><p id="materialPaymentDescription" data-inspector-id="html:ed903da4:1199">登记本次实际付款金额和日期，并同步计入项目成本。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1200"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1201"></button></div>
+      <input name="materialId" type="hidden" data-inspector-id="html:ed903da4:1202">
+      <label data-inspector-id="html:ed903da4:1203"><span data-inspector-id="html:ed903da4:1204">本次支出金额（元）*</span><input name="amount" type="number" min="0.01" max="1000000000" step="0.01" required="" data-inspector-id="html:ed903da4:1205"></label>
+      <label data-inspector-id="html:ed903da4:1206"><span data-inspector-id="html:ed903da4:1207">实际支出日期 *</span><input name="paidDate" type="date" required="" data-inspector-id="html:ed903da4:1208"></label>
+      <label data-inspector-id="html:ed903da4:1209"><span data-inspector-id="html:ed903da4:1210">支付方式</span><select name="method" data-inspector-id="html:ed903da4:1211"><option value="bank" data-inspector-id="html:ed903da4:1212">银行转账</option><option value="wechat" data-inspector-id="html:ed903da4:1213">微信</option><option value="alipay" data-inspector-id="html:ed903da4:1214">支付宝</option><option value="cash" data-inspector-id="html:ed903da4:1215">现金</option><option value="other" data-inspector-id="html:ed903da4:1216">其他</option></select></label>
+      <label data-inspector-id="html:ed903da4:1217"><span data-inspector-id="html:ed903da4:1218">凭证编号</span><input name="reference" maxlength="100" placeholder="例如：转账单号或收据号" data-inspector-id="html:ed903da4:1219"></label>
+      <label data-inspector-id="html:ed903da4:1220"><span data-inspector-id="html:ed903da4:1221">付款说明</span><textarea name="note" maxlength="500" placeholder="可填写本次付款用途或补充说明" data-inspector-id="html:ed903da4:1222"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1223"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1224">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1225">确认已支出</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="materialBatchDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1226">
+    <form method="dialog" class="dialog-form compact" id="materialBatchForm" data-inspector-id="html:ed903da4:1227">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1228"><div data-inspector-id="html:ed903da4:1229"><h2 data-inspector-id="html:ed903da4:1230">批量更新材料状态</h2><p id="materialBatchHint" data-inspector-id="html:ed903da4:1231">统一更新已勾选材料的采购物流状态。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1232"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1233"></button></div>
+      <label data-inspector-id="html:ed903da4:1234"><span data-inspector-id="html:ed903da4:1235">采购物流状态 *</span><select name="status" required="" data-inspector-id="html:ed903da4:1236"><option value="planned" data-inspector-id="html:ed903da4:1237">待采购</option><option value="ordered" data-inspector-id="html:ed903da4:1238">已下单</option><option value="in_transit" data-inspector-id="html:ed903da4:1239">运输中</option><option value="arrived" data-inspector-id="html:ed903da4:1240">已到场</option><option value="accepted" data-inspector-id="html:ed903da4:1241">已验收</option></select></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1242"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1243">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1244">确认批量更新</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="supplierDialog" class="wide-dialog enterprise-future-dialog" aria-labelledby="supplierDialogTitle" data-inspector-id="html:ed903da4:1245">
+    <form method="dialog" class="dialog-form" id="supplierForm" data-inspector-id="html:ed903da4:1246">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1247"><div data-inspector-id="html:ed903da4:1248"><h2 id="supplierDialogTitle" data-inspector-id="html:ed903da4:1249">厂家档案</h2><p data-inspector-id="html:ed903da4:1250">统一维护厂家联系人、主营品类、交付表现与合作备注。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1251"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1252"></button></div>
+      <div class="supplier-dialog-layout" data-inspector-id="html:ed903da4:1253"><section class="supplier-directory-panel" aria-labelledby="supplierDirectoryHeading" data-inspector-id="html:ed903da4:1254"><div class="future-dialog-section-head" data-inspector-id="html:ed903da4:1255"><div data-inspector-id="html:ed903da4:1256"><h3 id="supplierDirectoryHeading" data-inspector-id="html:ed903da4:1257">合作厂家</h3><p data-inspector-id="html:ed903da4:1258">选择厂家后可查看或维护档案。</p></div></div><div class="supplier-list" id="supplierList" aria-live="polite" data-inspector-id="html:ed903da4:1259"><p class="empty-state" data-inspector-id="html:ed903da4:1260">厂家档案功能接线后，将在这里显示企业厂家列表。</p></div></section><fieldset class="supplier-editor" data-inspector-id="html:ed903da4:1261"><legend data-inspector-id="html:ed903da4:1262">档案信息</legend><div class="form-grid" data-inspector-id="html:ed903da4:1263"><label data-inspector-id="html:ed903da4:1264"><span data-inspector-id="html:ed903da4:1265">厂家名称 *</span><input name="supplierName" maxlength="120" required="" data-inspector-id="html:ed903da4:1266"></label><label data-inspector-id="html:ed903da4:1267"><span data-inspector-id="html:ed903da4:1268">联系人与电话</span><input name="supplierContact" maxlength="120" data-inspector-id="html:ed903da4:1269"></label><label class="span-2" data-inspector-id="html:ed903da4:1270"><span data-inspector-id="html:ed903da4:1271">主营品类</span><input name="supplierCategories" maxlength="240" placeholder="例如：全屋定制、瓷砖、门窗" data-inspector-id="html:ed903da4:1272"></label><label class="span-2" data-inspector-id="html:ed903da4:1273"><span data-inspector-id="html:ed903da4:1274">合作备注</span><textarea name="supplierNote" maxlength="500" data-inspector-id="html:ed903da4:1275"></textarea></label></div></fieldset></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1276"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1277">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1278">保存厂家档案</button></div>
+    </form>
+  </dialog>
+  <dialog id="businessReportDialog" class="wide-dialog enterprise-future-dialog" aria-labelledby="businessReportDialogTitle" data-inspector-id="html:ed903da4:1279">
+    <form method="dialog" class="dialog-form" id="businessReportForm" data-inspector-id="html:ed903da4:1280">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1281"><div data-inspector-id="html:ed903da4:1282"><h2 id="businessReportDialogTitle" data-inspector-id="html:ed903da4:1283">经营报表</h2><p data-inspector-id="html:ed903da4:1284">按项目、负责人和时间范围汇总合同、回款、成本与毛利。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1285"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1286"></button></div>
+      <div class="form-grid" data-inspector-id="html:ed903da4:1287"><label data-inspector-id="html:ed903da4:1288"><span data-inspector-id="html:ed903da4:1289">统计范围</span><select name="reportScope" data-inspector-id="html:ed903da4:1290"><option value="organization" data-inspector-id="html:ed903da4:1291">全企业</option><option value="project" data-inspector-id="html:ed903da4:1292">指定项目</option></select></label><label data-inspector-id="html:ed903da4:1293"><span data-inspector-id="html:ed903da4:1294">统计周期</span><select name="reportPeriod" data-inspector-id="html:ed903da4:1295"><option value="month" data-inspector-id="html:ed903da4:1296">本月</option><option value="quarter" data-inspector-id="html:ed903da4:1297">本季度</option><option value="year" data-inspector-id="html:ed903da4:1298">本年度</option></select></label></div>
+      <section class="business-report-content" id="businessReportContent" aria-live="polite" data-inspector-id="html:ed903da4:1299"><div class="empty-state" data-inspector-id="html:ed903da4:1300"><b data-inspector-id="html:ed903da4:1301">报表尚未生成</b><p data-inspector-id="html:ed903da4:1302">选择统计范围和周期后，此处将呈现合同、回款、成本及毛利汇总。</p></div></section>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1303"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1304">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1305">生成经营报表</button></div>
+    </form>
+  </dialog>
+  <template id="batchActionDialogTemplate">
+    <dialog class="compact-dialog enterprise-future-dialog" aria-labelledby="batchActionDialogTitle"><form method="dialog" class="dialog-form compact"><div class="dialog-head"><div><h2 id="batchActionDialogTitle">批量操作</h2><p>先确认所选记录和影响范围，再执行批量更新。</p></div></div><label><span>批量操作类型</span><select name="batchAction"><option value="assign">分配负责人</option><option value="status">更新状态</option><option value="export">批量导出</option></select></label><label><span>操作说明</span><textarea name="batchNote" maxlength="500"></textarea></label><div class="dialog-actions"><button class="ghost" type="button">取消</button><button class="primary" type="submit">确认批量操作</button></div></form></dialog>
+  </template>
+  <template id="financeCorrectionDialogTemplate">
+    <dialog class="compact-dialog enterprise-future-dialog" aria-labelledby="financeCorrectionDialogTitle"><form method="dialog" class="dialog-form compact"><div class="dialog-head"><div><h2 id="financeCorrectionDialogTitle">财务更正 / 冲销</h2><p>保留原始记录并新增更正凭证，避免直接覆盖历史数据。</p></div></div><label><span>处理方式</span><select name="correctionType"><option value="correction">金额更正</option><option value="reversal">整笔冲销</option></select></label><label><span>更正原因 *</span><textarea name="correctionReason" maxlength="500" required=""></textarea></label><label><span>凭证编号</span><input name="correctionReference" maxlength="100"></label><div class="dialog-actions"><button class="ghost" type="button">取消</button><button class="danger" type="submit">确认更正 / 冲销</button></div></form></dialog>
+  </template>
+
+  <dialog id="milestoneDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1306">
+    <form method="dialog" class="dialog-form compact" id="milestoneForm" data-inspector-id="html:ed903da4:1307">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1308"><div data-inspector-id="html:ed903da4:1309"><h2 data-inspector-id="html:ed903da4:1310">新增施工节点</h2><p data-inspector-id="html:ed903da4:1311">建议通过“编辑施工计划”集中添加并自动排期。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1312"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1313"></button></div>
+      <label data-inspector-id="html:ed903da4:1314"><span data-inspector-id="html:ed903da4:1315">节点名称 *</span><input name="name" maxlength="100" required="" placeholder="例如：中央空调安装" data-inspector-id="html:ed903da4:1316"></label>
+      <label data-inspector-id="html:ed903da4:1317"><span data-inspector-id="html:ed903da4:1318">预计工期（天）</span><input name="durationDays" type="number" min="1" max="365" value="3" required="" data-inspector-id="html:ed903da4:1319"></label>
+      <label data-inspector-id="html:ed903da4:1320"><span data-inspector-id="html:ed903da4:1321">最低照片数量</span><input name="requiredPhotoCount" type="number" min="0" max="100" value="0" data-inspector-id="html:ed903da4:1322"></label>
+      <label data-inspector-id="html:ed903da4:1323"><span data-inspector-id="html:ed903da4:1324">节点说明</span><textarea name="note" maxlength="500" placeholder="施工内容、交付标准或注意事项" data-inspector-id="html:ed903da4:1325"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1326"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1327">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1328">添加到施工节点</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="logDialog" data-inspector-id="html:ed903da4:1329">
+    <form method="dialog" class="dialog-form" id="logForm" data-inspector-id="html:ed903da4:1330">
+      <input name="logId" type="hidden" data-inspector-id="html:ed903da4:1331">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1332"><div data-inspector-id="html:ed903da4:1333"><h2 data-inspector-id="html:ed903da4:1334">提交现场照片与日志</h2><p data-inspector-id="html:ed903da4:1335">照片先进入企业内部，负责人审核并发布后客户才能看到。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1336"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1337"></button></div>
+      <div class="form-grid" data-inspector-id="html:ed903da4:1338">
+        <input name="milestoneId" type="hidden" data-inspector-id="html:ed903da4:1339">
+        <label class="selected-node-card log-node-picker span-2" data-inspector-id="html:ed903da4:1340"><span data-inspector-id="html:ed903da4:1341">归属施工节点 · 点击可切换</span><select id="logMilestoneSelect" aria-label="选择现场记录归属施工节点" data-inspector-id="html:ed903da4:1342"></select><b id="logMilestoneName" hidden="" data-inspector-id="html:ed903da4:1343">当前施工节点</b><small id="logMilestoneHint" data-inspector-id="html:ed903da4:1344">系统会优先匹配当前或逾期节点；交叉施工时可改选其他节点。</small></label>
+        <label data-log-details="" data-inspector-id="html:ed903da4:1345"><span data-inspector-id="html:ed903da4:1346">现场记录日期 *</span><input name="occurredAt" type="datetime-local" required="" data-inspector-id="html:ed903da4:1347"></label>
+        <label class="span-2" data-log-details="" data-inspector-id="html:ed903da4:1348"><span data-inspector-id="html:ed903da4:1349">现场说明</span><textarea name="summary" maxlength="2000" placeholder="完成内容、现场情况、下一步安排" data-inspector-id="html:ed903da4:1350"></textarea></label>
+        <label class="span-2" data-log-upload="" data-inspector-id="html:ed903da4:1351"><span id="logPhotoLabel" data-inspector-id="html:ed903da4:1352">现场照片（本次最多 50 张）</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" data-upload-files="" data-inspector-id="html:ed903da4:1353"><small id="logPhotoHelp" data-inspector-id="html:ed903da4:1354">可分多次选择后一起提交；同一条记录累计最多 100 张，单张不超过 5MB。</small></label>
+        <div class="upload-preview span-2 log-photo-selector" data-upload-preview="" data-log-upload="" hidden="" data-inspector-id="html:ed903da4:1355"></div>
+        <div class="log-existing-photo-selector span-2" data-log-existing-media="" hidden="" data-inspector-id="html:ed903da4:1356"></div>
+        <label class="client-sync-card span-2" data-log-details="" data-inspector-id="html:ed903da4:1357">
+          <span class="client-sync-icon" aria-hidden="true" data-inspector-id="html:ed903da4:1358"><img class="xz-icon" src="assets/icons/user.svg" alt="" data-inspector-id="html:ed903da4:1359"></span>
+          <span class="client-sync-copy" data-inspector-id="html:ed903da4:1360"><strong data-client-sync-title="" data-inspector-id="html:ed903da4:1361">选择同步图片</strong><small data-client-sync-help="" data-inspector-id="html:ed903da4:1362">先选择图片，再勾选需要同步给客户的照片；未勾选照片仅企业内部可见。</small></span>
+          <span class="client-sync-state" aria-hidden="true" data-inspector-id="html:ed903da4:1363"><b class="client-sync-state-off" data-inspector-id="html:ed903da4:1364">未选择</b><b class="client-sync-state-on" data-inspector-id="html:ed903da4:1365">已全选</b></span>
+          <input class="client-sync-input" name="clientAfterReview" type="checkbox" aria-label="同步本次现场照片给客户" data-inspector-id="html:ed903da4:1366">
+          <span class="client-sync-toggle" aria-hidden="true" data-inspector-id="html:ed903da4:1367"><i data-inspector-id="html:ed903da4:1368"></i></span>
+        </label>
+      </div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1369"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1370">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1371">上传并提交</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="issueDialog" data-inspector-id="html:ed903da4:1372">
+    <form method="dialog" class="dialog-form" id="issueForm" data-inspector-id="html:ed903da4:1373">
+      <input type="hidden" name="issueId" data-inspector-id="html:ed903da4:1374">
+      <input type="hidden" name="milestoneId" data-inspector-id="html:ed903da4:1375">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1376"><div data-inspector-id="html:ed903da4:1377"><h2 data-inspector-id="html:ed903da4:1378">发起问题整改</h2><p data-inspector-id="html:ed903da4:1379">指定负责人后，整改人需上传整改后照片并提交复核。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1380"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1381"></button></div>
+      <div class="form-grid" data-inspector-id="html:ed903da4:1382">
+        <label class="span-2" data-inspector-id="html:ed903da4:1383"><span data-inspector-id="html:ed903da4:1384">问题标题 *</span><input name="title" maxlength="200" required="" placeholder="例如：强弱电交叉点需要加固" data-inspector-id="html:ed903da4:1385"></label>
+        <label class="span-2" data-inspector-id="html:ed903da4:1386"><span data-inspector-id="html:ed903da4:1387">整改要求</span><textarea name="description" maxlength="2000" data-inspector-id="html:ed903da4:1388"></textarea></label>
+        <label data-inspector-id="html:ed903da4:1389"><span data-inspector-id="html:ed903da4:1390">优先级</span><select name="priority" data-inspector-id="html:ed903da4:1391"><option value="normal" data-inspector-id="html:ed903da4:1392">普通</option><option value="urgent" data-inspector-id="html:ed903da4:1393">紧急</option></select></label>
+        <label data-inspector-id="html:ed903da4:1394"><span data-inspector-id="html:ed903da4:1395">整改负责人 *</span><select name="ownerMemberId" id="issueOwnerSelect" required="" data-inspector-id="html:ed903da4:1396"></select></label>
+        <label data-inspector-id="html:ed903da4:1397"><span data-inspector-id="html:ed903da4:1398">整改截止时间</span><input name="dueAt" type="datetime-local" data-inspector-id="html:ed903da4:1399"><small data-inspector-id="html:ed903da4:1400">可随时调整；创建、提交、复核等操作时间由系统自动保留。</small></label>
+        <label data-inspector-id="html:ed903da4:1401"><span data-inspector-id="html:ed903da4:1402">关联现场日志（可选）</span><select name="siteLogId" id="issueLogSelect" data-inspector-id="html:ed903da4:1403"><option value="" data-inspector-id="html:ed903da4:1404">不关联现场日志</option></select><small data-inspector-id="html:ed903da4:1405">仅用于标记问题来源，不会带入日志中的照片。</small></label>
+        <label class="span-2" data-issue-create-only="" data-inspector-id="html:ed903da4:1406"><span data-inspector-id="html:ed903da4:1407">整改前图片（仅此问题）</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" data-upload-files="" data-inspector-id="html:ed903da4:1408"><small data-inspector-id="html:ed903da4:1409">这里只上传能够说明当前整改问题的图片。</small></label>
+        <label data-issue-create-only="" data-inspector-id="html:ed903da4:1410"><span data-inspector-id="html:ed903da4:1411">整改前照片日期</span><input name="occurredAt" type="datetime-local" data-inspector-id="html:ed903da4:1412"><small data-inspector-id="html:ed903da4:1413">补录照片可选择实际现场日期。</small></label>
+        <div class="upload-preview span-2" data-upload-preview="" data-issue-create-only="" hidden="" data-inspector-id="html:ed903da4:1414"></div>
+      </div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1415"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1416">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1417">创建整改</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="checklistItemDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1418">
+    <form method="dialog" class="dialog-form compact" id="checklistItemForm" data-inspector-id="html:ed903da4:1419">
+      <input name="itemId" type="hidden" data-inspector-id="html:ed903da4:1420">
+      <input name="milestoneId" type="hidden" data-inspector-id="html:ed903da4:1421">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1422"><div data-inspector-id="html:ed903da4:1423"><h2 data-inspector-id="html:ed903da4:1424">新增节点必检项</h2><p data-inspector-id="html:ed903da4:1425">每一项独立检查；无问题直接打勾，有问题发起整改。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1426"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1427"></button></div>
+      <div class="selected-node-card" data-inspector-id="html:ed903da4:1428"><span data-inspector-id="html:ed903da4:1429">归属施工节点</span><b id="checklistItemMilestoneName" data-inspector-id="html:ed903da4:1430">当前施工节点</b><small data-inspector-id="html:ed903da4:1431">项目内修改只影响当前项目，不会改变企业模板。</small></div>
+      <label data-inspector-id="html:ed903da4:1432"><span data-inspector-id="html:ed903da4:1433">必检项名称 *</span><input name="title" maxlength="160" required="" placeholder="例如：冷热水管打压结果正常" data-inspector-id="html:ed903da4:1434"></label>
+      <label data-inspector-id="html:ed903da4:1435"><span data-inspector-id="html:ed903da4:1436">检查说明</span><textarea name="note" maxlength="500" placeholder="填写验收标准、检查位置或注意事项" data-inspector-id="html:ed903da4:1437"></textarea></label>
+      <label class="check-row" data-inspector-id="html:ed903da4:1438"><input name="required" type="checkbox" checked="" data-inspector-id="html:ed903da4:1439"><span data-inspector-id="html:ed903da4:1440">作为节点完成前必须通过的项目</span></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1441"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1442">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1443">保存必检项</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="checklistTemplateDialog" class="wide-dialog checklist-template-dialog" data-inspector-id="html:ed903da4:1444">
+    <form method="dialog" class="dialog-form" id="checklistTemplateForm" data-inspector-id="html:ed903da4:1445">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1446"><div data-inspector-id="html:ed903da4:1447"><h2 data-inspector-id="html:ed903da4:1448">企业必检项模板</h2><p data-inspector-id="html:ed903da4:1449">提前按施工阶段配置检查标准；新建项目会自动复制一份，后续项目内可独立调整。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1450"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1451"></button></div>
+      <label data-inspector-id="html:ed903da4:1452"><span data-inspector-id="html:ed903da4:1453">模板名称 *</span><input name="name" maxlength="100" required="" value="企业施工必检项模板" data-inspector-id="html:ed903da4:1454"></label>
+      <div class="checklist-template-tip" data-inspector-id="html:ed903da4:1455"><b data-inspector-id="html:ed903da4:1456">使用规则</b><span data-inspector-id="html:ed903da4:1457">模板只影响以后新建的项目，不会覆盖已有项目的验收结果；阶段名称会优先与施工节点同名匹配。必检项可用“置顶、上移、下移”调整顺序，保存模板后生效。</span></div>
+      <div class="checklist-template-stages" id="checklistTemplateStages" data-inspector-id="html:ed903da4:1458"></div>
+      <button class="secondary checklist-template-add-stage" type="button" id="addChecklistTemplateStage" data-inspector-id="html:ed903da4:1459">添加施工阶段</button>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1460"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1461">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1462">保存企业模板</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="checklistImportDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1463">
+    <form method="dialog" class="dialog-form compact" id="checklistImportForm" data-inspector-id="html:ed903da4:1464">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1465"><div data-inspector-id="html:ed903da4:1466"><h2 data-inspector-id="html:ed903da4:1467">从企业模板导入必检项</h2><p data-inspector-id="html:ed903da4:1468">选择一个施工阶段，将该阶段全部必检项复制到当前节点；同名项自动跳过。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1469"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1470"></button></div>
+      <input name="milestoneId" type="hidden" data-inspector-id="html:ed903da4:1471">
+      <label data-inspector-id="html:ed903da4:1472"><span data-inspector-id="html:ed903da4:1473">目标节点</span><input id="checklistImportTarget" readonly="" data-inspector-id="html:ed903da4:1474"></label>
+      <label data-inspector-id="html:ed903da4:1475"><span data-inspector-id="html:ed903da4:1476">选择模板施工阶段 *</span><select name="milestoneName" id="checklistImportStage" required="" data-inspector-id="html:ed903da4:1477"></select></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1478"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1479">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1480">导入全部必检项</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="inviteDialog" data-inspector-id="html:ed903da4:1481">
+    <form method="dialog" class="dialog-form compact" id="inviteForm" data-inspector-id="html:ed903da4:1482">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1483"><div data-inspector-id="html:ed903da4:1484"><h2 data-inspector-id="html:ed903da4:1485">邀请企业成员</h2><p data-inspector-id="html:ed903da4:1486">对方需先拥有装修小账本账号，并使用对应用户名或邮箱接受。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1487"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1488"></button></div>
+      <label data-inspector-id="html:ed903da4:1489"><span data-inspector-id="html:ed903da4:1490">用户名或邮箱 *</span><input name="loginName" maxlength="254" required="" data-inspector-id="html:ed903da4:1491"></label>
+      <label data-inspector-id="html:ed903da4:1492"><span data-inspector-id="html:ed903da4:1493">企业角色</span><select name="role" data-inspector-id="html:ed903da4:1494"><option value="project_manager" data-inspector-id="html:ed903da4:1495">项目经理</option><option value="designer" data-inspector-id="html:ed903da4:1496">设计师</option><option value="finance" data-inspector-id="html:ed903da4:1497">财务</option><option value="procurement" data-inspector-id="html:ed903da4:1498">采购</option><option value="quality" data-inspector-id="html:ed903da4:1499">质检</option><option value="viewer" data-inspector-id="html:ed903da4:1500">只读成员</option><option value="admin" data-inspector-id="html:ed903da4:1501">企业管理员</option></select></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1502"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1503">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1504">生成邀请链接</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="teamPlanDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1505">
+    <form method="dialog" class="dialog-form compact" data-inspector-id="html:ed903da4:1506">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1507"><div data-inspector-id="html:ed903da4:1508"><h2 data-inspector-id="html:ed903da4:1509">企业会员团队版专属</h2><p data-inspector-id="html:ed903da4:1510">邀请成员、设置成员角色和项目权限，需要开通企业会员团队版。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1511"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1512"></button></div>
+      <div class="team-plan-dialog-copy" data-inspector-id="html:ed903da4:1513"><b data-inspector-id="html:ed903da4:1514">团队版 ¥499 / 年</b><p data-inspector-id="html:ed903da4:1515">包含 2 个管理员和 5 个普通成员；网页端与小程序端共用同一套席位和权限。</p><small data-inspector-id="html:ed903da4:1516">如需开通或增加成员席位，请联系作者处理。</small></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1517"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1518">我知道了</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="enterpriseExpiryDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1519">
+    <form method="dialog" class="dialog-form compact" data-inspector-id="html:ed903da4:1520">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1521"><div data-inspector-id="html:ed903da4:1522"><h2 id="enterpriseAccessPromptTitle" data-inspector-id="html:ed903da4:1523">企业版已到期</h2><p id="enterpriseAccessPromptSummary" data-inspector-id="html:ed903da4:1524">历史项目和资料仍可继续查看。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1525"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1526"></button></div>
+      <div class="team-plan-dialog-copy" data-inspector-id="html:ed903da4:1527"><b id="enterpriseAccessPromptAction" data-inspector-id="html:ed903da4:1528">新增、编辑、上传、审核、邀请和同步等写入功能已暂停。</b><p id="enterpriseAccessPromptContact" data-inspector-id="html:ed903da4:1529">联系作者续费企业版后，网页版和小程序会同时恢复使用。</p></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1530"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1531">知道了</button><button class="primary" type="button" data-enterprise-contact="" data-inspector-id="html:ed903da4:1532">联系作者续费</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acceptanceMediaDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1533">
+    <form method="dialog" class="dialog-form compact" id="acceptanceMediaForm" data-inspector-id="html:ed903da4:1534">
+      <input name="milestoneId" type="hidden" data-inspector-id="html:ed903da4:1535">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1536"><div data-inspector-id="html:ed903da4:1537"><h2 data-inspector-id="html:ed903da4:1538">添加节点验收图片</h2><p data-inspector-id="html:ed903da4:1539">图片会作为验收单附件，并进入该节点的客户版图文报告。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1540"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1541"></button></div>
+      <div class="selected-node-card" data-inspector-id="html:ed903da4:1542"><span data-inspector-id="html:ed903da4:1543">归属施工节点</span><b id="acceptanceMediaMilestoneName" data-inspector-id="html:ed903da4:1544">当前施工节点</b><small data-inspector-id="html:ed903da4:1545">建议上传签字验收单、检测结果和完工交付照片。</small></div>
+      <label data-inspector-id="html:ed903da4:1546"><span data-inspector-id="html:ed903da4:1547">资料日期 *</span><input name="occurredAt" type="datetime-local" required="" data-inspector-id="html:ed903da4:1548"><small data-inspector-id="html:ed903da4:1549">用于影像资料归档；以后修改施工节点不会改变此日期。</small></label>
+      <label data-inspector-id="html:ed903da4:1550"><span data-inspector-id="html:ed903da4:1551">验收单图片（最多 20 张）*</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" required="" data-upload-files="" data-inspector-id="html:ed903da4:1552"><small data-inspector-id="html:ed903da4:1553">支持 JPG、PNG、WebP，单张不超过 5MB；上传后可删除并从回收站恢复。</small></label>
+      <div class="upload-preview" data-upload-preview="" hidden="" data-inspector-id="html:ed903da4:1554"></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1555"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1556">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1557">上传并加入验收单</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="unlinkedArchiveDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1558">
+    <form method="dialog" class="dialog-form compact" id="unlinkedArchiveForm" data-inspector-id="html:ed903da4:1559">
+      <input name="mediaId" type="hidden" data-inspector-id="html:ed903da4:1560">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1561"><div data-inspector-id="html:ed903da4:1562"><h2 data-inspector-id="html:ed903da4:1563">确认归档历史照片</h2><p data-inspector-id="html:ed903da4:1564">请选择真实归属和现场日期；归档后仅企业内部可见。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1565"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1566"></button></div>
+      <label data-inspector-id="html:ed903da4:1567"><span data-inspector-id="html:ed903da4:1568">归属施工节点</span><select name="milestoneId" id="unlinkedArchiveMilestone" data-inspector-id="html:ed903da4:1569"></select></label>
+      <label data-inspector-id="html:ed903da4:1570"><span data-inspector-id="html:ed903da4:1571">现场日期 *</span><input name="occurredAt" type="datetime-local" required="" data-inspector-id="html:ed903da4:1572"></label>
+      <label data-inspector-id="html:ed903da4:1573"><span data-inspector-id="html:ed903da4:1574">记录说明 *</span><input name="summary" maxlength="500" required="" value="找回的历史现场照片" data-inspector-id="html:ed903da4:1575"></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1576"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1577">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1578">确认归档</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="workerDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1579">
+    <form method="dialog" class="dialog-form compact" id="workerForm" data-inspector-id="html:ed903da4:1580">
+      <input type="hidden" name="workerId" data-inspector-id="html:ed903da4:1581">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1582"><div data-inspector-id="html:ed903da4:1583"><h2 data-inspector-id="html:ed903da4:1584">新增工人档案</h2><p data-inspector-id="html:ed903da4:1585">工人不占企业成员账号，可直接用于各项目经理的工地排班。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1586"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1587"></button></div>
+      <label data-inspector-id="html:ed903da4:1588"><span data-inspector-id="html:ed903da4:1589">工人姓名 *</span><input name="name" maxlength="80" required="" placeholder="例如：张师傅" data-inspector-id="html:ed903da4:1590"></label>
+      <label data-inspector-id="html:ed903da4:1591"><span data-inspector-id="html:ed903da4:1592">联系电话</span><input name="phone" maxlength="30" placeholder="手机号或班组电话" data-inspector-id="html:ed903da4:1593"></label>
+      <label data-inspector-id="html:ed903da4:1594"><span data-inspector-id="html:ed903da4:1595">工种 *</span><input name="trade" maxlength="50" required="" list="workerTradeOptions" placeholder="例如：水电工" data-inspector-id="html:ed903da4:1596"><datalist id="workerTradeOptions" data-inspector-id="html:ed903da4:1597"><option value="水电工" data-inspector-id="html:ed903da4:1598"></option><option value="瓦工" data-inspector-id="html:ed903da4:1599"></option><option value="木工" data-inspector-id="html:ed903da4:1600"></option><option value="油漆工" data-inspector-id="html:ed903da4:1601"></option><option value="安装工" data-inspector-id="html:ed903da4:1602"></option><option value="杂工" data-inspector-id="html:ed903da4:1603"></option></datalist></label>
+      <label data-inspector-id="html:ed903da4:1604"><span data-inspector-id="html:ed903da4:1605">熟练程度</span><select name="skillLevel" data-inspector-id="html:ed903da4:1606"><option value="学徒" data-inspector-id="html:ed903da4:1607">学徒</option><option value="熟练" selected="" data-inspector-id="html:ed903da4:1608">熟练</option><option value="班组长" data-inspector-id="html:ed903da4:1609">班组长</option></select></label>
+      <label data-inspector-id="html:ed903da4:1610"><span data-inspector-id="html:ed903da4:1611">人员状态</span><select name="status" data-inspector-id="html:ed903da4:1612"><option value="active" data-inspector-id="html:ed903da4:1613">正常在岗</option><option value="leave" data-inspector-id="html:ed903da4:1614">请假 / 暂停派工</option></select></label>
+      <label data-inspector-id="html:ed903da4:1615"><span data-inspector-id="html:ed903da4:1616">备注</span><textarea name="note" maxlength="500" placeholder="擅长工艺、班组信息等" data-inspector-id="html:ed903da4:1617"></textarea></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1618"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1619">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1620">保存工人</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="assignmentDialog" data-inspector-id="html:ed903da4:1621">
+    <form method="dialog" class="dialog-form" id="assignmentForm" data-inspector-id="html:ed903da4:1622">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1623"><div data-inspector-id="html:ed903da4:1624"><h2 data-inspector-id="html:ed903da4:1625">安排工人到工地</h2><p data-inspector-id="html:ed903da4:1626">选择工人和施工日期；如与已有工地重叠，系统会提示冲突并阻止保存。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1627"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1628"></button></div>
+      <div class="form-grid" data-inspector-id="html:ed903da4:1629">
+        <label data-inspector-id="html:ed903da4:1630"><span data-inspector-id="html:ed903da4:1631">工人 *</span><select name="workerId" id="assignmentWorkerSelect" required="" data-inspector-id="html:ed903da4:1632"></select></label>
+        <label data-inspector-id="html:ed903da4:1633"><span data-inspector-id="html:ed903da4:1634">安排工地 *</span><select name="projectId" id="assignmentProjectSelect" required="" data-inspector-id="html:ed903da4:1635"></select></label>
+        <label data-inspector-id="html:ed903da4:1636"><span data-inspector-id="html:ed903da4:1637">开始日期 *</span><input name="startDate" type="date" required="" data-inspector-id="html:ed903da4:1638"></label>
+        <label data-inspector-id="html:ed903da4:1639"><span data-inspector-id="html:ed903da4:1640">结束日期 *</span><input name="endDate" type="date" required="" data-inspector-id="html:ed903da4:1641"></label>
+        <label class="span-2" data-inspector-id="html:ed903da4:1642"><span data-inspector-id="html:ed903da4:1643">施工内容</span><input name="workContent" maxlength="200" placeholder="例如：水电布管、回路复核" data-inspector-id="html:ed903da4:1644"></label>
+        <label class="span-2" data-inspector-id="html:ed903da4:1645"><span data-inspector-id="html:ed903da4:1646">调配备注</span><textarea name="note" maxlength="500" placeholder="进场要求、联系人或注意事项" data-inspector-id="html:ed903da4:1647"></textarea></label>
+      </div>
+      <div class="assignment-duration" id="assignmentDuration" data-inspector-id="html:ed903da4:1648">请选择开始和结束日期</div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1649"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1650">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1651">确认派工</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="reportStyleDialog" class="report-style-dialog" data-inspector-id="html:ed903da4:1652">
+    <div class="dialog-head" data-inspector-id="html:ed903da4:1653"><div data-inspector-id="html:ed903da4:1654"><h2 data-inspector-id="html:ed903da4:1655">客户报告样式预览</h2><p data-inspector-id="html:ed903da4:1656">这是版式预览，不代表当前节点已经验收通过。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1657"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1658"></button></div>
+    <form id="reportBrandingForm" class="report-branding-form report-admin-only" data-inspector-id="html:ed903da4:1659">
+      <div class="report-branding-head" data-inspector-id="html:ed903da4:1660"><div data-inspector-id="html:ed903da4:1661"><b data-inspector-id="html:ed903da4:1662">企业报告抬头</b><small data-inspector-id="html:ed903da4:1663">保存一次后，网页和小程序生成的报告都会使用这套设置。</small></div><button class="primary" type="submit" data-inspector-id="html:ed903da4:1664">保存报告设置</button></div>
+      <div class="report-branding-grid" data-inspector-id="html:ed903da4:1665">
+        <label data-inspector-id="html:ed903da4:1666"><span data-inspector-id="html:ed903da4:1667">抬头样式</span><select name="brandMode" data-inspector-id="html:ed903da4:1668"><option value="text" data-inspector-id="html:ed903da4:1669">企业文字</option><option value="logo" data-inspector-id="html:ed903da4:1670">公司 Logo</option></select></label>
+        <label data-inspector-id="html:ed903da4:1671"><span data-inspector-id="html:ed903da4:1672">企业抬头文字</span><input name="brandText" maxlength="100" placeholder="例如：东莞荆东装饰" data-inspector-id="html:ed903da4:1673"></label>
+        <label data-inspector-id="html:ed903da4:1674"><span data-inspector-id="html:ed903da4:1675">负责人岗位名称</span><input name="managerTitle" maxlength="30" placeholder="例如：项目经理 / 工长" data-inspector-id="html:ed903da4:1676"></label>
+        <label data-inspector-id="html:ed903da4:1677"><span data-inspector-id="html:ed903da4:1678">报告显示人员</span><select name="managerSource" data-inspector-id="html:ed903da4:1679"><option value="site_manager" data-inspector-id="html:ed903da4:1680">项目经理 / 工长</option><option value="manager" data-inspector-id="html:ed903da4:1681">项目总负责人</option><option value="designer" data-inspector-id="html:ed903da4:1682">设计师</option></select></label>
+        <label class="span-2" data-inspector-id="html:ed903da4:1683"><span data-inspector-id="html:ed903da4:1684">报告标语</span><input name="tagline" maxlength="160" placeholder="例如：专业施工 · 透明交付 · 节点验收" data-inspector-id="html:ed903da4:1685"></label>
+        <label class="span-2 report-export-option" data-inspector-id="html:ed903da4:1686"><input name="includeIssueRecords" type="checkbox" checked="" data-inspector-id="html:ed903da4:1687"><span data-inspector-id="html:ed903da4:1688">默认显示问题整改闭环</span><small data-inspector-id="html:ed903da4:1689">开启后，有整改记录时写入节点验收报告；每次导出前仍可临时调整。</small></label>
+        <label class="span-2 report-export-option" data-inspector-id="html:ed903da4:1690"><input name="includeCustomerSyncRecords" type="checkbox" data-inspector-id="html:ed903da4:1691"><span data-inspector-id="html:ed903da4:1692">导出客户同步明细</span><small data-inspector-id="html:ed903da4:1693">默认关闭；开启后，有同步记录时才会写入节点验收报告。</small></label>
+        <label class="span-2 report-logo-field" data-inspector-id="html:ed903da4:1694"><span data-inspector-id="html:ed903da4:1695">公司 Logo（JPG / PNG / WebP，建议透明背景）</span><input id="reportLogoInput" name="logo" type="file" accept="image/jpeg,image/png,image/webp" data-inspector-id="html:ed903da4:1696"><small id="reportLogoHint" data-inspector-id="html:ed903da4:1697">选择 Logo 抬头时需要上传图片；保留为空不会替换现有 Logo。</small></label>
+      </div>
+    </form>
+    <div class="report-pdf-preview-note" id="reportStylePreviewNote" data-inspector-id="html:ed903da4:1698">下方直接显示正式 PDF 模板；修改企业抬头后，请先保存报告设置。</div>
+    <div class="report-pdf-preview-shell" data-inspector-id="html:ed903da4:1699">
+      <iframe id="reportStylePdfFrame" title="节点验收报告正式版式预览" data-inspector-id="html:ed903da4:1700"></iframe>
+    </div>
+    <div class="dialog-actions" data-inspector-id="html:ed903da4:1701"><button class="secondary" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1702">关闭预览</button></div>
+  </dialog>
+
+  <dialog id="milestoneReportExportDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1703">
+    <form method="dialog" class="dialog-form compact" id="milestoneReportExportForm" data-inspector-id="html:ed903da4:1704">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1705"><div data-inspector-id="html:ed903da4:1706"><h2 data-inspector-id="html:ed903da4:1707">生成节点验收报告</h2><p data-inspector-id="html:ed903da4:1708">实际完成时间与客户交付日期分开填写，不受报告生成当天限制。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1709"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1710"></button></div>
+      <input name="milestoneId" type="hidden" data-inspector-id="html:ed903da4:1711"><input name="preview" type="hidden" data-inspector-id="html:ed903da4:1712">
+      <label data-inspector-id="html:ed903da4:1713"><span data-inspector-id="html:ed903da4:1714">验收节点</span><input id="milestoneReportNodeName" readonly="" data-inspector-id="html:ed903da4:1715"></label>
+      <label data-inspector-id="html:ed903da4:1716"><span data-inspector-id="html:ed903da4:1717">实际完成时间 *</span><input name="actualFinishedAt" type="datetime-local" required="" data-inspector-id="html:ed903da4:1718"><small data-inspector-id="html:ed903da4:1719">统一按中国标准时间（北京时间）写入报告。</small></label>
+      <label data-inspector-id="html:ed903da4:1720"><span data-inspector-id="html:ed903da4:1721">交付日期 *</span><input name="deliveryDate" type="date" required="" data-inspector-id="html:ed903da4:1722"><small data-inspector-id="html:ed903da4:1723">默认取本节点最新验收通过日期，可按实际交给客户的日期调整；仅影响本次报告。</small></label>
+      <label class="report-export-option" data-inspector-id="html:ed903da4:1724"><input name="includeIssueRecords" type="checkbox" data-inspector-id="html:ed903da4:1725"><span data-inspector-id="html:ed903da4:1726">显示问题整改闭环</span><small data-inspector-id="html:ed903da4:1727">仅本次报告生效；无整改记录时会自动隐藏。</small></label>
+      <label class="report-export-option" data-inspector-id="html:ed903da4:1728"><input name="includeCustomerSyncRecords" type="checkbox" data-inspector-id="html:ed903da4:1729"><span data-inspector-id="html:ed903da4:1730">显示客户同步记录</span><small data-inspector-id="html:ed903da4:1731">仅本次报告生效；无同步记录时会自动隐藏。</small></label>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1732"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1733">取消</button><button class="primary" type="submit" data-inspector-id="html:ed903da4:1734">打开报告</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="constructionScheduleImageDialog" class="schedule-image-dialog" data-inspector-id="html:ed903da4:1735">
+    <div class="dialog-head" data-inspector-id="html:ed903da4:1736"><div data-inspector-id="html:ed903da4:1737"><h2 id="constructionScheduleImageTitle" data-inspector-id="html:ed903da4:1738">客户版施工进度表</h2><p id="constructionScheduleImageDescription" data-inspector-id="html:ed903da4:1739">横向日期排期样式，带企业抬头，可下载后直接发送给客户。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1740"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1741"></button></div>
+    <div class="schedule-image-preview-wrap" data-inspector-id="html:ed903da4:1742">
+      <img id="constructionScheduleImagePreview" alt="客户版施工进度计划表预览" data-inspector-id="html:ed903da4:1743">
+    </div>
+    <div class="schedule-image-footer" data-inspector-id="html:ed903da4:1744"><span id="constructionScheduleImageMeta" data-inspector-id="html:ed903da4:1745"></span><div class="dialog-actions" data-inspector-id="html:ed903da4:1746"><button class="secondary" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1747">关闭预览</button><button class="primary" type="button" id="downloadConstructionScheduleImage" data-inspector-id="html:ed903da4:1748">下载高清 PNG 图片</button></div></div>
+  </dialog>
+
+  <dialog id="photoPreviewDialog" class="photo-preview-dialog" data-inspector-id="html:ed903da4:1749">
+    <button class="photo-preview-close" type="button" data-dialog-close="" aria-label="关闭照片预览" data-inspector-id="html:ed903da4:1750"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1751"></button>
+    <img id="photoPreviewImage" alt="企业现场照片预览" data-inspector-id="html:ed903da4:1752">
+    <p id="photoPreviewCaption" data-inspector-id="html:ed903da4:1753"></p>
+  </dialog>
+
+  <dialog id="issueReviewDialog" class="compact-dialog" data-inspector-id="html:ed903da4:1754">
+    <form method="dialog" class="dialog-form compact" id="issueReviewForm" data-inspector-id="html:ed903da4:1755">
+      <div class="dialog-head" data-inspector-id="html:ed903da4:1756"><div data-inspector-id="html:ed903da4:1757"><h2 data-inspector-id="html:ed903da4:1758">提交整改后照片</h2><p data-inspector-id="html:ed903da4:1759">选择实际现场日期，照片会按该日期进入影像资料。</p></div><button class="icon-button" type="button" data-dialog-close="" aria-label="关闭" data-inspector-id="html:ed903da4:1760"><img class="xz-icon" src="assets/icons/close.svg" alt="" aria-hidden="true" data-inspector-id="html:ed903da4:1761"></button></div>
+      <label data-inspector-id="html:ed903da4:1762"><span data-inspector-id="html:ed903da4:1763">照片日期 *</span><input name="occurredAt" type="datetime-local" required="" data-inspector-id="html:ed903da4:1764"></label>
+      <label data-inspector-id="html:ed903da4:1765"><span data-inspector-id="html:ed903da4:1766">整改后照片 *</span><input id="issueReviewPhotos" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple="" required="" data-upload-files="" data-inspector-id="html:ed903da4:1767"></label>
+      <div class="upload-preview" data-upload-preview="" hidden="" data-inspector-id="html:ed903da4:1768"></div>
+      <div class="dialog-actions" data-inspector-id="html:ed903da4:1769"><button class="ghost" type="button" data-dialog-close="" data-inspector-id="html:ed903da4:1770">取消</button><button class="primary" type="submit" value="default" data-inspector-id="html:ed903da4:1771">提交复核</button></div>
+    </form>
+  </dialog>
+  <section id="staticNotice" hidden style="max-width:720px;margin:12vh auto;padding:36px 32px;border:1px solid #ece7e2;border-radius:14px;background:#fffdfb;box-shadow:0 24px 70px rgba(55,42,31,.12);font-family:inherit;color:#202124">
+    <p style="margin:0 0 8px;font-size:13px;font-weight:800;letter-spacing:.08em;color:#e45b3f">静态演示环境</p>
+    <h1 style="margin:0 0 12px;font-size:26px;line-height:1.35">企业版需要连接服务端</h1>
+    <p style="margin:0 0 8px;font-size:15px;line-height:1.8;color:#68615b">当前版本是纯静态复刻版，没有后端接口，企业工作台的登录、项目、待办与收款数据都无法读取。</p>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.8;color:#68615b">个人版的装修总览、预算记账、流程验收、采购比价等功能可以正常使用；企业侧的客户项目管理可在静态演示页查看。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <a href="home.html" style="display:inline-flex;align-items:center;height:40px;padding:0 18px;border-radius:10px;background:#e45b3f;color:#fff;font-size:14px;font-weight:800;text-decoration:none">返回个人版首页</a>
+      <a href="customer-projects.html" style="display:inline-flex;align-items:center;height:40px;padding:0 18px;border:1px solid #ece7e2;border-radius:10px;background:#fff;color:#68615b;font-size:14px;font-weight:800;text-decoration:none">查看客户项目演示</a>
+    </div>
+  </section>
+  <script src="workday-calendar.js?v=20260813-workday-v1"></script>
+  <script>
+    (function () {
+      if (window.__XZ_STATIC__ === false) {
+        document.write('<script src="enterprise.js?v=20261024-mobile-overflow"><\/script>');
+        return;
+      }
+      document.getElementById('staticNotice').hidden = false;
+      var shell = document.querySelector('.app-shell');
+      if (shell) shell.style.display = 'none';
+    })();
+  </script>
+
+
+</body></html>

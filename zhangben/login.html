@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 登录</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <header class="page-head">
+    <a class="brand" href="login.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 3h13a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5zM3 3v18M8 7h8M8 12h8M8 17h5"/></svg>
+      </span>
+      <span>装修小账本</span>
+    </a>
+    <a class="back" href="login.html">返回首页</a>
+  </header>
+
+  <main class="auth-wrap">
+    <!-- 左侧介绍 -->
+    <section class="intro">
+      <h1>一份装修记录，<br>随时接着用。</h1>
+      <p>网页上整理项目，小程序里随手记录。登录同一个账号，选择同一个项目，资料就能接续。</p>
+      <div class="features">
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></i>
+          <b>待办同步</b><span>装修节点、提醒事项统一管理。</span>
+        </div>
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M5.5 7.5h13A1.5 1.5 0 0 1 20 9v9.2A1.8 1.8 0 0 1 18.2 20H5.8A1.8 1.8 0 0 1 4 18.2V6.8A1.8 1.8 0 0 1 5.8 5h11.7"/><path d="M15.5 13h4.5"/></svg></i>
+          <b>预算记账</b><span>支出、分类和预算分配保留记录。</span>
+        </div>
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M6.6 7.4h12.2l-1.4 7H8.7L7.5 4.8H5"/><circle cx="10" cy="18.7" r=".8"/><circle cx="16.8" cy="18.7" r=".8"/></svg></i>
+          <b>采购清单</b><span>待购物品和比价信息持续跟进。</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右侧登录卡 -->
+    <section class="auth-card">
+      <h2 id="cardTitle">登录装修小账本</h2>
+      <p class="hint" id="cardHint">使用同一个账号，继续管理同一份装修项目。</p>
+
+      <div class="mode-tabs" role="tablist" aria-label="登录方式">
+        <button type="button" id="tabPwd" role="tab" aria-selected="true">账号登录</button>
+        <button type="button" id="tabPair" role="tab" aria-selected="false">微信确认登录</button>
+      </div>
+
+      <div class="msg error" id="msgError" role="alert"></div>
+      <div class="msg ok" id="msgOk" role="status"></div>
+
+      <!-- 账号密码登录 -->
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">用户名或邮箱</label>
+          <input id="username" autocomplete="username" placeholder="输入用户名或已绑定邮箱" required>
+        </div>
+        <div class="form-group">
+          <label for="password">密码</label>
+          <div class="pwd-wrap">
+            <input id="password" type="password" autocomplete="current-password" placeholder="输入密码" required>
+            <button type="button" class="pwd-eye" id="pwdToggle" aria-label="显示密码">
+              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="forgot-entry">
+          <button class="text-btn" id="forgotLink" type="button">忘记密码？</button>
+        </div>
+        <button class="btn-primary" id="submitBtn" type="submit">登录</button>
+      </form>
+
+      <!-- 微信确认登录 -->
+      <section id="pairPanel" hidden>
+        <div class="pair-card">
+          <p class="footnote" style="margin:0">打开微信「装修小账本」小程序，输入下方登录码确认登录</p>
+          <output class="pair-code" id="pairCode">····</output>
+          <p class="pair-status" id="pairStatus">登录码 5 分钟内有效</p>
+          <button class="btn-ghost" id="refreshPair" type="button">复制登录码</button>
+        </div>
+        <p class="footnote">已有小程序账号可以直接确认登录，无需再注册一个账号。</p>
+      </section>
+
+      <!-- 找回密码 -->
+      <form id="forgotForm" hidden novalidate>
+        <div class="form-group">
+          <label for="forgotEmail">已绑定邮箱</label>
+          <input id="forgotEmail" type="email" autocomplete="email" placeholder="name@example.com">
+        </div>
+        <button class="btn-primary" id="forgotBtn" type="submit">发送重置链接</button>
+        <div class="switch-link">
+          <button class="text-btn" id="backLogin" type="button">返回登录</button>
+        </div>
+      </form>
+
+      <label class="check-row">
+        <input type="checkbox" id="rememberMe">
+        <span>保持登录 30 天（公共设备请勿勾选）</span>
+      </label>
+
+      <div class="switch-link">第一次使用？<a href="register.html">创建账号</a></div>
+      <p class="footnote">个人版和企业版共用账号，企业成员权限由所属企业管理。</p>
+      <div class="legal-links">
+        <a href="#" onclick="return false">用户协议</a>
+        <a href="#" onclick="return false">隐私政策</a>
+      </div>
+
+      <button class="mini-entry" type="button" id="miniEntry">
+        <span class="mini-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M8 3.5A4.5 4.5 0 0 0 3.5 8v.5A4.5 4.5 0 0 0 8 13h.2A6 6 0 0 1 8 11.5a6 6 0 0 1 6-6c.24 0 .48.01.71.04A4.5 4.5 0 0 0 8 3.5z"/><path d="M14.5 7.5a5 5 0 0 0-5 5c0 2.76 2.24 5 5 5 .63 0 1.23-.11 1.78-.32l2.22 1.07-.62-2.02A5 5 0 0 0 14.5 7.5z"/></svg>
+        </span>
+        <span><b>使用微信小程序</b><small>打开微信，搜索“装修小账本”</small></span>
+        <span class="mini-arrow" aria-hidden="true">›</span>
+      </button>
+    </section>
+  </main>
+
+  <script src="js/login.js?v=3"></script>
+</body>
+</html>

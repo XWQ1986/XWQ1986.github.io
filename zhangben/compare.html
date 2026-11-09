@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 比价选品</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 比价选品（对齐原版 yellow-compare） */
+    .compare-heading { margin: 5px 0 28px; }
+    .compare-heading h1 { margin: 0; font-size: 28px; font-weight: 600; line-height: 1.35; }
+
+    .compare-tabs { display: flex; gap: 28px; margin: 0 0 22px; border-bottom: 1px solid var(--line); }
+    .compare-tabs button { position: relative; padding: 0 2px 15px; border: 0; background: none; color: var(--text-3); font-size: 15px; }
+    .compare-tabs button.active { color: var(--text); }
+    .compare-tabs button.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: #E8C935; }
+
+    .compare-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .compare-action-group { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .compare-btn {
+      min-height: 40px;
+      padding: 9px 14px;
+      border: 1px solid #DFE5E5;
+      border-radius: 10px;
+      background: #fff;
+      color: #41494B;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .compare-btn:hover { background: #FFFBEa; border-color: #DECB74; }
+    .compare-btn.primary { background: #FFF8D9; border-color: #EFE2A8; padding: 12px 18px; }
+
+    .compare-note { margin: 0 0 24px; padding: 17px 18px; border-radius: 12px; background: #FFF9DF; color: #756839; font-size: 14px; line-height: 1.7; }
+
+    .comparison-panel { padding: 24px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .comparison-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+    .comparison-head h2 { margin: 0; font-size: 20px; font-weight: 600; }
+    .compare-counts { display: flex; gap: 20px; align-items: center; margin-top: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
+    .compare-counts b { margin-left: 8px; color: var(--text); font-weight: 500; }
+
+    .cmp-list { display: grid; gap: 16px; margin-top: 18px; }
+    .cmp-card { border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; }
+    .cmp-card .card-hd { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 0; padding: 18px 0 12px; border-bottom: 1px solid var(--line); }
+    .cmp-card .item-info b { display: block; font-size: 15px; font-weight: 600; }
+    .cmp-card .item-info span { color: var(--text-3); font-size: 12px; }
+
+    .quote-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .quote-row:last-child { border-bottom: 0; }
+    .quote-row.chosen { background: #EEF7F1; }
+    .quote-row .vendor { font-size: 13px; font-weight: 600; }
+    .quote-row .note { display: block; color: var(--text-3); font-size: 11px; }
+    .quote-row .price { font-size: 15px; font-weight: 700; white-space: nowrap; }
+    .quote-row.best .price { color: var(--green); }
+    .quote-row .pick-btn { white-space: nowrap; }
+    #cmpGrid.only-best .quote-row:not(.best):not(.chosen),
+    .cmp-card.is-collapsed .quote-row:not(.best):not(.chosen) { display: none; }
+
+    .quote-add { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) 100px auto; gap: 8px; margin: 10px 0 16px; }
+    .quote-add .quote-note { grid-column: 1 / -1; }
+
+    .compare-summary { display: flex; align-items: center; gap: 46px; margin-top: 20px; padding: 18px 22px; border-radius: 12px; background: #FFF9DF; }
+    .compare-summary span { display: block; color: #786825; font-size: 12px; }
+    .compare-summary b { display: block; margin-top: 4px; font-size: 20px; font-weight: 500; }
+    .compare-summary .save b { color: #4F8A63; }
+    .compare-summary .spacer { flex: 1; }
+
+    @media (max-width: 960px) {
+      .compare-actions { flex-direction: column; align-items: stretch; }
+      .compare-summary { flex-wrap: wrap; gap: 20px; }
+    }
+    @media (max-width: 640px) {
+      .quote-add { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="compare-heading">
+      <h1>比价选品</h1>
+    </header>
+
+    <div class="compare-tabs">
+      <button id="chOnline" class="active">线上</button>
+      <button id="chOffline">线下</button>
+    </div>
+
+    <div class="compare-actions">
+      <div class="compare-action-group">
+        <button class="compare-btn" id="btnAll">全部展开</button>
+        <button class="compare-btn" id="btnMode">对比模式</button>
+      </div>
+      <div class="compare-action-group">
+        <button class="compare-btn" id="btnEdit">编辑数据</button>
+        <button class="compare-btn" id="btnExport">导出</button>
+        <button class="compare-btn" id="btnImport">导入</button>
+      </div>
+    </div>
+
+    <p class="compare-note">按数量、运费、安装费计算到手价 · 采用方案后自动回写采购清单</p>
+
+    <section class="comparison-panel">
+      <div class="comparison-head">
+        <h2 id="sectionTitle">线上选品</h2>
+        <button class="compare-btn primary" id="btnNewGroup">添加品类</button>
+      </div>
+      <div class="compare-counts">
+        <span>比价项目<b id="mGroups">0</b></span>
+        <span>已选定方案<b id="mPicked">0</b></span>
+        <span>已省金额<b id="mSaved">¥0</b></span>
+      </div>
+      <div class="cmp-list" id="cmpGrid"></div>
+      <div class="compare-summary">
+        <div><span>已选 <b id="tbCnt" style="display:inline;font-size:13px">0</b> 项合计</span><b id="tbTotal">¥0.00</b></div>
+        <div class="save"><span>相对最高价节省</span><b id="tbSave">¥0.00</b></div>
+        <div class="spacer"></div>
+        <button class="compare-btn primary" id="btnAdopt">采用方案并加入采购</button>
+        <button class="compare-btn" id="btnClearPicks">清空已选</button>
+        <a class="compare-btn" href="procurement.html">返回采购清单</a>
+      </div>
+    </section>
+    <input type="file" id="importFile" accept=".json,application/json" aria-label="导入比价文件" hidden>
+  </main>
+
+  <!-- 新建比价项弹窗 -->
+  <div class="modal-bg" id="groupModal" role="dialog" aria-modal="true" aria-labelledby="groupModalTitle" hidden>
+    <div class="modal">
+      <div class="modal-hd"><h3 id="groupModalTitle">添加品类</h3><button class="modal-close" data-close aria-label="关闭">✕</button></div>
+      <div class="modal-bd">
+        <div class="form-group"><label for="gName">材料 / 物品名称</label><input class="input" id="gName" aria-label="材料 / 物品名称" placeholder="例如：恒温花洒"></div>
+        <div class="form-group"><label for="gSpec">规格说明（可选）</label><input class="input" id="gSpec" aria-label="规格说明" placeholder="例如：全铜主体 带下出水"></div>
+        <div class="form-group"><label for="gStage">所属阶段</label><select class="input" id="gStage" aria-label="所属阶段"></select></div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn" data-close>取消</button>
+        <button class="btn primary" id="gSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    shell.renderNav('compare');
+    shell.store.seed();
+    const $ = id => document.getElementById(id);
+    const stageName = k => (shell.stages.find(s => s.key === k) || {}).name || '其他';
+
+    /* ---------- 数据 ---------- */
+    if (!shell.store.read('compare')) {
+      /* 空白开始模式下不写入演示比价项 */
+      shell.store.write('compare', shell.store.dataMode() === 'blank' ? [] : [
+        { id: shell.store.uid(), name: '恒温花洒', spec: '全铜主体', stage: 'install', channel: 'online', chosen: 1,
+          quotes: [
+            { vendor: '京东自营', brand: '九牧 JOMOO', price: 1299, note: '包安装 次日达' },
+            { vendor: '天猫旗舰店', brand: '箭牌 ARROW', price: 1149, note: '满 1000 减 50' },
+            { vendor: '拼多多百亿补贴', brand: '摩恩 MOEN', price: 989, note: '官方联保' } ]},
+        { id: shell.store.uid(), name: '大单槽水槽', spec: 'SUS304 75cm', stage: 'install', channel: 'online', chosen: -1,
+          quotes: [
+            { vendor: '京东自营', brand: '悍高 HIGOLD', price: 899, note: '含沥水篮' },
+            { vendor: '淘宝工厂店', brand: '无牌 304', price: 620, note: '运费 30' } ]},
+        { id: shell.store.uid(), name: '瓷砖 800×800', spec: '通体大理石纹', stage: 'masonry', channel: 'offline', chosen: 0,
+          quotes: [
+            { vendor: '建材市场 A 区', brand: '马可波罗', price: 68, note: '元/片 包送货' },
+            { vendor: '品牌专卖门店', brand: '东鹏', price: 88, note: '元/片 有活动赠品' },
+            { vendor: '仓库直销', brand: '冠珠', price: 55, note: '元/片 自提' } ]},
+        { id: shell.store.uid(), name: '乳胶漆面漆', spec: '18L 优等品', stage: 'paint', channel: 'offline', chosen: -1,
+          quotes: [
+            { vendor: '授权经销商', brand: '立邦', price: 780, note: '免费调色' },
+            { vendor: '建材超市', brand: '多乐士', price: 720, note: '两桶 9 折' } ]}
+      ]);
+    }
+    let groups = shell.store.read('compare', []);
+    let channel = 'online';
+    const save = () => shell.store.write('compare', groups);
+    const money = n => shell.fmt.money(n);
+
+    /* ---------- 渲染 ---------- */
+    function render() {
+      const list = groups.filter(g => g.channel === channel);
+      $('sectionTitle').textContent = channel === 'online' ? '线上选品' : '线下选品';
+      const grid = $('cmpGrid');
+      grid.innerHTML = '';
+      if (!list.length) {
+        grid.innerHTML = '<div class="empty" style="min-height:260px">这个渠道还没有比价项，点右上角「添加品类」开始</div>';
+      }
+      list.forEach(g => grid.appendChild(groupCard(g)));
+      renderMetrics();
+      renderTotalBar();
+    }
+
+    function effectivePrice(q) {
+      return (Number(q.price) || 0) + (Number(q.ship) || 0) + (Number(q.install) || 0);
+    }
+
+    function groupCard(g) {
+      const card = document.createElement('div');
+      card.className = 'cmp-card';
+      const minP = g.quotes.length ? Math.min.apply(null, g.quotes.map(effectivePrice)) : 0;
+      card.innerHTML =
+        '<div class="card-hd"><div class="item-info"><b>' + g.name + '</b>' +
+        '<span>' + (g.spec ? g.spec + ' · ' : '') + stageName(g.stage) + '</span></div>' +
+        '<button class="op del" title="删除比价项" style="border:0;background:none;color:#c4bab2;padding:4px;">' + shell.icon('trash', 'ic-sm') + '</button></div>' +
+        '<div class="quotes"></div>' +
+        '<div class="quote-add">' +
+        '<input class="input quote-vendor" aria-label="商家 / 平台" placeholder="商家 / 平台">' +
+        '<input class="input quote-brand" aria-label="品牌 / 型号" placeholder="品牌 / 型号（可选）">' +
+        '<input class="input quote-price" type="number" min="0" step="0.01" aria-label="价格" placeholder="价格">' +
+        '<button class="btn sm">加报价</button>' +
+        '<input class="input quote-ship" type="number" min="0" step="0.01" aria-label="运费" placeholder="运费（可选）" style="grid-column:span 2">' +
+        '<input class="input quote-install" type="number" min="0" step="0.01" aria-label="安装费" placeholder="安装费（可选）" style="grid-column:span 2">' +
+        '<input class="input quote-note" aria-label="报价备注" placeholder="备注：质保、赠品等（可选）">' +
+        '</div>';
+
+      const box = card.querySelector('.quotes');
+      g.quotes.forEach((q, qi) => {
+        const row = document.createElement('div');
+        const eff = effectivePrice(q);
+        const isBest = g.quotes.length > 0 && eff === minP;
+        const extra = (Number(q.ship) || 0) + (Number(q.install) || 0) > 0;
+        row.className = 'quote-row' + (qi === g.chosen ? ' chosen' : '') + (isBest ? ' best' : '');
+        row.innerHTML =
+          '<span class="badge ' + (isBest ? 'green' : '') + '">' + (isBest ? '最低' : '报价') + '</span>' +
+          '<div><span class="vendor">' + q.vendor + '</span><span class="note">' +
+          [q.brand, q.note].filter(Boolean).join(' · ') + '</span></div>' +
+          '<span class="price">' + money(eff) +
+          (extra ? '<small style="display:block;font-size:11px;color:var(--text-3);font-weight:500">含运费 ' + money(Number(q.ship) || 0) + ' · 安装 ' + money(Number(q.install) || 0) + '</small>' : '') +
+          '</span>' +
+          '<button class="btn sm pick-btn' + (qi === g.chosen ? ' primary' : '') + '">' + (qi === g.chosen ? '已选定' : '选这个') + '</button>';
+        row.querySelector('.pick-btn').onclick = () => {
+          g.chosen = g.chosen === qi ? -1 : qi;
+          save(); render();
+        };
+        box.appendChild(row);
+      });
+
+      const vIn = card.querySelector('.quote-vendor');
+      const bIn = card.querySelector('.quote-brand');
+      const pIn = card.querySelector('.quote-price');
+      const sIn = card.querySelector('.quote-ship');
+      const iIn = card.querySelector('.quote-install');
+      const nIn = card.querySelector('.quote-note');
+      card.querySelector('.quote-add .btn').onclick = () => {
+        const vendor = vIn.value.trim(), brand = bIn.value.trim(), note = nIn.value.trim(), price = +pIn.value;
+        if (!vendor || !(price > 0)) { shell.toast('请填写商家和有效价格'); return; }
+        g.quotes.push({ vendor, brand, price, note, ship: +sIn.value || 0, install: +iIn.value || 0 });
+        vIn.value = ''; bIn.value = ''; pIn.value = ''; sIn.value = ''; iIn.value = ''; nIn.value = '';
+        save(); render();
+        shell.toast('报价已添加');
+      };
+      card.querySelector('.del').onclick = () => {
+        groups = groups.filter(x => x.id !== g.id);
+        save(); render();
+        shell.toast('比价项已删除');
+      };
+      return card;
+    }
+
+    function renderMetrics() {
+      const picked = groups.filter(g => g.chosen >= 0);
+      let saved = 0;
+      picked.forEach(g => {
+        const ps = g.quotes.map(effectivePrice);
+        saved += Math.max.apply(null, ps) - ps[g.chosen];
+      });
+      $('mGroups').textContent = groups.length;
+      $('mPicked').textContent = picked.length;
+      $('mSaved').textContent = money(saved);
+    }
+
+    function renderTotalBar() {
+      const picked = groups.filter(g => g.chosen >= 0);
+      let total = 0, saved = 0;
+      picked.forEach(g => {
+        const ps = g.quotes.map(effectivePrice);
+        total += ps[g.chosen];
+        saved += Math.max.apply(null, ps) - ps[g.chosen];
+      });
+      $('tbCnt').textContent = picked.length;
+      $('tbTotal').textContent = money(total);
+      $('tbSave').textContent = money(saved);
+    }
+
+    /* ---------- 交互 ---------- */
+    $('chOnline').onclick = () => { channel = 'online'; $('chOnline').classList.add('active'); $('chOffline').classList.remove('active'); render(); };
+    $('chOffline').onclick = () => { channel = 'offline'; $('chOffline').classList.add('active'); $('chOnline').classList.remove('active'); render(); };
+    $('btnClearPicks').onclick = () => { groups.forEach(g => g.chosen = -1); save(); render(); shell.toast('已清空所有选定方案'); };
+
+    /* 采用方案 → 回写采购清单（按 compareRef 去重，重复采用为更新） */
+    $('btnAdopt').onclick = () => {
+      const picked = groups.filter(g => g.chosen >= 0);
+      if (!picked.length) { shell.toast('请先选定至少一个方案'); return; }
+      const list = shell.store.read('buylist', []);
+      let added = 0, updated = 0;
+      picked.forEach(g => {
+        const q = g.quotes[g.chosen];
+        const unit = q ? effectivePrice(q) : 0;
+        if (!(unit > 0)) return;
+        const ref = 'compare-' + g.id;
+        const payload = {
+          name: g.name,
+          spec: [g.spec, q.brand, q.vendor].filter(Boolean).join(' · '),
+          qty: 1,
+          stage: g.stage,
+          bought: false,
+          price: unit,
+          vendor: q.vendor || '',
+          brand: q.brand || '',
+          note: [q.note, q.ship ? '运费 ' + q.ship : '', q.install ? '安装费 ' + q.install : ''].filter(Boolean).join('；'),
+          compareRef: ref,
+          status: '已选方案'
+        };
+        const exist = list.find(i => i.compareRef === ref);
+        if (exist) { Object.assign(exist, payload); updated++; }
+        else { list.push(Object.assign({ id: shell.store.uid() }, payload)); added++; }
+      });
+      shell.store.write('buylist', list);
+      shell.toast('已加入采购清单：新增 ' + added + ' 项' + (updated ? '，更新 ' + updated + ' 项' : ''));
+    };
+    let allExpanded = true, onlyBest = false;
+    $('btnAll').onclick = () => {
+      allExpanded = !allExpanded;
+      document.querySelectorAll('#cmpGrid .cmp-card').forEach(c => c.classList.toggle('is-collapsed', !allExpanded));
+      $('btnAll').textContent = allExpanded ? '全部收起' : '全部展开';
+      shell.toast(allExpanded ? '已展开全部报价' : '已收起非最低价报价');
+    };
+    $('btnMode').onclick = () => {
+      onlyBest = !onlyBest;
+      $('cmpGrid').classList.toggle('only-best', onlyBest);
+      $('btnMode').textContent = onlyBest ? '退出对比模式' : '对比模式';
+      shell.toast(onlyBest ? '已只显示最低价与已选方案' : '已退出对比模式');
+    };
+    $('btnEdit').onclick = () => { $('groupModal').hidden = false; $('gName').focus(); };
+
+    $('btnExport').onclick = () => {
+      const blob = new Blob([JSON.stringify(groups, null, 2)], { type: 'application/json;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '比价数据-' + shell.fmt.today() + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      shell.toast('已导出比价数据');
+    };
+    $('btnImport').onclick = () => $('importFile').click();
+    $('importFile').onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result || '[]'));
+          if (!Array.isArray(data)) throw new Error('bad');
+          groups = data;
+          save(); render();
+          shell.toast('已导入比价数据');
+        } catch (err) {
+          shell.toast('文件格式不正确');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+      e.target.value = '';
+    };
+
+    $('gStage').innerHTML = shell.stages.map(s => '<option value="' + s.key + '">' + s.name + '</option>').join('');
+    $('btnNewGroup').onclick = () => { $('groupModal').hidden = false; $('gName').focus(); };
+    $('groupModal').addEventListener('click', e => { if (e.target.closest('[data-close]') || e.target === $('groupModal')) $('groupModal').hidden = true; });
+    $('gSubmit').onclick = () => {
+      const name = $('gName').value.trim();
+      if (!name) { shell.toast('请填写名称'); return; }
+      groups.push({ id: shell.store.uid(), name, spec: $('gSpec').value.trim(), stage: $('gStage').value, channel, chosen: -1, quotes: [] });
+      save(); render();
+      $('groupModal').hidden = true;
+      $('gName').value = ''; $('gSpec').value = '';
+      shell.toast('比价项已创建，去添加几个报价吧');
+    };
+
+    render();
+  </script>
+</body>
+</html>

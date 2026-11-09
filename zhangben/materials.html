@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 装修记账</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 装修记账专属样式（对齐原版 yellow-ledger） */
+    .ledger-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin: 0 0 26px; }
+    .ledger-head h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; line-height: 1.4; }
+    .ledger-head p { margin: 0; color: var(--text-3); font-size: 14px; }
+    .ledger-head .btn { padding: 11px 17px; border-radius: 10px; font-weight: 400; box-shadow: none; }
+
+    .ledger-top { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; margin-bottom: 26px; }
+    .money-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 190px;
+      padding: 25px 28px;
+      border-radius: 18px;
+      background: linear-gradient(118deg, #FFE96E, #FFE347);
+    }
+    .money-card .lbl { color: #776726; font-size: 15px; line-height: 1.2; }
+    .money-card .amt {
+      margin: 12px 0 20px;
+      color: #292D2E;
+      font-size: 44px;
+      font-weight: 500;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .money-card .foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: auto; }
+    .money-card .foot p { margin: 0; color: #776726; font-size: 14px; }
+    .money-card .foot b { margin-left: 12px; color: #292D2E; font-size: 20px; font-weight: 500; }
+    .money-card .btn {
+      min-height: 0;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 11px;
+      background: #FFFDF0;
+      color: #414744;
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+    .money-card .btn:hover { background: #fff; }
+
+    .pay-card {
+      display: flex;
+      flex-direction: column;
+      padding: 24px 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #FAFAF9;
+    }
+    .pay-card h2 { margin: 0 0 20px; font-size: 16px; font-weight: 600; }
+    .pay-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .pay-grid span { display: block; color: var(--text-3); font-size: 12px; }
+    .pay-grid b { display: block; margin-top: 6px; font-size: 20px; font-weight: 500; }
+    .pay-grid b.warn { color: var(--amber); }
+    .pay-grid b.good { color: var(--green); }
+    .pay-note { margin: auto 0 0; padding-top: 16px; color: var(--text-3); font-size: 12px; }
+
+    /* 下划线标签 */
+    .ledger-tabs { display: flex; gap: 26px; margin: 0 0 18px; border-bottom: 1px solid var(--line); }
+    .ledger-tabs button { position: relative; padding: 10px 0 12px; border: 0; background: none; color: var(--text-3); font-size: 14px; font-weight: 500; }
+    .ledger-tabs button.active { color: var(--text); font-weight: 600; }
+    .ledger-tabs button.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: #E9C93F; }
+
+    /* 工具栏 */
+    .ledger-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .status-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status-chips button { min-height: 32px; padding: 0 14px; border: 1px solid transparent; border-radius: 8px; background: #F6F6F6; color: var(--text-2); font-size: 13px; }
+    .status-chips button.active { background: #FFF7D6; color: #75642C; font-weight: 600; }
+    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toolbar-actions .btn { min-height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 600; box-shadow: none; }
+
+    .cat-filter { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: var(--text-3); font-size: 13px; }
+    .cat-filter select { min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); font-size: 13px; }
+
+    /* 账单表格 */
+    .ledger-table { width: 100%; border-collapse: collapse; }
+    .ledger-table th { padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--text-3); font-size: 12px; font-weight: 500; text-align: left; }
+    .ledger-table td { padding: 14px 12px; border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: middle; }
+    .ledger-table tr:last-child td { border-bottom: 0; }
+    .ledger-table .c-cat { width: 24%; }
+    .ledger-table .c-note { width: 24%; }
+    .ledger-table .c-date { width: 13%; }
+    .ledger-table .c-status { width: 12%; }
+    .ledger-table .c-amt { width: 15%; text-align: right; }
+    .ledger-table .c-op { width: 8%; text-align: right; }
+    .ledger-table .cat-cell { display: flex; align-items: center; gap: 10px; }
+    .ledger-table .cat-dot {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .ledger-table .ttl { font-size: 13px; font-weight: 600; }
+    .ledger-table .sub { color: var(--text-3); font-size: 12px; }
+    .ledger-table .amt { font-weight: 600; white-space: nowrap; }
+    .ledger-table .amt.pending { color: var(--amber); }
+    .ledger-table .amt.refund { color: var(--green); }
+    .ledger-table .status { display: inline-flex; padding: 2px 9px; border-radius: 6px; background: #F4F4F4; color: var(--text-2); font-size: 12px; }
+    .ledger-table .status.pending { background: #FFF4E0; color: var(--amber); }
+    .ledger-table .status.refund { background: #EAF5EE; color: var(--green); }
+    .ledger-table .op { padding: 4px; border: 0; background: none; color: #c4bab2; }
+    .ledger-count { margin: 12px 2px 0; color: var(--text-3); font-size: 12px; }
+
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* 分类统计 */
+    .stat-row { display: grid; grid-template-columns: 130px minmax(0,1fr) 110px; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .stat-row:last-child { border-bottom: 0; }
+    .stat-row .nm { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+    .stat-row .dot { width: 10px; height: 10px; border-radius: 3px; }
+    .stat-row .num { text-align: right; font-size: 13px; font-weight: 700; }
+    .stat-row .num small { display: block; color: var(--text-3); font-weight: 500; }
+
+    /* 分组设置 */
+    .group-edit-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) 150px auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .group-edit-row:last-child { border-bottom: 0; }
+    .group-edit-row .swatch { width: 26px; height: 26px; border-radius: 7px; border: 0; padding: 0; }
+
+    @media (max-width: 760px) {
+      .ledger-top { grid-template-columns: minmax(0, 1fr); }
+      .ledger-top > * { min-width: 0; }
+      .group-edit-row { grid-template-columns: auto 1fr auto; }
+
+      /* 移动端账单卡片化：不再隐藏备注/操作，改为逐行标签 */
+      .ledger-table thead { display: none; }
+      .ledger-table, .ledger-table tbody, .ledger-table tr, .ledger-table td { display: block; width: auto; }
+      .ledger-table tr { padding: 12px 0; border-bottom: 1px solid var(--line); }
+      .ledger-table tr:last-child { border-bottom: 0; }
+      .ledger-table td {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 3px 0;
+        border: 0;
+        text-align: right;
+      }
+      .ledger-table td::before {
+        content: attr(data-label);
+        flex: none;
+        color: var(--text-3);
+        font-size: 12px;
+        text-align: left;
+      }
+      .ledger-table td.c-cat, .ledger-table td.c-note, .ledger-table td.c-date,
+      .ledger-table td.c-status, .ledger-table td.c-amt, .ledger-table td.c-op { width: auto; }
+      .ledger-table td.c-cat { display: block; text-align: left; padding-bottom: 6px; }
+      .ledger-table td.c-cat::before { display: none; }
+      .ledger-table td.c-amt { font-size: 15px; }
+      .ledger-table td.c-op { padding-top: 4px; }
+      .ledger-table td .status, .ledger-table td .amt { white-space: nowrap; }
+    }
+
+    /* 记账弹窗（对齐原版 yellow-ledger 弹窗样式） */
+    .amount-input { padding: 20px; text-align: center; }
+    .amount-input .prefix { font-size: 24px; color: #ccc; }
+    .amount-input input { font-size: 38px; font-weight: 700; border: none; outline: none; width: 200px; text-align: center; color: #333; background: transparent; }
+    .transaction-type { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 20px 12px; }
+    .transaction-type button { min-height: 34px; border: 1.5px solid #eee; border-radius: 10px; background: white; color: #68615b; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .transaction-type button.selected { background: #fff0ea; border-color: #e45b3f; color: #e45b3f; }
+    .pay-status { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 20px 12px; }
+    .pay-status-btn { min-height: 34px; border: 1.5px solid #eee; border-radius: 10px; background: white; color: #68615b; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .pay-status-btn.selected { background: #fff0ea; border-color: #e45b3f; color: #e45b3f; }
+    .expense-setting { margin: 0 20px 12px; padding: 10px 12px; border: 1px solid #eee; border-radius: 12px; background: #fffdfb; }
+    .expense-setting label { display: flex; align-items: center; gap: 8px; color: #68615b; font-size: 13px; font-weight: 650; cursor: pointer; }
+    .expense-setting input { accent-color: #e45b3f; }
+    .expense-setting small { display: block; margin-top: 6px; color: #aaa; font-size: 11px; line-height: 1.5; }
+    .modal-form { padding: 0 20px 12px; }
+    .modal-form input, .modal-form textarea, .modal-form select { width: 100%; padding: 10px 12px; border: 1.5px solid #eee; border-radius: 10px; font-size: 13px; background: #fafafa; font-family: inherit; }
+    .modal-form input:focus, .modal-form textarea:focus, .modal-form select:focus { outline: none; border-color: #e45b3f; }
+    .modal-form textarea { resize: none; height: 40px; }
+    .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    @media (max-width: 520px) { .modal-form-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="ledger-head">
+      <div>
+        <h1>装修记账</h1>
+        <p>支出、退款与待付款，一处看清</p>
+      </div>
+      <button class="btn" id="btnManage">管理分类</button>
+    </div>
+
+    <!-- 预算占用 + 支付统计 -->
+    <section class="ledger-top">
+      <div class="money-card">
+        <span class="lbl">装修预算占用</span>
+        <div class="amt" id="hSpent">--</div>
+        <div class="foot">
+          <p>待付款 <b id="hPending">--</b></p>
+          <button class="btn" id="btnAdd">记一笔</button>
+        </div>
+      </div>
+      <div class="pay-card">
+        <h2>支付统计</h2>
+        <div class="pay-grid">
+          <div><span>已支付现金</span><b id="payCash">--</b></div>
+          <div><span>待付款</span><b class="warn" id="payPending">--</b></div>
+          <div><span>退款</span><b class="good" id="payRefund">--</b></div>
+        </div>
+        <p class="pay-note">预算占用含待付款；已支付现金已扣除到账退款</p>
+      </div>
+    </section>
+
+    <div class="ledger-tabs">
+      <button id="tabAll" class="active">全部账单</button>
+      <button id="tabStat">分类统计</button>
+      <button id="tabGroup">分组设置</button>
+    </div>
+
+    <!-- 全部账单 -->
+    <section id="panelAll">
+      <div class="ledger-toolbar">
+        <div class="status-chips" id="statusFilter">
+          <button data-f="all" class="active">全部</button>
+          <button data-f="paid">已付</button>
+          <button data-f="prepaid">预付</button>
+          <button data-f="pending">待付</button>
+          <button data-f="refund">退款</button>
+          <button data-f="occupation">计入预算</button>
+          <button data-f="cash">已支付现金</button>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn" id="btnImport">导入 Excel</button>
+          <button class="btn" id="btnExport">导出 Excel</button>
+          <button class="btn" id="btnStats">统计</button>
+        </div>
+      </div>
+      <div class="cat-filter">
+        <span>分类筛选</span>
+        <select id="catFilter" aria-label="按分类筛选"><option value="all">全部分类</option></select>
+      </div>
+      <div id="billList"></div>
+      <p class="ledger-count" id="billCount">共 0 笔账单</p>
+      <input type="file" id="importFile" accept=".csv,text/csv" aria-label="导入账单 CSV" hidden>
+    </section>
+
+    <!-- 分类统计 -->
+    <section id="panelStat" hidden>
+      <div class="card">
+        <div class="card-hd"><h3 id="statTitle"></h3></div>
+        <div class="card-bd" id="statList"></div>
+      </div>
+    </section>
+
+    <!-- 分组设置 -->
+    <section id="panelGroup" hidden>
+      <div class="card">
+        <div class="card-hd"><h3 id="groupTitle"></h3><span class="badge">改动即时生效</span></div>
+        <div class="card-bd">
+          <div id="groupList"></div>
+          <div class="form-group" style="margin-top:18px;max-width:280px;">
+            <label>总预算（元）</label>
+            <input class="input" id="totalBudget" type="number" min="0" step="1000" aria-label="总预算">
+          </div>
+          <button class="btn primary" id="btnSaveBudget">保存预算设置</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 记账弹窗 -->
+  <div class="modal-bg" id="billModal" role="dialog" aria-modal="true" aria-labelledby="billModalTitle" hidden>
+    <div class="modal">
+      <div class="modal-hd"><h3 id="billModalTitle">记一笔</h3><button class="modal-close" data-close aria-label="关闭">✕</button></div>
+      <div class="amount-input">
+        <span class="prefix">¥</span><input type="number" id="bAmt" aria-label="金额" placeholder="0.00" step="0.01">
+      </div>
+      <div class="transaction-type" id="bTransType">
+        <button type="button" class="selected" data-type="expense">支出</button>
+        <button type="button" data-type="refund">退款</button>
+      </div>
+      <div class="form-group" style="padding:0 20px 12px"><label for="bCat">所属分组</label><select class="input" id="bCat" aria-label="所属分组"></select></div>
+      <div class="form-group" style="padding:0 20px 12px"><label for="bSub">明细说明</label><input class="input" id="bSub" aria-label="明细说明" placeholder="例如：瓷砖定金"></div>
+      <div class="pay-status" id="bPayStatus">
+        <button type="button" class="pay-status-btn selected" data-status="paid">已付</button>
+        <button type="button" class="pay-status-btn" data-status="prepaid">预付</button>
+        <button type="button" class="pay-status-btn" data-status="pending">待付</button>
+      </div>
+      <div class="expense-setting show" id="bExpSetting">
+        <label><input type="checkbox" id="bIncludeExp" checked> 计入预算占用和分类统计</label>
+        <small>取消勾选后，这笔记录仍会保留在全部账单中，但不会影响预算占用、预算余额和分类金额。</small>
+      </div>
+      <div class="modal-form">
+        <div class="modal-form-grid">
+          <input type="date" id="bDate" aria-label="日期">
+          <input type="date" id="bDueDate" aria-label="应付日期" title="应付日期">
+        </div>
+        <div class="modal-form-grid">
+          <input type="text" id="bMerchant" aria-label="商家 / 收款方" placeholder="商家 / 收款方">
+          <input type="number" id="bContract" aria-label="合同总额" placeholder="合同总额（选填）" min="0" step="0.01">
+        </div>
+        <textarea id="bNote" aria-label="备注" placeholder="备注，例如：客厅地砖人工费"></textarea>
+        <textarea id="bEvidence" aria-label="凭证 / 验收说明" placeholder="凭证 / 验收说明（票据号、验收结果等）"></textarea>
+      </div>
+      <div class="modal-ft">
+        <button class="btn" data-close>取消</button>
+        <button class="btn primary" id="bSubmit">确定记账</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    shell.renderNav('ledger');
+    shell.store.seed();
+    const $ = id => document.getElementById(id);
+    const money = n => shell.fmt.money(n);
+
+    let budget = shell.store.read('budget') || { total: 0, groups: [] };
+    let bills = shell.store.read('bills', []);
+    let filter = 'all';
+    let catFilterValue = 'all';
+    let editingId = null;
+
+    const STATUS_LABEL = { paid: '已付', prepaid: '预付', pending: '待付', refund: '退款' };
+    const catOf = key => budget.groups.find(g => g.key === key) || { name: '其他', color: '#8a8077' };
+
+    /* ---------- 预算总览 ---------- */
+    function renderHero() {
+      const t = shell.ledgerTotals(bills);
+      const occupation = Math.max(0, t.spent - t.refund);
+      const cash = Math.max(0, t.spent - t.pending - t.refund);
+      $('hSpent').textContent = money(occupation);
+      $('hPending').textContent = money(t.pending);
+      $('payCash').textContent = money(cash);
+      $('payPending').textContent = money(t.pending);
+      $('payRefund').textContent = money(t.refund);
+    }
+
+    /* ---------- 分类筛选 ---------- */
+    function renderCatFilter() {
+      const sel = $('catFilter');
+      sel.innerHTML = '<option value="all">全部分类</option>' + budget.groups.map(g =>
+        '<option value="' + g.key + '">' + g.name + '</option>').join('');
+      sel.value = catFilterValue;
+    }
+
+    /* ---------- 全部账单 ---------- */
+    function matchFilter(b) {
+      if (catFilterValue !== 'all' && b.cat !== catFilterValue) return false;
+      if (filter === 'paid') return b.status === 'paid';
+      if (filter === 'prepaid') return b.status === 'prepaid';
+      if (filter === 'pending') return b.status === 'pending';
+      if (filter === 'refund') return b.status === 'refund';
+      if (filter === 'occupation') return b.status !== 'refund';
+      if (filter === 'cash') return b.status === 'paid' || b.status === 'prepaid';
+      return true;
+    }
+
+    function renderBills() {
+      document.querySelectorAll('#statusFilter button').forEach(b =>
+        b.classList.toggle('active', b.dataset.f === filter));
+      renderCatFilter();
+      const rows = bills.filter(matchFilter)
+        .slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const box = $('billList');
+      $('billCount').textContent = '共 ' + rows.length + ' 笔账单';
+      if (!rows.length) {
+        box.innerHTML = '<div class="card"><div class="empty">暂无账单，点右上角「记一笔」开始记账</div></div>';
+        return;
+      }
+      box.innerHTML = '<div class="card" style="padding:0 18px;">' +
+        '<table class="ledger-table"><thead><tr>' +
+        '<th class="c-cat">分类小项</th><th class="c-note">备注</th><th class="c-date">日期</th>' +
+        '<th class="c-status">支付状态</th><th class="c-amt">收支金额</th><th class="c-op">操作</th>' +
+        '</tr></thead><tbody>' + rows.map(b => {
+          const cat = catOf(b.cat);
+          const sign = b.status === 'refund' ? '+' : '-';
+          return '<tr>' +
+            '<td class="c-cat" data-label="分类小项"><div class="cat-cell"><span class="cat-dot" style="background:' + cat.color + '">' +
+            cat.name.slice(0, 1) + '</span><div><div class="ttl">' + (b.sub || cat.name) + '</div>' +
+            '<div class="sub">' + cat.name + '</div></div></div></td>' +
+            '<td class="c-note" data-label="备注"><div>' + (b.merchant ? '<div class="ttl">' + b.merchant + '</div>' : '') +
+            '<span class="sub">' + (b.note || '—') + '</span></div></td>' +
+            '<td class="c-date" data-label="日期">' + (b.date || '') + '</td>' +
+            '<td class="c-status" data-label="支付状态"><span class="status ' + b.status + '">' + STATUS_LABEL[b.status] + '</span></td>' +
+            '<td class="c-amt" data-label="收支金额"><span class="amt ' + b.status + '">' + sign + money(b.amount) + '</span></td>' +
+            '<td class="c-op" data-label="操作"><button class="op" data-id="' + b.id + '" title="删除" aria-label="删除这条账单">' + shell.icon('trash', 'ic-sm') + '</button></td>' +
+            '</tr>';
+        }).join('') + '</tbody></table></div>';
+      box.querySelectorAll('.op').forEach(btn => {
+        btn.onclick = () => {
+          bills = bills.filter(x => x.id !== btn.dataset.id);
+          shell.store.write('bills', bills);
+          renderHero(); renderBills(); renderStat();
+          shell.toast('账单已删除');
+        };
+      });
+    }
+
+    document.querySelectorAll('#statusFilter button').forEach(b =>
+      b.onclick = () => { filter = b.dataset.f; renderBills(); });
+    $('catFilter').onchange = e => { catFilterValue = e.target.value; renderBills(); };
+
+    /* ---------- 导入 / 导出 ---------- */
+    function exportCsv() {
+      const rows = [['分类', '小项', '备注', '日期', '支付状态', '收支金额']];
+      bills.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(b => {
+        rows.push([
+          catOf(b.cat).name,
+          b.sub || '',
+          b.note || '',
+          b.date || '',
+          STATUS_LABEL[b.status] || '',
+          (b.status === 'refund' ? '+' : '-') + Math.abs(+b.amount || 0).toFixed(2)
+        ]);
+      });
+      const csv = '\ufeff' + rows.map(r =>
+        r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '装修记账-' + shell.fmt.today() + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      shell.toast('已导出 Excel');
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [], cur = '', q = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (q) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') { cur += '"'; i++; } else q = false;
+          } else cur += ch;
+        } else if (ch === '"') q = true;
+        else if (ch === ',') { row.push(cur); cur = ''; }
+        else if (ch === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+        else if (ch !== '\r') cur += ch;
+      }
+      if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    function importCsv(text) {
+      const rows = parseCsv(text).filter(r => r.some(v => v.trim() !== ''));
+      if (rows.length && /分类|小项/.test(rows[0][0])) rows.shift();
+      const reverse = { '已付': 'paid', '预付': 'prepaid', '待付': 'pending', '退款': 'refund' };
+      let count = 0;
+      rows.forEach(r => {
+        const cat = budget.groups.find(g => g.name === (r[0] || '').trim());
+        const amount = Math.abs(parseFloat(String(r[5] || '').replace(/[^\d.-]/g, '')) || 0);
+        if (!(amount > 0)) return;
+        bills.push({
+          id: shell.store.uid(),
+          cat: cat ? cat.key : budget.groups[0].key,
+          sub: (r[1] || '').trim() || (cat ? cat.name : '其他'),
+          note: (r[2] || '').trim(),
+          date: (r[3] || '').trim() || shell.fmt.today(),
+          status: reverse[(r[4] || '').trim()] || 'paid',
+          amount: amount
+        });
+        count++;
+      });
+      if (count) {
+        shell.store.write('bills', bills);
+        renderHero(); renderBills(); renderStat();
+        shell.toast('已导入 ' + count + ' 笔账单');
+      } else {
+        shell.toast('未识别到可导入的账单');
+      }
+    }
+
+    $('btnExport').onclick = exportCsv;
+    $('btnImport').onclick = () => $('importFile').click();
+    $('importFile').onchange = e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => importCsv(String(reader.result || ''));
+      reader.readAsText(file, 'utf-8');
+      e.target.value = '';
+    };
+    $('btnManage').onclick = () => switchTab('group');
+    $('btnStats').onclick = () => switchTab('stat');
+
+    /* ---------- 分类统计 ---------- */
+    function renderStat() {
+      $('statTitle').innerHTML = shell.icon('chart') + '按分组统计支出';
+      const box = $('statList');
+      box.innerHTML = '';
+      const max = Math.max.apply(null, budget.groups.map(g =>
+        bills.filter(b => b.cat === g.key && b.status !== 'refund')
+             .reduce((s, b) => s + Math.abs(+b.amount || 0), 0)).concat([1]));
+      budget.groups.forEach(g => {
+        const used = bills.filter(b => b.cat === g.key && b.status !== 'refund')
+                          .reduce((s, b) => s + Math.abs(+b.amount || 0), 0);
+        const pctOfBudget = g.budget > 0 ? Math.min(100, used / g.budget * 100) : 0;
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML =
+          '<span class="nm"><i class="dot" style="background:' + g.color + '"></i>' + g.name + '</span>' +
+          '<div><div class="bar"><i style="width:' + (used / max * 100) + '%;background:' + g.color + '"></i></div></div>' +
+          '<span class="num">' + money(used) + '<small>占分组预算 ' + pctOfBudget.toFixed(0) + '%</small></span>';
+        box.appendChild(row);
+      });
+    }
+
+    /* ---------- 分组设置 ---------- */
+    function renderGroups() {
+      $('groupTitle').innerHTML = shell.icon('tool') + '预算分组设置';
+      const box = $('groupList');
+      box.innerHTML = '';
+      budget.groups.forEach(g => {
+        const row = document.createElement('div');
+        row.className = 'group-edit-row';
+        row.innerHTML =
+          '<input type="color" class="swatch" value="' + g.color + '" aria-label="分组颜色" title="分组颜色">' +
+          '<input class="input" value="' + g.name + '" aria-label="分组名称" placeholder="分组名称">' +
+          '<input class="input" type="number" min="0" step="500" value="' + g.budget + '" aria-label="预算金额" placeholder="预算金额">' +
+          '<span class="badge">' + money(g.budget) + '</span>';
+        const [color, name, amt] = row.querySelectorAll('input');
+        color.oninput = () => { g.color = color.value; row.querySelector('.badge').textContent = money(g.budget); };
+        name.oninput = () => { g.name = name.value; };
+        amt.oninput = () => { g.budget = Math.max(0, +amt.value || 0); row.querySelector('.badge').textContent = money(g.budget); };
+        box.appendChild(row);
+      });
+      $('totalBudget').value = budget.total;
+    }
+    $('btnSaveBudget').onclick = () => {
+      budget.total = Math.max(0, +$('totalBudget').value || 0);
+      shell.store.write('budget', budget);
+      renderHero(); renderBills(); renderStat();
+      shell.toast('预算设置已保存');
+    };
+
+    /* ---------- 记账弹窗 ---------- */
+    let bTransType = 'expense';   // 支出 / 退款
+    let bPayStatus = 'paid';      // 已付 / 预付 / 待付
+    function fillCatOptions() {
+      $('bCat').innerHTML = budget.groups.map(g => '<option value="' + g.key + '">' + g.name + '</option>').join('');
+    }
+    function renderTransType() {
+      document.querySelectorAll('#bTransType button').forEach(btn =>
+        btn.classList.toggle('selected', btn.dataset.type === bTransType));
+    }
+    function renderPayStatus() {
+      document.querySelectorAll('#bPayStatus .pay-status-btn').forEach(btn =>
+        btn.classList.toggle('selected', btn.dataset.status === bPayStatus));
+    }
+    $('btnAdd').onclick = () => {
+      editingId = null;
+      bTransType = 'expense'; bPayStatus = 'paid';
+      fillCatOptions();
+      $('bSub').value = ''; $('bAmt').value = ''; $('bNote').value = '';
+      $('bMerchant').value = ''; $('bContract').value = '';
+      $('bDueDate').value = ''; $('bEvidence').value = '';
+      $('bIncludeExp').checked = true;
+      $('bDate').value = shell.fmt.today();
+      renderTransType(); renderPayStatus();
+      $('billModal').hidden = false;
+      $('bAmt').focus();
+    };
+    document.querySelectorAll('#bTransType button').forEach(btn => {
+      btn.onclick = () => { bTransType = btn.dataset.type; renderTransType(); };
+    });
+    document.querySelectorAll('#bPayStatus .pay-status-btn').forEach(btn => {
+      btn.onclick = () => { bPayStatus = btn.dataset.status; renderPayStatus(); };
+    });
+    $('billModal').addEventListener('click', e => {
+      if (e.target.closest('[data-close]') || e.target === $('billModal')) $('billModal').hidden = true;
+    });
+    $('bSubmit').onclick = () => {
+      const amt = +$('bAmt').value;
+      if (!(amt > 0)) { shell.toast('请填写有效金额'); return; }
+      // 退款 → status=refund；否则用支付状态
+      const status = bTransType === 'refund' ? 'refund' : bPayStatus;
+      bills.push({
+        id: shell.store.uid(),
+        cat: $('bCat').value,
+        sub: $('bSub').value.trim() || catOf($('bCat').value).name,
+        amount: amt,
+        status,
+        date: $('bDate').value || shell.fmt.today(),
+        note: $('bNote').value.trim(),
+        transactionType: bTransType,
+        payStatus: bPayStatus,
+        includeExpense: $('bIncludeExp').checked,
+        merchant: $('bMerchant').value.trim(),
+        contractTotal: Math.abs(Number($('bContract').value) || 0) || '',
+        dueDate: $('bDueDate').value,
+        evidenceNote: $('bEvidence').value.trim()
+      });
+      shell.store.write('bills', bills);
+      $('billModal').hidden = true;
+      renderHero(); renderBills(); renderStat();
+      shell.toast('已记账');
+    };
+
+    /* ---------- 标签切换 ---------- */
+    function switchTab(which) {
+      $('panelAll').hidden = which !== 'all';
+      $('panelStat').hidden = which !== 'stat';
+      $('panelGroup').hidden = which !== 'group';
+      $('tabAll').classList.toggle('active', which === 'all');
+      $('tabStat').classList.toggle('active', which === 'stat');
+      $('tabGroup').classList.toggle('active', which === 'group');
+    }
+    $('tabAll').onclick = () => switchTab('all');
+    $('tabStat').onclick = () => switchTab('stat');
+    $('tabGroup').onclick = () => switchTab('group');
+
+    renderHero(); renderBills(); renderStat(); renderGroups();
+  </script>
+</body>
+</html>

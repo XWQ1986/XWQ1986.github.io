@@ -1,0 +1,287 @@
+<html lang="zh-CN" class="" data-inspector-id="html:4743259f:0" data-sync-state="saved" data-sync-text="已同步"><head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="only light">
+    <meta name="darkreader-lock">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装修小账本 - 价格估算</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{margin:0;padding:0}
+        body{font-family:Arial,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+        .navbar{background:white;border-bottom:1px solid #e8e8e8;padding:0 20px;display:flex;align-items:center;height:56px;position:sticky;top:0;z-index:100}
+        .nav-brand{font-size:17px;font-weight:700;color:#e45b3f;margin-right:28px}
+        .nav-links{display:flex;gap:2px}
+        .nav-links a{padding:8px 14px;border-radius:10px;font-size:13px;color:#666;text-decoration:none;transition:all .2s;white-space:nowrap}
+        .nav-links a:hover{background:#f5f5f5}
+        .nav-links a.active{background:#fff0ea;color:#e45b3f;font-weight:600}
+        .container{max-width:720px;margin:0 auto;padding:16px}
+        .card{background:white;border-radius:16px;margin-bottom:14px;overflow:hidden;border:1px solid #eee;transition:box-shadow .2s}
+        .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.04)}
+        .card-hd{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f5f5f5}
+        .card-hd h3{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+        .card-bd{padding:16px 18px}
+        .btn{padding:8px 16px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+        .btn-p{background:#e45b3f;color:white}.btn-p:hover{background:#c94f36}
+        .btn-o{background:white;border:1px solid #ddd;color:#666}.btn-o:hover{border-color:#e45b3f;color:#e45b3f}
+        .input{padding:8px 12px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:13px;outline:none;transition:all .2s;width:100%}
+        .input:focus{border-color:#e45b3f;box-shadow:0 0 0 3px rgba(228,91,63,.08)}
+
+        /* 表单网格 */
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .form-group{display:flex;flex-direction:column;gap:4px}
+        .form-group label{font-size:12px;color:#666;font-weight:500}
+        .form-full{grid-column:1/-1}
+
+        /* 类型切换 */
+        .type-switch{display:flex;gap:8px}
+        .type-chip{flex:1;padding:8px;border:1.5px solid #e8e8e8;border-radius:10px;text-align:center;font-size:13px;cursor:pointer;transition:all .2s;background:white}
+        .type-chip.active{border-color:#e45b3f;background:#fff0ea;color:#e45b3f;font-weight:600}
+
+        /* 分类手风琴 */
+        .cat-group{margin-bottom:10px;border:1px solid #eee;border-radius:12px;overflow:hidden}
+        .cat-hd{padding:12px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;background:white;user-select:none}
+        .cat-icon{font-size:18px}
+        .cat-name{flex:1;font-size:14px;font-weight:600}
+        .cat-total{font-size:14px;font-weight:700;color:#e45b3f}
+        .cat-arrow{font-size:12px;color:#ccc;transition:transform .2s}
+        .cat-arrow.open{transform:rotate(180deg)}
+        .cat-body{display:none;padding:0 14px 14px;background:#fafafa}
+        .cat-body.show{display:block}
+
+        /* 明细行 */
+        .item-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;gap:8px}
+        .item-row:last-child{border-bottom:none}
+        .item-name{flex:1;font-size:13px;color:#333}
+        .item-unit{font-size:11px;color:#999;width:40px;text-align:center}
+        .item-price{font-size:12px;color:#666;width:80px;text-align:right}
+        .item-sub{font-size:13px;font-weight:600;color:#e45b3f;width:90px;text-align:right}
+
+        /* 汇总 */
+        .summary{background:white;border-radius:16px;padding:20px;border:2px solid #e45b3f}
+        .summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;color:#666}
+        .summary-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;border-top:1px solid #eee;margin-top:8px}
+        .summary-total span{font-size:16px;font-weight:700;color:#e45b3f}
+        .summary-total small{font-size:12px;color:#999}
+        .estimate-notice{margin:0 0 14px;padding:13px 15px;border:1px solid #d7e4db;border-radius:12px;background:#f3f8f5;color:#52665a;font-size:13px;line-height:1.65}
+        .estimate-notice strong{display:block;margin-bottom:3px;color:#2f664b}
+
+        @media(max-width:768px){
+            html,body{max-width:100%;overflow-x:hidden}
+            .bottom-tab{display:block}
+            .nav-links{overflow-x:auto}
+            .container{width:100%;max-width:100%;padding:12px}
+            .card-bd{padding:14px 12px}
+            .form-grid{grid-template-columns:minmax(0,1fr)}
+            .type-switch,.item-row,.summary-row,.summary-total{min-width:0}
+            .type-chip,.item-name{min-width:0;overflow-wrap:anywhere}
+            .item-price{display:none}
+            .item-sub{width:78px;flex:0 0 78px}
+        }
+            
+        
+        .nav-more-btn:hover{background:#f5f5f5}
+        
+        
+        
+        
+        .bottom-tab{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8e8e8;z-index:100;padding:6px 0 env(safe-area-inset-bottom,8px)}
+        .bottom-tab-inner{display:flex;justify-content:space-around;max-width:500px;margin:0 auto}
+        .bottom-tab a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#999;font-size:10px;padding:4px 8px;border-radius:8px;transition:all .15s}
+        .bottom-tab a.active{color:#e45b3f}
+        .bottom-tab a .tab-icon{font-size:20px}    </style>
+    <link rel="stylesheet" href="fresh-theme.css?v=20260814-personal-ux-v1">
+    <link rel="stylesheet" href="personal-enterprise.css?v=20261108-narrowfix" data-personal-enterprise="">
+    <link rel="stylesheet" href="assets/yellow/calculators.css?v=20261015-yellow">
+    <link rel="icon" href="assets/yellow/logo.svg" type="image/svg+xml">
+    <script src="fresh-shell.js?v=20261108-accountlink" defer=""></script>
+  <link rel="stylesheet" href="assets/icons/icons.css?v=20261023">
+  <script src="assets/icons/image-fallback.js?v=20261023" defer=""></script>
+<script src="platform-entry.js?v=20260801-mobile-reminder-v1" data-platform-entry="true"></script><style id="freshProjectStyles">.fresh-project-card{display:grid;gap:7px;margin:4px 8px 8px 42px;padding:9px 10px;border:1px solid #ece7e2;border-radius:8px;background:#fffdfb}.fresh-project-nav{display:grid;grid-template-columns:minmax(116px,160px) auto;align-items:center;gap:6px;margin:0;padding:0;border:0;background:transparent}.fresh-project-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}.fresh-project-nav .fresh-project-head{display:block;order:2}.fresh-project-head b{font-size:13px;color:#202124;white-space:nowrap}.fresh-project-nav .fresh-project-head b,.fresh-project-nav small{display:none}.fresh-project-head button{height:30px;padding:0 10px;border:1px solid #f0d6cc;border-radius:7px;background:#fff0ea;color:#e45b3f;font-size:12px;font-weight:800;cursor:pointer}.fresh-project-nav .fresh-project-head button{height:34px;white-space:nowrap}.fresh-project-select{width:100%;height:32px;padding:0 8px;border:1px solid #ece7e2;border-radius:7px;background:#fff;color:#202124;font-size:13px}.fresh-project-nav .fresh-project-select{order:1;height:34px;background:#fff}.fresh-project-card small{color:#9b928b;font-size:11px;line-height:1.35}.fresh-project-toggle{display:none;width:38px;height:38px;border:1px solid #f0d6cc;border-radius:12px;background:#fff;color:#e45b3f;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(55,42,31,.05);cursor:pointer}.fresh-project-toggle svg{width:18px;height:18px}.fresh-project-popover[hidden]{display:none}.fresh-project-popover{position:fixed;right:12px;top:58px;z-index:1500;width:min(330px,calc(100vw - 24px));padding:12px;border:1px solid #ece7e2;border-radius:12px;background:#fffdfb;box-shadow:0 18px 46px rgba(55,42,31,.16);display:grid;gap:9px}.fresh-project-popover-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.fresh-project-popover-head b{font-size:14px;color:#202124}.fresh-project-popover .fresh-project-select{height:38px}.fresh-project-popover .fresh-project-new{height:38px;border:1px solid #f0d6cc;border-radius:8px;background:#fff0ea;color:#e45b3f;font-size:13px;font-weight:850;cursor:pointer}.fresh-project-popover small{color:#9b928b;font-size:12px;line-height:1.45}@media(max-width:860px){.fresh-project-nav{grid-template-columns:minmax(96px,1fr) auto;width:100%;grid-column:1/-1;order:8}.fresh-project-nav .fresh-project-head button{padding:0 8px}}@media(max-width:680px){.fresh-navbar{grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;min-height:58px!important}.fresh-navbar .fresh-brand{width:40px!important;min-width:40px!important;overflow:hidden!important}.fresh-navbar .fresh-brand>span:not(.fresh-iconbox){display:none!important}.fresh-navbar .fresh-nav-actions{grid-column:2!important;display:flex!important;gap:6px!important;width:100%!important;align-items:center!important;justify-content:flex-end!important}.fresh-project-nav{display:none!important}.fresh-project-toggle{display:inline-flex!important;order:2}.fresh-navbar .fresh-notice-link{order:3}.fresh-navbar .fresh-account{order:1;max-width:calc(100vw - 190px)!important}.fresh-navbar .fresh-user-link{max-width:150px!important;padding:0 10px!important}.fresh-navbar .fresh-user-link span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.fresh-project-popover{top:56px}}.fresh-project-dialog[hidden]{display:none}.fresh-project-dialog{position:fixed;inset:0;z-index:2600;display:grid;place-items:center;padding:18px}.fresh-project-backdrop{position:absolute;inset:0;background:rgba(32,33,36,.35);backdrop-filter:blur(6px)}.fresh-project-panel{position:relative;width:min(420px,100%);display:grid;gap:12px;padding:22px;border:1px solid #ece7e2;border-radius:12px;background:#fffdfb;box-shadow:0 24px 70px rgba(55,42,31,.22)}.fresh-project-panel h2{margin:0;color:#202124;font-size:20px}.fresh-project-panel p{margin:0;color:#68615b;font-size:14px;line-height:1.7}.fresh-project-panel input{height:40px;padding:0 12px;border:1px solid #ece7e2;border-radius:8px;font-size:14px;outline:none}.fresh-project-panel input:focus{border-color:#e45b3f;box-shadow:0 0 0 3px rgba(228,91,63,.08)}.fresh-project-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}.fresh-project-actions button{height:36px;padding:0 14px;border:1px solid #ece7e2;border-radius:8px;background:#fff;color:#68615b;font-size:13px;font-weight:800;cursor:pointer}.fresh-project-actions .primary{border-color:#e45b3f;background:#e45b3f;color:#fff}.fresh-project-error{color:#c94b3f;font-size:12px;line-height:1.5}.fresh-project-head-actions{display:flex;gap:5px}.fresh-project-nav .fresh-project-head-actions{justify-content:flex-end}.fresh-project-popover-head .fresh-project-head-actions button{height:34px;padding:0 9px;border:1px solid #f0d6cc;border-radius:8px;background:#fff0ea;color:#e45b3f;font-size:12px;font-weight:800;cursor:pointer}.fresh-project-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fresh-project-fields label{display:grid;gap:5px;color:#68615b;font-size:12px;font-weight:700}.fresh-project-fields label:first-child{grid-column:1/-1}.fresh-project-fields input,.fresh-project-fields select{width:100%;height:40px;padding:0 10px;border:1px solid #ece7e2;border-radius:8px;background:#fff;color:#202124;box-sizing:border-box;font-size:14px;outline:none}.fresh-project-fields input:focus,.fresh-project-fields select:focus{border-color:#e45b3f;box-shadow:0 0 0 3px rgba(228,91,63,.08)}@media(max-width:520px){.fresh-project-fields{grid-template-columns:1fr}}.fresh-enterprise-switch{min-height:38px;padding:0 13px;display:inline-flex;align-items:center;gap:7px;border:1px solid #efc6b9;border-radius:10px;background:#fff0ea;color:#c94f36;font-size:13px;font-weight:850;text-decoration:none;white-space:nowrap;box-shadow:0 8px 20px rgba(228,91,63,.10);transition:transform .18s ease,background .18s ease}.fresh-enterprise-switch:hover{background:#ffe6dc;transform:translateY(-1px)}.fresh-enterprise-switch svg{width:17px;height:17px}.fresh-customer-switch{border-color:#cfe5d7;background:#eef7f1;color:#397457;box-shadow:0 8px 20px rgba(63,140,94,.10)}.fresh-customer-switch:hover{background:#e3f2e9}@media(max-width:680px){.fresh-enterprise-switch{width:38px;min-width:38px;padding:0;justify-content:center}.fresh-enterprise-switch span{display:none}}</style></head>
+<body data-inspector-id="html:4743259f:1" class="personal-enterprise-shell fresh-topbar-title-required fresh-shell-ready"><aside class="fresh-sidebar"><a class="fresh-brand" href="home.html"><span class="fresh-brand-mark"><img src="assets/yellow/logo.svg" alt=""></span><span><b>装修小账本</b></span></a><nav class="fresh-navlinks" aria-label="个人版导航"><span class="fresh-nav-label">我的装修</span><a href="home.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M4.5 11.5 12 5l7.5 6.5"></path><path d="M6.5 10.5V20h4.2v-5.2h2.6V20h4.2v-9.5"></path></svg><span>今日总览</span></a><a href="process.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4h10v5H7zM7 15h10v5H7zM12 9v6"></path></svg><span>装修流程</span></a><a href="procurement.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M6.6 7.4h12.2l-1.4 7H8.7L7.5 4.8H5"></path><circle cx="10" cy="18.7" r=".8"></circle><circle cx="16.8" cy="18.7" r=".8"></circle></svg><span>采购清单</span></a><a href="materials.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5.5 7.5h13A1.5 1.5 0 0 1 20 9v9.2A1.8 1.8 0 0 1 18.2 20H5.8A1.8 1.8 0 0 1 4 18.2V6.8A1.8 1.8 0 0 1 5.8 5h11.7"></path><path d="M15.5 13h4.5"></path><circle cx="16.2" cy="13" r=".7"></circle></svg><span>装修记账</span></a><a href="compare.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg><span>比价选品</span></a><span class="fresh-nav-label fresh-nav-label-support">辅助工具</span><a href="tools.html" class="active" aria-current="page"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M14.9 6.2a4.2 4.2 0 0 0-5.2 5.2l-4.9 4.9a1.9 1.9 0 0 0 2.7 2.7l4.9-4.9a4.2 4.2 0 0 0 5.2-5.2l-3 3-2.7-2.7z"></path></svg><span>实用工具</span></a><a href="diary.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M6 4h11a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><path d="M8 8h7M8 12h7M8 16h4"></path></svg><span>装修日记</span></a><a href="shuidian.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg><span>水电知识</span></a></nav><div class="fresh-sidebar-note"><span></span><p><b>装修小提醒</b><small>重要节点先确认，付款与验收都留档。</small></p></div><div class="fresh-nav-actions"><button class="fresh-platform-link" type="button" data-mini-program-entry=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M8.5 11.5V7a3.5 3.5 0 1 1 3.5 3.5H8.5a3.5 3.5 0 1 0 3.5 3.5V9.5"></path></svg><span><b>微信小程序</b><small>手机随时记录</small></span></button><a href="account.html"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号管理</span></a></div></aside><header class="fresh-topbar"><div class="fresh-header-project" data-project-host=""><section class="fresh-project-card fresh-project-nav" aria-label="项目管理"><div class="fresh-project-head"><b>项目</b><span class="fresh-project-head-actions"><button type="button" data-account-action="edit-project">项目资料</button></span></div><select class="fresh-project-select" data-project-select="" aria-label="切换装修项目"><option value="4a259235-6ce3-4fcd-b5f2-d190aba028d2">我的装修</option></select><small>不同项目之间的数据相互独立。</small></section></div><div class="fresh-topbar-copy"><small>实用工具 / 装修预算</small><strong>价格估算</strong></div><div class="fresh-topbar-actions"><a class="fresh-enterprise-switch" href="enterprise.html" title="查看企业版开通或加入方式" aria-label="进入装修小账本企业版"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>企业版 · 开通</span></a><button type="button" class="fresh-project-toggle" title="切换项目" aria-label="切换项目"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg></button><div class="fresh-account"><a class="fresh-user-link" href="#" title="账号菜单" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号：xwq</span></a><div class="fresh-account-menu" role="menu" hidden=""><div class="fresh-account-user"><b>xwq</b><span>普通用户账号</span></div><div class="fresh-account-status" data-state="saved"><i></i><span>已同步</span></div><section class="fresh-douyin-card" aria-label="抖音关注"><div class="fresh-douyin-head"><span class="fresh-douyin-logo"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5.5 7.5h9A2.5 2.5 0 0 1 17 10v4a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 3 14v-4a2.5 2.5 0 0 1 2.5-2.5z"></path><path d="m17 11 4-2.5v7L17 13"></path></svg></span><div><b>关注我的抖音</b><span>装修避坑和选品经验</span></div></div><div class="fresh-douyin-main"><div class="fresh-douyin-qr"><img src="assets/brand/douyin-qr-thumb.png" alt="金大金自装日记抖音二维码" loading="lazy"></div><div class="fresh-douyin-copy"><p><b>主包为爱发电</b><span>网站对你有帮助的话<br>抖音点个免费关注吧</span></p><strong>@金大金自装日记</strong></div></div></section><a href="enterprise.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>绑定装修公司</span></a><a href="enterprise.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>企业版 · 开通</span></a><a href="account.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号管理</span></a><button type="button" data-account-action="clear" class="account-danger" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 10v8M12 10v8M16 10v8M7 7l1 14h8l1-14"></path></svg><span>清空数据</span></button><button type="button" data-account-action="switch" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg><span>切换账号</span></button><button type="button" data-account-action="logout" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></svg><span>退出登录</span></button></div></div><div class="fresh-global-search"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg><input type="search" data-shell-search="" aria-label="搜索本页内容或功能" placeholder="搜索本页内容或功能"><span class="fresh-search-status" role="status" aria-live="polite"></span></div><a class="fresh-topbar-primary" href="home.html"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M4.5 11.5 12 5l7.5 6.5"></path><path d="M6.5 10.5V20h4.2v-5.2h2.6V20h4.2v-9.5"></path></svg><span>返回总览</span></a></div></header>  <div class="container yellow-calculator price-calculator" data-inspector-id="html:4743259f:10"> <div class="calculator-heading" data-inspector-id="html:4743259f:11"> <div data-inspector-id="html:4743259f:12"><h1 data-inspector-id="html:4743259f:13">装修价格估算</h1><p class="calculator-subtitle" data-inspector-id="html:4743259f:14">根据房屋条件，了解装修预算的初步范围</p></div> <a class="calculator-back" href="tools.html" data-inspector-id="html:4743259f:15">返回工具</a> </div> <div class="estimate-notice" role="note" data-inspector-id="html:4743259f:16"><strong data-inspector-id="html:4743259f:17">这是装修预算的初步范围，不是正式报价</strong><span class="calculator-notice-copy" data-inspector-id="html:4743259f:18">结果会随地区、材料品牌、施工难度和现场条件变化。签约前请以完整工程量清单和书面报价为准，修改下方条件后结果会自动更新。</span></div> <div class="calculator-columns price-columns" data-inspector-id="html:4743259f:19"> <!-- 输入表单 --> <section class="calculator-panel price-form" data-inspector-id="html:4743259f:20"> <h3 data-inspector-id="html:4743259f:21">房屋信息</h3> <div class="card-bd" data-inspector-id="html:4743259f:22"> <div class="form-grid" data-inspector-id="html:4743259f:23"> <div class="form-group form-full" data-inspector-id="html:4743259f:24"> <label data-inspector-id="html:4743259f:25">城市等级</label> <select class="input" id="cityLevel" onchange="calculate()" data-inspector-id="html:4743259f:26"> <option value="1" data-inspector-id="html:4743259f:27">一线城市（北上广深）</option> <option value="0.9" data-inspector-id="html:4743259f:28">新一线城市（杭州成都等）</option> <option value="0.8" selected="" data-inspector-id="html:4743259f:29">二线城市</option> <option value="0.7" data-inspector-id="html:4743259f:30">三线城市</option> <option value="0.6" data-inspector-id="html:4743259f:31">四线城市</option> <option value="0.5" data-inspector-id="html:4743259f:32">五线及以下</option> </select> </div> <div class="form-group form-full" data-inspector-id="html:4743259f:33"> <label data-inspector-id="html:4743259f:34">房屋类型</label> <div class="type-switch" data-inspector-id="html:4743259f:35"> <div class="type-chip active" onclick="setType('new',this)" data-inspector-id="html:4743259f:36">新房毛坯</div> <div class="type-chip" onclick="setType('old',this)" data-inspector-id="html:4743259f:37">旧房翻新</div> </div> </div> <div class="form-group" data-inspector-id="html:4743259f:38"> <label data-inspector-id="html:4743259f:39">建筑面积（㎡）</label> <input type="number" class="input" id="area" value="100" min="20" max="500" oninput="calculate()" data-inspector-id="html:4743259f:40"> </div> <div class="form-group" data-inspector-id="html:4743259f:41"> <label data-inspector-id="html:4743259f:42">使用面积系数</label> <select class="input" id="areaRatio" oninput="calculate()" data-inspector-id="html:4743259f:43"> <option value="0.75" data-inspector-id="html:4743259f:44">高层 0.75</option> <option value="0.8" selected="" data-inspector-id="html:4743259f:45">小高层 0.8</option> <option value="0.85" data-inspector-id="html:4743259f:46">多层 0.85</option> <option value="0.9" data-inspector-id="html:4743259f:47">别墅 0.9</option> </select> </div> <div class="form-group" data-inspector-id="html:4743259f:48"> <label data-inspector-id="html:4743259f:49">卧室数量</label> <input type="number" class="input" id="bedrooms" value="3" min="1" max="8" oninput="calculate()" data-inspector-id="html:4743259f:50"> </div> <div class="form-group" data-inspector-id="html:4743259f:51"> <label data-inspector-id="html:4743259f:52">客厅数量</label> <input type="number" class="input" id="livingRooms" value="1" min="0" max="4" oninput="calculate()" data-inspector-id="html:4743259f:53"> </div> <div class="form-group" data-inspector-id="html:4743259f:54"> <label data-inspector-id="html:4743259f:55">卫生间数量</label> <input type="number" class="input" id="bathrooms" value="1" min="1" max="5" oninput="calculate()" data-inspector-id="html:4743259f:56"> </div> <div class="form-group" data-inspector-id="html:4743259f:57"> <label data-inspector-id="html:4743259f:58">厨房数量</label> <input type="number" class="input" id="kitchens" value="1" min="0" max="3" oninput="calculate()" data-inspector-id="html:4743259f:59"> </div> </div> </div> </section> <div class="calculator-main price-results" data-inspector-id="html:4743259f:60"> <!-- 汇总 --> <section class="estimate-overview" data-inspector-id="html:4743259f:61"><h3 data-inspector-id="html:4743259f:62">预算估算</h3><div class="estimate-summary" id="summaryArea" data-inspector-id="html:4743259f:63"> <div class="summary-row" data-inspector-id="html:4743259f:64"><span data-inspector-id="html:4743259f:65">估算面积</span><span data-inspector-id="html:4743259f:66">100㎡（使用≈80㎡）</span></div> <div class="summary-row" data-inspector-id="html:4743259f:67"><span data-inspector-id="html:4743259f:68">城市系数</span><span data-inspector-id="html:4743259f:69">×0.8</span></div> <div class="summary-row" data-inspector-id="html:4743259f:70"><span data-inspector-id="html:4743259f:71">价格范围</span><span data-inspector-id="html:4743259f:72">¥63,088 ~ ¥168,704</span></div> <div class="summary-total" data-inspector-id="html:4743259f:73"> <div data-inspector-id="html:4743259f:74"> <div style="font-size:13px;color:#999" data-inspector-id="html:4743259f:75">估算总价</div> <span data-inspector-id="html:4743259f:76">¥115,896</span> </div> <div style="text-align:right" data-inspector-id="html:4743259f:77"> <div style="font-size:13px;color:#999" data-inspector-id="html:4743259f:78">每平米</div> <span data-inspector-id="html:4743259f:79">≈¥1,159/㎡</span> </div> </div></div></section> <!-- 估算明细 --> <section class="calculator-panel price-breakdown" data-inspector-id="html:4743259f:80"><h3 data-inspector-id="html:4743259f:81">费用分类</h3><div id="detailArea" data-inspector-id="html:4743259f:82"> <div class="cat-group" data-inspector-id="html:4743259f:83"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:84"> <span class="cat-icon" data-inspector-id="html:4743259f:85"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:86">基础工程</span> <span class="cat-total" data-inspector-id="html:4743259f:87">≈¥8.4k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:88">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:89"> <div class="item-row" data-inspector-id="html:4743259f:90"> <span class="item-name" data-inspector-id="html:4743259f:91">墙体拆除 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:92">非承重墙拆除</span></span> <span class="item-unit" data-inspector-id="html:4743259f:93">12㎡</span> <span class="item-price" data-inspector-id="html:4743259f:94">30-60元</span> <span class="item-sub" data-inspector-id="html:4743259f:95">0.3k-0.6k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:96"> <span class="item-name" data-inspector-id="html:4743259f:97">墙体砌筑 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:98">新建隔墙</span></span> <span class="item-unit" data-inspector-id="html:4743259f:99">8㎡</span> <span class="item-price" data-inspector-id="html:4743259f:100">80-150元</span> <span class="item-sub" data-inspector-id="html:4743259f:101">0.5k-1.0k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:102"> <span class="item-name" data-inspector-id="html:4743259f:103">地面找平 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:104">水泥砂浆找平</span></span> <span class="item-unit" data-inspector-id="html:4743259f:105">68㎡</span> <span class="item-price" data-inspector-id="html:4743259f:106">25-45元</span> <span class="item-sub" data-inspector-id="html:4743259f:107">1.4k-2.4k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:108"> <span class="item-name" data-inspector-id="html:4743259f:109">墙面找平 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:110">含刮腻子</span></span> <span class="item-unit" data-inspector-id="html:4743259f:111">224㎡</span> <span class="item-price" data-inspector-id="html:4743259f:112">20-40元</span> <span class="item-sub" data-inspector-id="html:4743259f:113">3.6k-7.2k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:114"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:115"> <span class="cat-icon" data-inspector-id="html:4743259f:116"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:117">水电工程</span> <span class="cat-total" data-inspector-id="html:4743259f:118">≈¥3.9k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:119">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:120"> <div class="item-row" data-inspector-id="html:4743259f:121"> <span class="item-name" data-inspector-id="html:4743259f:122">电路改造 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:123">强弱电改造</span></span> <span class="item-unit" data-inspector-id="html:4743259f:124">64米</span> <span class="item-price" data-inspector-id="html:4743259f:125">35-65元</span> <span class="item-sub" data-inspector-id="html:4743259f:126">1.8k-3.3k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:127"> <span class="item-name" data-inspector-id="html:4743259f:128">水路改造 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:129">冷热水管</span></span> <span class="item-unit" data-inspector-id="html:4743259f:130">12米</span> <span class="item-price" data-inspector-id="html:4743259f:131">50-90元</span> <span class="item-sub" data-inspector-id="html:4743259f:132">0.5k-0.9k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:133"> <span class="item-name" data-inspector-id="html:4743259f:134">开关插座安装 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:135">每个房间约5-8个</span></span> <span class="item-unit" data-inspector-id="html:4743259f:136">36个</span> <span class="item-price" data-inspector-id="html:4743259f:137">15-30元</span> <span class="item-sub" data-inspector-id="html:4743259f:138">0.4k-0.9k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:139"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:140"> <span class="cat-icon" data-inspector-id="html:4743259f:141"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:142">瓦工工程</span> <span class="cat-total" data-inspector-id="html:4743259f:143">≈¥7.5k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:144">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:145"> <div class="item-row" data-inspector-id="html:4743259f:146"> <span class="item-name" data-inspector-id="html:4743259f:147">墙砖铺贴 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:148">厨卫阳台墙砖</span></span> <span class="item-unit" data-inspector-id="html:4743259f:149">40㎡</span> <span class="item-price" data-inspector-id="html:4743259f:150">45-80元</span> <span class="item-sub" data-inspector-id="html:4743259f:151">1.4k-2.6k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:152"> <span class="item-name" data-inspector-id="html:4743259f:153">地砖铺贴 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:154">客餐厅卧室地面</span></span> <span class="item-unit" data-inspector-id="html:4743259f:155">68㎡</span> <span class="item-price" data-inspector-id="html:4743259f:156">40-70元</span> <span class="item-sub" data-inspector-id="html:4743259f:157">2.2k-3.8k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:158"> <span class="item-name" data-inspector-id="html:4743259f:159">防水处理 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:160">厨卫防水</span></span> <span class="item-unit" data-inspector-id="html:4743259f:161">16㎡</span> <span class="item-price" data-inspector-id="html:4743259f:162">60-100元</span> <span class="item-sub" data-inspector-id="html:4743259f:163">0.8k-1.3k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:164"> <span class="item-name" data-inspector-id="html:4743259f:165">美缝处理 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:166">全屋美缝</span></span> <span class="item-unit" data-inspector-id="html:4743259f:167">80㎡</span> <span class="item-price" data-inspector-id="html:4743259f:168">15-30元</span> <span class="item-sub" data-inspector-id="html:4743259f:169">1.0k-1.9k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:170"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:171"> <span class="cat-icon" data-inspector-id="html:4743259f:172"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:173">木工工程</span> <span class="cat-total" data-inspector-id="html:4743259f:174">≈¥22.7k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:175">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:176"> <div class="item-row" data-inspector-id="html:4743259f:177"> <span class="item-name" data-inspector-id="html:4743259f:178">吊顶 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:179">客餐厅+厨卫吊顶</span></span> <span class="item-unit" data-inspector-id="html:4743259f:180">24㎡</span> <span class="item-price" data-inspector-id="html:4743259f:181">100-180元</span> <span class="item-sub" data-inspector-id="html:4743259f:182">1.9k-3.5k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:183"> <span class="item-name" data-inspector-id="html:4743259f:184">定制柜体 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:185">衣柜橱柜鞋柜等</span></span> <span class="item-unit" data-inspector-id="html:4743259f:186">20投影㎡</span> <span class="item-price" data-inspector-id="html:4743259f:187">500-1200元</span> <span class="item-sub" data-inspector-id="html:4743259f:188">8.0k-19.2k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:189"> <span class="item-name" data-inspector-id="html:4743259f:190">木门 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:191">卧室+卫生间门</span></span> <span class="item-unit" data-inspector-id="html:4743259f:192">4樘</span> <span class="item-price" data-inspector-id="html:4743259f:193">1000-3000元</span> <span class="item-sub" data-inspector-id="html:4743259f:194">3.2k-9.6k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:195"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:196"> <span class="cat-icon" data-inspector-id="html:4743259f:197"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:198">油漆工程</span> <span class="cat-total" data-inspector-id="html:4743259f:199">≈¥7.1k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:200">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:201"> <div class="item-row" data-inspector-id="html:4743259f:202"> <span class="item-name" data-inspector-id="html:4743259f:203">墙面乳胶漆 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:204">含底漆面漆</span></span> <span class="item-unit" data-inspector-id="html:4743259f:205">224㎡</span> <span class="item-price" data-inspector-id="html:4743259f:206">25-50元</span> <span class="item-sub" data-inspector-id="html:4743259f:207">4.5k-9.0k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:208"> <span class="item-name" data-inspector-id="html:4743259f:209">木器漆 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:210">门套窗套等</span></span> <span class="item-unit" data-inspector-id="html:4743259f:211">8㎡</span> <span class="item-price" data-inspector-id="html:4743259f:212">40-80元</span> <span class="item-sub" data-inspector-id="html:4743259f:213">0.3k-0.5k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:214"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:215"> <span class="cat-icon" data-inspector-id="html:4743259f:216"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:217">安装工程</span> <span class="cat-total" data-inspector-id="html:4743259f:218">≈¥11.1k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:219">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:220"> <div class="item-row" data-inspector-id="html:4743259f:221"> <span class="item-name" data-inspector-id="html:4743259f:222">厨卫吊顶 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:223">铝扣板/蜂窝板</span></span> <span class="item-unit" data-inspector-id="html:4743259f:224">10㎡</span> <span class="item-price" data-inspector-id="html:4743259f:225">80-150元</span> <span class="item-sub" data-inspector-id="html:4743259f:226">0.6k-1.2k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:227"> <span class="item-name" data-inspector-id="html:4743259f:228">橱柜安装 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:229">含台面五金</span></span> <span class="item-unit" data-inspector-id="html:4743259f:230">1套</span> <span class="item-price" data-inspector-id="html:4743259f:231">3000-8000元</span> <span class="item-sub" data-inspector-id="html:4743259f:232">2.4k-6.4k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:233"> <span class="item-name" data-inspector-id="html:4743259f:234">卫浴安装 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:235">马桶花洒浴室柜</span></span> <span class="item-unit" data-inspector-id="html:4743259f:236">1套</span> <span class="item-price" data-inspector-id="html:4743259f:237">2000-6000元</span> <span class="item-sub" data-inspector-id="html:4743259f:238">1.6k-4.8k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:239"> <span class="item-name" data-inspector-id="html:4743259f:240">灯具安装 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:241">全屋灯具</span></span> <span class="item-unit" data-inspector-id="html:4743259f:242">1套</span> <span class="item-price" data-inspector-id="html:4743259f:243">1500-5000元</span> <span class="item-sub" data-inspector-id="html:4743259f:244">1.2k-4.0k</span> </div></div> </div> <div class="cat-group" data-inspector-id="html:4743259f:245"> <div class="cat-hd" onclick="toggleCat(this)" data-inspector-id="html:4743259f:246"> <span class="cat-icon" data-inspector-id="html:4743259f:247"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg></span> <span class="cat-name" data-inspector-id="html:4743259f:248">软装家电</span> <span class="cat-total" data-inspector-id="html:4743259f:249">≈¥55.2k</span> <span class="cat-arrow" data-inspector-id="html:4743259f:250">▼</span> </div> <div class="cat-body" data-inspector-id="html:4743259f:251"> <div class="item-row" data-inspector-id="html:4743259f:252"> <span class="item-name" data-inspector-id="html:4743259f:253">窗帘 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:254">全屋窗帘</span></span> <span class="item-unit" data-inspector-id="html:4743259f:255">1套</span> <span class="item-price" data-inspector-id="html:4743259f:256">2000-6000元</span> <span class="item-sub" data-inspector-id="html:4743259f:257">1.6k-4.8k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:258"> <span class="item-name" data-inspector-id="html:4743259f:259">家具 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:260">沙发床餐桌椅等</span></span> <span class="item-unit" data-inspector-id="html:4743259f:261">1套</span> <span class="item-price" data-inspector-id="html:4743259f:262">15000-50000元</span> <span class="item-sub" data-inspector-id="html:4743259f:263">12.0k-40.0k</span> </div> <div class="item-row" data-inspector-id="html:4743259f:264"> <span class="item-name" data-inspector-id="html:4743259f:265">家电 <span style="font-size:11px;color:#bbb" data-inspector-id="html:4743259f:266">冰箱洗衣机空调等</span></span> <span class="item-unit" data-inspector-id="html:4743259f:267">1套</span> <span class="item-price" data-inspector-id="html:4743259f:268">15000-50000元</span> <span class="item-sub" data-inspector-id="html:4743259f:269">12.0k-40.0k</span> </div></div> </div></div></section> <p class="calculator-footnote" data-inspector-id="html:4743259f:270">估算结果仅用于前期预算规划，请以现场测量和正式报价为准。</p> </div> </div> </div> <script>
+        // ===== 估算数据（元/㎡ 或 元/项）=====
+        // priceType: 'area'=按面积, 'room'=按房间数, 'fixed'=固定
+        const COST_CATEGORIES = [
+            {
+                name: '基础工程', icon: '🔨',
+                items: [
+                    { name: '墙体拆除', unit: '㎡', priceMin: 30, priceMax: 60, priceType: 'area', qtyRatio: 0.15, desc: '非承重墙拆除' },
+                    { name: '墙体砌筑', unit: '㎡', priceMin: 80, priceMax: 150, priceType: 'area', qtyRatio: 0.1, desc: '新建隔墙' },
+                    { name: '地面找平', unit: '㎡', priceMin: 25, priceMax: 45, priceType: 'area', qtyRatio: 0.85, desc: '水泥砂浆找平' },
+                    { name: '墙面找平', unit: '㎡', priceMin: 20, priceMax: 40, priceType: 'area', qtyRatio: 2.8, desc: '含刮腻子' },
+                ]
+            },
+            {
+                name: '水电工程', icon: '🔌',
+                items: [
+                    { name: '电路改造', unit: '米', priceMin: 35, priceMax: 65, priceType: 'area', qtyRatio: 0.8, desc: '强弱电改造' },
+                    { name: '水路改造', unit: '米', priceMin: 50, priceMax: 90, priceType: 'area', qtyRatio: 0.15, desc: '冷热水管' },
+                    { name: '开关插座安装', unit: '个', priceMin: 15, priceMax: 30, priceType: 'room', qty: 0, desc: '每个房间约5-8个' },
+                ]
+            },
+            {
+                name: '瓦工工程', icon: '🧱',
+                items: [
+                    { name: '墙砖铺贴', unit: '㎡', priceMin: 45, priceMax: 80, priceType: 'area', qtyRatio: 0.5, desc: '厨卫阳台墙砖' },
+                    { name: '地砖铺贴', unit: '㎡', priceMin: 40, priceMax: 70, priceType: 'area', qtyRatio: 0.85, desc: '客餐厅卧室地面' },
+                    { name: '防水处理', unit: '㎡', priceMin: 60, priceMax: 100, priceType: 'area', qtyRatio: 0.2, desc: '厨卫防水' },
+                    { name: '美缝处理', unit: '㎡', priceMin: 15, priceMax: 30, priceType: 'area', qtyRatio: 1.0, desc: '全屋美缝' },
+                ]
+            },
+            {
+                name: '木工工程', icon: '🪵',
+                items: [
+                    { name: '吊顶', unit: '㎡', priceMin: 100, priceMax: 180, priceType: 'area', qtyRatio: 0.3, desc: '客餐厅+厨卫吊顶' },
+                    { name: '定制柜体', unit: '投影㎡', priceMin: 500, priceMax: 1200, priceType: 'area', qtyRatio: 0.25, desc: '衣柜橱柜鞋柜等' },
+                    { name: '木门', unit: '樘', priceMin: 1000, priceMax: 3000, priceType: 'room', qty: 0, desc: '卧室+卫生间门' },
+                ]
+            },
+            {
+                name: '油漆工程', icon: '🎨',
+                items: [
+                    { name: '墙面乳胶漆', unit: '㎡', priceMin: 25, priceMax: 50, priceType: 'area', qtyRatio: 2.8, desc: '含底漆面漆' },
+                    { name: '木器漆', unit: '㎡', priceMin: 40, priceMax: 80, priceType: 'area', qtyRatio: 0.1, desc: '门套窗套等' },
+                ]
+            },
+            {
+                name: '安装工程', icon: '🔧',
+                items: [
+                    { name: '厨卫吊顶', unit: '㎡', priceMin: 80, priceMax: 150, priceType: 'area', qtyRatio: 0.12, desc: '铝扣板/蜂窝板' },
+                    { name: '橱柜安装', unit: '套', priceMin: 3000, priceMax: 8000, priceType: 'fixed', qty: 1, desc: '含台面五金' },
+                    { name: '卫浴安装', unit: '套', priceMin: 2000, priceMax: 6000, priceType: 'room', qty: 0, desc: '马桶花洒浴室柜' },
+                    { name: '灯具安装', unit: '套', priceMin: 1500, priceMax: 5000, priceType: 'fixed', qty: 1, desc: '全屋灯具' },
+                ]
+            },
+            {
+                name: '软装家电', icon: '🛋️',
+                items: [
+                    { name: '窗帘', unit: '套', priceMin: 2000, priceMax: 6000, priceType: 'fixed', qty: 1, desc: '全屋窗帘' },
+                    { name: '家具', unit: '套', priceMin: 15000, priceMax: 50000, priceType: 'fixed', qty: 1, desc: '沙发床餐桌椅等' },
+                    { name: '家电', unit: '套', priceMin: 15000, priceMax: 50000, priceType: 'fixed', qty: 1, desc: '冰箱洗衣机空调等' },
+                ]
+            }
+        ];
+
+        let houseType = 'new';
+
+        function setType(type, el) {
+            houseType = type;
+            document.querySelectorAll('.type-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            calculate();
+        }
+
+        function calculate() {
+            const city = parseFloat(document.getElementById('cityLevel').value);
+            const area = parseFloat(document.getElementById('area').value) || 100;
+            const ratio = parseFloat(document.getElementById('areaRatio').value);
+            const rooms = parseInt(document.getElementById('bedrooms').value) || 3;
+            const living = parseInt(document.getElementById('livingRooms').value) || 1;
+            const baths = parseInt(document.getElementById('bathrooms').value) || 1;
+            const kitchens = parseInt(document.getElementById('kitchens').value) || 1;
+            const useArea = area * ratio;
+            const totalRooms = rooms + living + baths + kitchens;
+            const oldRatio = houseType === 'old' ? 1.15 : 1; // 旧房加15%
+
+            let grandMin = 0, grandMax = 0;
+            let detailHtml = '';
+
+            COST_CATEGORIES.forEach(cat => {
+                let catTotal = 0;
+                let itemsHtml = '';
+
+                cat.items.forEach(item => {
+                    let qty;
+                    if (item.priceType === 'area') {
+                        qty = Math.round(useArea * item.qtyRatio);
+                    } else if (item.priceType === 'room') {
+                        if (item.name.includes('开关')) qty = totalRooms * 6;
+                        else if (item.name.includes('卫浴')) qty = baths;
+                        else if (item.name.includes('木门')) qty = rooms + baths;
+                        else qty = totalRooms;
+                    } else {
+                        qty = item.qty;
+                    }
+
+                    const min = Math.round(item.priceMin * qty * city * oldRatio);
+                    const max = Math.round(item.priceMax * qty * city * oldRatio);
+                    catTotal += (min + max) / 2;
+                    grandMin += min;
+                    grandMax += max;
+
+                    itemsHtml += `
+                    <div class="item-row">
+                        <span class="item-name">${item.name} <span style="font-size:11px;color:#bbb">${item.desc}</span></span>
+                        <span class="item-unit">${qty}${item.unit}</span>
+                        <span class="item-price">${item.priceMin}-${item.priceMax}元</span>
+                        <span class="item-sub">${(min/1000).toFixed(1)}k-${(max/1000).toFixed(1)}k</span>
+                    </div>`;
+                });
+
+                detailHtml += `
+                <div class="cat-group">
+                    <div class="cat-hd" onclick="toggleCat(this)">
+                        <span class="cat-icon">${cat.icon}</span>
+                        <span class="cat-name">${cat.name}</span>
+                        <span class="cat-total">≈¥${(catTotal/1000).toFixed(1)}k</span>
+                        <span class="cat-arrow">▼</span>
+                    </div>
+                    <div class="cat-body">${itemsHtml}</div>
+                </div>`;
+            });
+
+            document.getElementById('detailArea').innerHTML = detailHtml;
+
+            const avg = (grandMin + grandMax) / 2;
+            const perSqm = Math.round(avg / area);
+            const perUseSqm = useArea > 0 ? Math.round(avg / useArea) : 0;
+            document.getElementById('summaryArea').innerHTML = `
+                <div class="summary-row"><span>估算面积</span><span>${area}㎡（使用≈${Math.round(useArea)}㎡）</span></div>
+                <div class="summary-row"><span>城市系数</span><span>×${city}</span></div>
+                ${houseType==='old'?'<div class="summary-row"><span>翻新加价</span><span>+15%</span></div>':''}
+                <div class="summary-row"><span>价格范围</span><span>¥${grandMin.toLocaleString()} ~ ¥${grandMax.toLocaleString()}</span></div>
+                <div class="summary-total">
+                    <div>
+                        <div style="font-size:13px;color:#999">估算总价</div>
+                        <span>¥${Math.round(avg).toLocaleString()}</span>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:13px;color:#999">每建筑平米</div>
+                        <span>≈¥${perSqm.toLocaleString()}/㎡</span>
+                        <div style="font-size:12px;color:#b3aaa2;margin-top:2px">使用面积 ≈¥${perUseSqm.toLocaleString()}/㎡</div>
+                    </div>
+                </div>`;
+            try {
+                localStorage.setItem('xzreplica.priceEstimate', JSON.stringify({
+                    city: document.getElementById('cityLevel').value,
+                    area: document.getElementById('area').value,
+                    ratio: document.getElementById('areaRatio').value,
+                    bedrooms: document.getElementById('bedrooms').value,
+                    livingRooms: document.getElementById('livingRooms').value,
+                    bathrooms: document.getElementById('bathrooms').value,
+                    kitchens: document.getElementById('kitchens').value,
+                    houseType: houseType
+                }));
+            } catch (e) {}
+        }
+
+        // 展开/收起分类
+        function toggleCat(el) {
+            const body = el.nextElementSibling;
+            const arrow = el.querySelector('.cat-arrow');
+            body.classList.toggle('show');
+            arrow.classList.toggle('open');
+        }
+
+        // 初始化（恢复上次输入）
+        try {
+            const ps = JSON.parse(localStorage.getItem('xzreplica.priceEstimate') || 'null');
+            if (ps) {
+                ['cityLevel', 'area', 'areaRatio', 'bedrooms', 'livingRooms', 'bathrooms', 'kitchens'].forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el && ps[k] != null) el.value = ps[k];
+                });
+                if (ps.houseType === 'old') houseType = 'old';
+            }
+        } catch (e) {}
+        calculate();
+    </script> <!-- 底部Tab栏（移动端） -->  <!-- Toast提示 --> <div id="toast" style="display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:10px 20px;border-radius:10px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .3s" data-inspector-id="html:4743259f:283"></div> <div class="fresh-project-popover" hidden=""><div class="fresh-project-popover-head"><b>项目</b><span class="fresh-project-head-actions"><button type="button" data-account-action="edit-project">项目资料</button></span></div><select class="fresh-project-select" data-project-select="" aria-label="切换装修项目"><option value="4a259235-6ce3-4fcd-b5f2-d190aba028d2">我的装修</option></select><small>不同项目之间的数据相互独立。</small></div></body></html>

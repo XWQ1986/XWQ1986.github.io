@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="only light">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 我的装修公司</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="fresh-theme.css?v=20260814-personal-ux-v1">
+  <link rel="stylesheet" href="personal-enterprise.css?v=20261108-narrowfix">
+  <link rel="stylesheet" href="assets/icons/icons.css?v=20261023">
+  <link rel="stylesheet" href="customer-projects.css?v=20261107-static">
+  <style>
+    .customer-demo { margin: 6px 0 0 !important; color: #8a7a3a !important; font-size: 12px !important; }
+  </style>
+</head>
+<body>
+  <main class="container customer-sync-page">
+    <section class="customer-hero">
+      <div>
+        <span class="customer-eyebrow">装修公司发给我的提醒</span>
+        <h1>我的装修公司</h1>
+        <p>装修公司审核并推送后，施工进度、现场照片和下一步安排会同步到这里与微信小程序。企业内部日志、整改和成员信息不会显示。</p>
+      </div>
+      <div class="customer-hero-stat">
+        <span>待查看更新</span>
+        <strong id="unreadTotal">0</strong>
+        <small>网页和小程序使用同一个装修小账本账号</small>
+      </div>
+    </section>
+
+    <section class="claim-card">
+      <div>
+        <h2>绑定装修公司</h2>
+        <p>让装修公司按你的装修小账本用户名或登录邮箱绑定；也可粘贴对方发来的客户链接主动绑定。</p>
+        <p class="customer-demo">本地演示版：粘贴任意分享码即可体验绑定流程，示例项目数据保存在本机。</p>
+      </div>
+      <form id="claimForm">
+        <input id="claimCode" required autocomplete="off" placeholder="粘贴装修公司链接或分享码" aria-label="装修公司链接或分享码">
+        <button type="submit">绑定到我的账号</button>
+      </form>
+    </section>
+
+    <section class="customer-layout is-empty">
+      <aside class="customer-list-panel">
+        <div class="customer-panel-head">
+          <div><small>COMPANIES</small><h2>已绑定的装修公司</h2></div>
+          <span id="projectCount">0 家 · 0 个项目</span>
+        </div>
+        <div id="customerProjectList" class="customer-project-list">
+          <div class="customer-empty"><b>暂无已绑定装修公司</b><span>请让装修公司绑定你的用户名/邮箱，或在上方粘贴客户链接。</span></div>
+        </div>
+      </aside>
+      <section class="customer-detail-panel" id="customerDetail" hidden>
+        <div class="customer-empty large"><b>选择一家装修公司</b><span>查看装修公司最新发布的施工提醒和现场照片</span></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="customerToast" class="customer-toast" role="status" aria-live="polite"></div>
+
+  <script src="fresh-shell.js?v=20261108-accountlink"></script>
+  <script src="customer-projects.js?v=20261107-static"></script>
+</body>
+</html>

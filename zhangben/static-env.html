@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 静态演示说明</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 静态演示说明（复刻版环境说明页） */
+    .env-head { margin: 0 0 18px; }
+    .env-head h1 { margin: 0 0 6px; font-size: 28px; font-weight: 600; line-height: 1.35; }
+    .env-head p { margin: 0; color: #70767B; font-size: 14px; }
+
+    .env-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+    .env-badge { padding: 7px 12px; border-radius: 999px; background: #FFF7D6; color: #6C5B24; font-size: 12px; font-weight: 600; }
+    .env-badge.green { background: #EDF7F1; color: #2F7D5A; }
+    .env-badge.gray { background: #F3F4F4; color: #5B6367; }
+
+    .env-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .env-stat { padding: 16px 18px; border: 1px solid #E9ECEC; border-radius: 14px; background: #fff; }
+    .env-stat span { display: block; color: #70767B; font-size: 12px; }
+    .env-stat b { display: block; margin-top: 6px; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .env-card { margin-bottom: 14px; border: 1px solid #E9ECEC; border-radius: 16px; background: #fff; overflow: hidden; }
+    .env-card-hd { padding: 16px 20px; border-bottom: 1px solid #EDF2F7; }
+    .env-card-hd h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .env-card-hd p { margin: 5px 0 0; color: #70767B; font-size: 12px; }
+    .env-card-bd { padding: 4px 20px 18px; color: #4A5568; font-size: 14px; line-height: 1.8; }
+
+    .env-scroll { max-width: 100%; overflow-x: auto; }
+    .env-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .env-table th { padding: 10px 12px; border-bottom: 2px solid #E2E8F0; background: #F7FAFC; color: #4A5568; font-weight: 600; text-align: left; white-space: nowrap; }
+    .env-table td { padding: 10px 12px; border-bottom: 1px solid #EDF2F7; vertical-align: top; }
+    .env-table tr:last-child td { border-bottom: 0; }
+    .env-table code { padding: 1px 5px; border-radius: 4px; background: #F3F5F6; color: #2D3748; font-family: monospace; font-size: 12px; }
+
+    .env-list { margin: 0; padding-left: 20px; }
+    .env-list li { margin-bottom: 8px; }
+    .env-list li:last-child { margin-bottom: 0; }
+
+    .env-tip { margin: 14px 0 0; padding: 12px 16px; border-left: 3px solid #48BB78; border-radius: 0 8px 8px 0; background: #F0FFF4; font-size: 13px; }
+    .env-warn { margin: 14px 0 0; padding: 12px 16px; border-radius: 8px; background: #FFF7E6; color: #8A6212; font-size: 13px; }
+    .env-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+    @media (max-width: 760px) {
+      .env-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="env-head">
+      <h1>静态演示说明</h1>
+      <p>装修小管家复刻版的运行环境、数据存放位置与备份方式</p>
+    </header>
+
+    <div class="env-badges">
+      <span class="env-badge green">静态文件运行</span>
+      <span class="env-badge">数据仅存本机</span>
+      <span class="env-badge gray">无后端接口</span>
+    </div>
+
+    <div class="env-grid">
+      <div class="env-stat"><span>本机数据项</span><b id="envKeys">0</b></div>
+      <div class="env-stat"><span>占用浏览器存储</span><b id="envSize">0 KB</b></div>
+      <div class="env-stat"><span>最近一次备份</span><b id="envBackup" style="font-size:15px">暂无</b></div>
+    </div>
+
+    <section class="env-card">
+      <div class="env-card-hd">
+        <h2>这个版本是什么</h2>
+        <p>用于演示与本地试用，不连接任何服务器</p>
+      </div>
+      <div class="env-card-bd">
+        <ul class="env-list">
+          <li>页面由 HTML / CSS / JS 静态文件组成，通过本机 HTTP 服务打开即可使用，不需要数据库或后端接口。</li>
+          <li>所有装修数据（预算、账单、待办、采购、日记、比价、流程节点、验收记录）都保存在<strong>当前浏览器的 localStorage</strong>，键名前缀为 <code>xzreplica.</code>。</li>
+          <li>登录为<strong>本机模拟</strong>：账号信息存在 <code>zhangben_users</code>，登录状态存在 <code>zhangben_session</code>，不进行服务器校验。</li>
+          <li>数据不会上传到任何服务器，也不会与其他设备共享。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="env-card">
+      <div class="env-card-hd">
+        <h2>与线上正式版的差异</h2>
+        <p>功能逻辑与界面一致，差别在数据如何保存</p>
+      </div>
+      <div class="env-card-bd">
+        <div class="env-scroll">
+          <table class="env-table">
+            <thead>
+              <tr><th>能力</th><th>静态演示版</th><th>线上正式版</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>数据存储</td><td>本机浏览器 localStorage</td><td>账号云端同步</td></tr>
+              <tr><td>登录鉴权</td><td>本机模拟，无真实鉴权</td><td>手机号 / 邮箱验证</td></tr>
+              <tr><td>多设备使用</td><td>不支持，需手动导出导入</td><td>支持</td></tr>
+              <tr><td>微信小程序</td><td>仅入口说明，无真实跳转</td><td>支持扫码进入</td></tr>
+              <tr><td>客户项目（施工提醒）</td><td>内置 2 家示例装修公司</td><td>真实装修公司数据</td></tr>
+              <tr><td>瓷砖排版模拟器</td><td>本地降级模拟，不调用后端</td><td>后端排版计算</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="env-card">
+      <div class="env-card-hd">
+        <h2>本机数据存放在哪</h2>
+        <p>可在浏览器开发者工具的 Application → Local Storage 中查看</p>
+      </div>
+      <div class="env-card-bd">
+        <div class="env-scroll">
+          <table class="env-table">
+            <thead>
+              <tr><th>数据类别</th><th>存储键</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>预算分组</td><td><code>budget</code></td><td>预算额度与分组配置</td></tr>
+              <tr><td>账单</td><td><code>bills</code></td><td>装修记账明细</td></tr>
+              <tr><td>待办</td><td><code>todos</code></td><td>首页待办清单</td></tr>
+              <tr><td>采购清单</td><td><code>buylist</code></td><td>采购项与已购状态</td></tr>
+              <tr><td>装修日记</td><td><code>diary</code> / <code>diaryDraft</code></td><td>正文与未保存草稿</td></tr>
+              <tr><td>流程节点</td><td><code>flowSteps</code></td><td>节点完成状态</td></tr>
+              <tr><td>比价选品</td><td><code>compare</code></td><td>品类、报价与已选方案</td></tr>
+              <tr><td>节点验收</td><td><code>acceptance</code></td><td>验收结论与留痕时间</td></tr>
+              <tr><td>客户项目</td><td><code>customerProjects</code></td><td>施工提醒示例数据</td></tr>
+              <tr><td>登录信息</td><td><code>zhangben_users</code> / <code>zhangben_session</code></td><td>本机账号与登录态（无前缀）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="env-card">
+      <div class="env-card-hd">
+        <h2>备份与迁移</h2>
+        <p>换设备、换浏览器或清理缓存前，请先导出备份</p>
+      </div>
+      <div class="env-card-bd">
+        <ul class="env-list">
+          <li><strong>账号管理页「导出数据」</strong>：导出带 <code>xzreplica.</code> 前缀的完整备份 JSON。</li>
+          <li><strong>首页「导出备份」</strong>：导出无前缀键名的备份 JSON。</li>
+          <li>两种格式<strong>可以互相导入</strong>，导入时会覆盖本机同类数据。</li>
+          <li>导入后可在首页核对预算、账单、采购与比价是否与导出前一致。</li>
+        </ul>
+        <div class="env-actions">
+          <a class="btn primary" href="account.html">去账号管理导出</a>
+          <a class="btn" href="home.html">去首页导出备份</a>
+        </div>
+        <p class="env-warn">清理浏览器数据、切换浏览器或使用隐私模式，都会让本机数据消失且无法恢复，请务必保留导出的 JSON 文件。</p>
+      </div>
+    </section>
+
+    <section class="env-card">
+      <div class="env-card-hd">
+        <h2>使用建议与已知限制</h2>
+        <p>按以下方式使用体验最好</p>
+      </div>
+      <div class="env-card-bd">
+        <ul class="env-list">
+          <li>建议使用最新版 Chrome / Edge，通过 HTTP 地址访问；直接双击以 <code>file://</code> 打开时，部分页面脚本可能无法正常加载。</li>
+          <li>本机存储容量通常为 5–10 MB，日记照片会自动压缩；空间不足时页面会提示保存失败，请先导出备份再清理旧数据。</li>
+          <li>客户端项目页的装修公司、照片均为演示数据，可按实际公司信息手动修改。</li>
+          <li>计算器的算法与原版一致，最近一次输入与房间列表会保存在本机，刷新后可恢复；瓷砖排版工具为申请制，静态版不提供排版画布。</li>
+          <li>登录页预置的演示账号（<code>15668681555@163.com</code>）在首次访问时自动生成，账号密码以明文保存在本机 localStorage，请勿在本演示环境使用真实密码。</li>
+          <li>对外部署前，在登录页引入 <code>window.__XZ_DEMO__ = false</code> 并清空本机 <code>zhangben_users</code>，即可不再生成演示账号；已注册账号不受影响。</li>
+          <li>首页“数据备份”支持导出/导入 JSON；“恢复上一版”可回滚最近一次写入前的本机内容（最多保留 3 份），误删或误清空时可先用它找回。</li>
+        </ul>
+        <p class="env-tip">如果只需要查看界面与流程，使用本机演示数据即可；如需长期记录真实装修支出，请定期导出备份，或使用线上正式版账号同步。</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    shell.renderNav('env');
+
+    var keys = Object.keys(localStorage).filter(function (k) { return k.indexOf('xzreplica.') === 0; });
+    var bytes = 0;
+    keys.forEach(function (k) { bytes += (localStorage.getItem(k) || '').length * 2; });
+    var size = bytes >= 1024 * 1024 ? (bytes / 1024 / 1024).toFixed(2) + ' MB' : (bytes / 1024).toFixed(1) + ' KB';
+
+    document.getElementById('envKeys').textContent = keys.length + ' 类';
+    document.getElementById('envSize').textContent = size;
+
+    var last = shell.store.read('lastBackupAt');
+    if (last) {
+      var d = new Date(last);
+      last = isNaN(d.getTime()) ? last :
+        d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') +
+        ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+    document.getElementById('envBackup').textContent = last || '暂无';
+  </script>
+</body>
+</html>

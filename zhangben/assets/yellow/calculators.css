@@ -1,0 +1,159 @@
+/* Yellow handoff layouts. Calculation scripts and electrical warnings are retained. */
+.yellow-calculator { color:#292d2e;font-family:Arial,"Microsoft YaHei",sans-serif; }
+.yellow-calculator .calculator-heading { display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:23px; }
+.yellow-calculator .calculator-heading h1 { font-size:27px;font-weight:600;line-height:1.4;margin:0 0 7px; }
+.yellow-calculator .calculator-subtitle { margin:0;color:#687176;font-size:14px;line-height:1.6; }
+.calculator-back { display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;height:37px;padding:0 16px;background:#fff;border:1px solid #e7ebec;border-radius:9px;color:#555e62;text-decoration:none;font-size:13px; }
+.calculator-back:hover { background:#fff9df; }
+.yellow-calculator .safety-notice,.yellow-calculator .estimate-notice { padding:13px 18px;margin:0 0 23px;background:#fff8d9;border:1px solid #f1e5aa;border-radius:11px;color:#716337;font-size:13px;line-height:1.7; }
+.yellow-calculator .safety-notice strong,.yellow-calculator .estimate-notice strong { color:#554b2b;font-weight:600; }
+.yellow-calculator .calculator-notice-copy { display:block;max-width:64em; }
+.calculator-columns { display:grid;gap:22px;align-items:start; }
+.calculator-columns > * { min-width:0; }
+.calculator-panel { margin:0 0 22px;padding:24px;border:1px solid #e7ebec;border-radius:13px;background:#fff; }
+.yellow-calculator h3 { margin:0 0 22px;font-size:17px;line-height:1.5;font-weight:600; }
+.yellow-calculator .input-group label,.calculator-label { display:block;margin-bottom:8px;color:#596368;font-size:13px;line-height:1.5; }
+.yellow-calculator input,.yellow-calculator select { min-width:0;height:44px;font:inherit;font-size:14px;color:#292d2e;background:#fff; }
+.calculator-button { display:inline-flex;justify-content:center;align-items:center;flex-shrink:0;min-height:44px;padding:0 18px;border:1px solid #f0d952;border-radius:9px;background:#ffe66a;color:#38351f;font:inherit;font-size:14px;font-weight:600;cursor:pointer; }
+.calculator-button:hover { background:#ffdf43; }
+.calculator-button:focus-visible,.calculator-back:focus-visible { outline:3px solid #a98e27;outline-offset:3px; }
+.calculator-footnote { font-size:13px;line-height:1.7;color:#687176;text-align:center;margin:0; }
+
+/* Wire size: input and recommendation beside the appliance list. */
+.wire-columns { grid-template-columns:1fr 1fr;align-items:stretch; }
+.wire-columns .calculator-panel { margin-bottom:22px; }
+.yellow-calculator .input-group input { font-size:16px; }
+.wire-calculator .result { margin:18px 0 0;padding:23px 20px;background:#fff8d9;border-radius:11px;min-height:144px;display:flex;flex-direction:column;justify-content:center; }
+.wire-calculator .result .val { font-size:30px; }
+.wire-calculator .result-grid { gap:0;margin-top:20px;border-top:1px solid #efe3b2;padding-top:15px;row-gap:17px; }
+.wire-calculator .result-item { border:0;border-radius:0;background:transparent;padding:0 8px; }
+.wire-calculator .result-item .val { font-size:24px; }
+.wire-calculator .result-item .label,.wire-calculator .result .label,.wire-calculator .quick-btn .power { color:#687176;font-size:13px;line-height:1.6; }
+.formula-note { margin-top:22px;padding-top:19px;border-top:1px solid #e7ebec;color:#687176;font-size:13px;line-height:1.85; }
+.formula-note b { display:block;margin-bottom:5px;color:#444d51;font-weight:600; }
+.appliance-select-row { display:flex;gap:10px; }
+.appliance-select-row select { width:100%;padding:0 12px; }
+.appliance-list-heading { display:flex;justify-content:space-between;margin-top:26px;padding:12px 0;border-bottom:1px solid #e7ebec;font-size:13px;color:#687176; }
+.wire-calculator #appList { min-height:133px;padding:10px 0; }
+.wire-calculator #totalResult { margin-top:18px; }
+.wire-calculator .quick-grid { grid-template-columns:repeat(6,minmax(0,1fr));gap:12px; }
+.wire-calculator .quick-btn { padding:15px 8px;border-color:#e7ebec;border-radius:9px; }
+.wire-calculator .quick-btn:hover { border-color:#e7ca4a;background:#fff9df; }
+/* The existing renderers use inline presentational colors. Keep their scripts intact. */
+.wire-calculator #result .label[style],.wire-calculator #appList [style*="color:#ccc"],.wire-calculator #appList [style*="color:#999"] { color:#687176!important; }
+.wire-calculator #result .val[style*="#e45b3f"],.wire-calculator #result .val[style*="#999"] { color:#4a5154!important; }
+.wire-calculator #totalResult > div { background:#fff8d9!important; }
+.wire-calculator #totalResult [style*="color:#666"] { color:#665b39!important; }
+.wire-calculator #totalResult [style*="font-size:12px"] { font-size:13px!important; }
+.wire-calculator #appList button { min-width:30px;min-height:30px; }
+
+/* Circuit: working area on the left, current totals and reference on the right. */
+.circuit-columns { grid-template-columns:minmax(0,1.75fr) minmax(330px,1fr); }
+.circuit-create .input-row { display:grid;grid-template-columns:1fr 1fr auto;gap:14px; }
+.circuit-create .input-group { min-width:0; }
+.circuit-create .input-group input,.circuit-create .input-group select { width:100%; }
+.circuit-create .input-group label { margin-bottom:4px; }
+.circuit-calculator .circuit-configuration { padding:24px;min-height:345px; }
+.circuit-calculator .loop-list > .panel { padding:64px 12px!important;border:0!important;box-shadow:none!important;margin:0;color:#687176!important; }
+.circuit-calculator .loop-card { border:1px solid #e7ebec;border-radius:10px;box-shadow:none; }
+.circuit-calculator .loop-header { gap:12px;background:#fafbfb; }
+.circuit-calculator .loop-name { flex-wrap:wrap; }
+.circuit-calculator .loop-body { padding:16px; }
+.circuit-calculator .config-row { gap:10px;padding:14px;background:#f8f9f9; }
+.circuit-calculator .config-row .input-group { flex:1;min-width:120px; }
+.circuit-calculator .config-row select { width:100%; }
+.circuit-calculator .total-panel { padding:24px;margin:0 0 22px;border:1px solid #f1e5aa;border-radius:13px;background:#fff8d9; }
+.circuit-calculator .total-grid { grid-template-columns:1fr 1fr;gap:15px; }
+.circuit-calculator .total-card { padding:8px 0;background:transparent;border:0;border-radius:0; }
+.circuit-calculator .total-card .label { font-size:13px;color:#687176; }
+.circuit-calculator .total-card .value { font-size:25px; }
+.circuit-calculator .tip-box { padding:14px 0 0;background:transparent;border:0;border-top:1px solid #efe3b2;border-radius:0;color:#716337;font-size:13px; }
+.circuit-calculator .tabs { border-bottom:1px solid #e7ebec;gap:16px; }
+.circuit-calculator .tab { padding:9px 0;margin-bottom:-1px;color:#60696d!important; }
+.circuit-calculator .tab.active { background:transparent!important;color:#4a442a!important;border-bottom-color:#e1c342; }
+.circuit-calculator .wire-table th,.circuit-calculator .wire-table td { padding:12px 5px;line-height:1.5;overflow-wrap:anywhere; }
+.circuit-calculator .wire-table th { font-size:12px;font-weight:500;color:#687176;background:#f8f9f9; }
+.circuit-calculator .wire-table td { font-size:13px; }
+.circuit-calculator .preset-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.circuit-calculator .preset-btn { color:#4b5356;border-color:#e7ebec; }
+.circuit-calculator .summary-label,.circuit-calculator .appliance-table th { font-size:13px;color:#687176; }
+.circuit-calculator .delete-btn { color:#687176; }
+.circuit-calculator .loop-card [style*="color:#ccc"],.circuit-calculator .loop-card [style*="color:#999"] { color:#687176!important; }
+.circuit-calculator .loop-card [style*="color:#777"] { color:#626c70!important; }
+.circuit-calculator .loop-card [style*="color:#e45b3f"],.circuit-calculator .loop-card [style*="color:#dd6b20"] { color:#81651e!important; }
+.circuit-calculator .color-yellow { color:#81651e; }
+.circuit-calculator .loop-card [style*="font-size:11px"],.circuit-calculator .loop-card [style*="font-size:12px"] { font-size:13px!important; }
+
+/* Price estimate: house inputs beside the live range and category breakdown. */
+.price-columns { grid-template-columns:minmax(320px,.9fr) minmax(0,1.45fr); }
+.price-form .card-bd { padding:0; }
+.price-form .form-grid { grid-template-columns:1fr 1fr;gap:21px 16px; }
+.price-form .form-group { gap:8px; }
+.price-form .form-group label { font-size:13px;color:#596368; }
+.price-form .type-chip { display:flex;align-items:center;justify-content:center;min-height:43px;border:1px solid #e7ebec;border-radius:9px;color:#596368; }
+.price-form .type-chip.active { border-color:#e7ce58;background:#fff7cb;color:#4b4427; }
+.estimate-overview { padding:24px;margin-bottom:22px;background:#fff8d9;border:1px solid #f1e5aa;border-radius:13px; }
+.price-results .estimate-overview h3 { margin-bottom:12px; }
+.estimate-summary { display:flex;flex-direction:column; }
+.price-calculator .summary-row { font-size:13px;color:#716337;padding:5px 0;gap:14px; }
+.price-calculator .summary-total { order:-1;align-items:flex-end;gap:20px;padding:0 0 19px;margin:0 0 13px;border-top:0;border-bottom:1px solid #efe3b2; }
+.price-calculator .summary-total span { display:block;font-size:30px;font-weight:600;color:#3b3b2b;line-height:1.5; }
+.price-calculator .summary-total > div:last-child span { font-size:20px; }
+.price-calculator .summary-total [style*="color:#999"] { color:#716337!important; }
+.price-breakdown h3 { margin-bottom:8px; }
+.price-calculator .cat-group { margin:0;border:0;border-bottom:1px solid #e7ebec;border-radius:0; }
+.price-calculator .cat-group:last-child { border-bottom:0; }
+.price-calculator .cat-hd { padding:18px 0;gap:12px; }
+.price-calculator .cat-icon { display:flex;justify-content:center;align-items:center;width:33px;height:33px;border-radius:8px;background:#f8f7ef;font-size:17px; }
+.price-calculator .cat-name { font-weight:500; }
+.price-calculator .cat-total { color:#4f5557;font-weight:500; }
+.price-calculator .cat-arrow { color:#687176; }
+.price-calculator .cat-body { padding:0 12px 12px;background:#f8f9f9; }
+.price-calculator .item-row { flex-wrap:wrap; }
+.price-calculator .item-unit,.price-calculator .item-price { font-size:13px;color:#687176; }
+.price-calculator .item-sub { color:#675a2c; }
+.price-calculator .item-name [style] { display:block;margin-top:3px;color:#687176!important;font-size:13px!important; }
+
+@media(max-width:1120px) {
+  .circuit-columns { grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr); }
+  .circuit-create .input-row { grid-template-columns:1fr 1fr; }
+  .circuit-create .calculator-button { grid-column:1/-1; }
+  .calculator-panel { padding:21px; }
+  .wire-calculator .quick-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .price-columns { grid-template-columns:minmax(285px,1fr) minmax(0,1.2fr); }
+  .price-calculator .summary-total span { font-size:27px; }
+  .price-calculator .summary-total > div:last-child span { font-size:17px; }
+}
+@media(max-width:800px) {
+  .calculator-heading { align-items:flex-start; }
+  .yellow-calculator .calculator-heading { gap:12px;margin-bottom:20px; }
+  .yellow-calculator .calculator-heading h1 { font-size:24px!important; }
+  .calculator-back { margin-top:3px;padding:0 12px; }
+  .yellow-calculator .calculator-subtitle { font-size:13px; }
+  .calculator-columns { grid-template-columns:minmax(0,1fr);gap:0; }
+  .calculator-panel,.circuit-calculator .circuit-configuration { padding:20px;margin-bottom:18px; }
+  .wire-calculator .quick-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+  .wire-calculator #appList { min-height:95px; }
+  .circuit-calculator .circuit-configuration { min-height:260px; }
+  .circuit-calculator .loop-list > .panel { padding:37px 8px!important; }
+  .circuit-calculator .loop-header { align-items:flex-start;flex-direction:column; }
+  .circuit-calculator .config-row { align-items:stretch; }
+  .circuit-calculator .loop-body { padding:12px; }
+  .circuit-calculator .total-panel { padding:20px; }
+  .circuit-calculator .wire-table th { font-size:13px; }
+  .circuit-calculator .preset-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .circuit-calculator .appliance-table th,.circuit-calculator .appliance-table td { padding:7px 4px; }
+  .circuit-calculator .power-bar { min-width:35px; }
+  .price-form .card-bd { padding:0!important; }
+  .estimate-overview { padding:20px; }
+  .price-form .form-grid { gap:18px 14px; }
+  .price-calculator .summary-total { gap:12px; }
+  .price-calculator .summary-total span { font-size:28px; }
+  .price-calculator .summary-total > div:last-child span { font-size:17px; }
+}
+@media(max-width:380px) {
+  .yellow-calculator .calculator-heading { flex-wrap:wrap; }
+  .wire-calculator .quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .appliance-select-row { flex-wrap:wrap; }
+  .appliance-select-row .calculator-button { width:100%; }
+}

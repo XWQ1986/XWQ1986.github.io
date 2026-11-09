@@ -1,0 +1,247 @@
+<html lang="zh-CN" class="" data-inspector-id="html:e8048d86:0" data-sync-state="saved" data-sync-text="已同步"><head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="only light">
+    <meta name="darkreader-lock">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装修小账本 - 瓷砖用量</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif; background:#f0f2f5; color:#1a1a2e; min-height: 100vh; }
+        .navbar{background:white;border-bottom:1px solid #e8e8e8;padding:0 20px;display:flex;align-items:center;height:56px;position:sticky;top:0;z-index:100}
+        .nav-brand{font-size:17px;font-weight:700;color:#e45b3f;margin-right:28px;white-space:nowrap}
+        .nav-links { display: flex; gap: 4px; }
+        .nav-links a{padding:8px 14px;border-radius:10px;font-size:13px;color:#666;text-decoration:none;transition:all .2s;white-space:nowrap}
+        .nav-links a:hover{background:#f5f5f5}
+        .nav-links a.active { background: #fff0ea; color: #e45b3f; font-weight: 600; }
+        .container { max-width: 600px; margin: 0 auto; padding: 24px; }
+        h1 { font-size: 22px; margin-bottom: 4px; color: #2d3748; }
+        .subtitle { color: #999; font-size: 13px; margin-bottom: 24px; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .card h3 { font-size: 15px; color: #333; margin-bottom: 16px; }
+        .row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .input-group { flex: 1; }
+        .input-group label { display: block; font-size: 12px; color: #999; margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; font-size: 14px; background: #fafafa; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #447c5b; box-shadow:0 0 0 3px rgba(68,124,91,.1); }
+        .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+        .size-btn { padding: 10px 8px; border: 1px solid #eee; border-radius: 8px; background: white; cursor: pointer; text-align: center; font-size: 12px; }
+        .size-btn.active { border-color: #8ebaa1; background: #eef7f1; color: #2f7756; font-weight: 700; }
+        .result { background: #eef7f1; border-radius: 10px; padding: 20px; margin-top: 16px; }
+        .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8f0fe; font-size: 14px; }
+        .result-row:last-child { border-bottom: none; }
+        .result-row .val { font-weight: 600; color: #333; }
+        .result-row.total { font-size: 16px; font-weight: 700; color: #2f7756; }
+        .room-list { margin-top: 12px; }
+        .room-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+        .room-item:last-child { border-bottom: none; }
+        .room-item .del { background: none; border: none; color: #ccc; cursor: pointer; }
+        .room-item .del:hover { color: #e53e3e; }
+        .add-room { display: flex; gap: 8px; margin-top: 10px; }
+        .add-room input { flex: 1; padding: 8px; border: 1px solid #eee; border-radius: 6px; font-size: 13px; }
+        .add-room button { padding: 8px 14px; border: none; border-radius: 6px; background: #447c5b; color: white; font-size: 13px; cursor: pointer; }
+        .area-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 14px;padding:4px;border:1px solid #e5e2dd;border-radius:10px;background:#f7f6f3}
+        .area-mode-switch button{min-height:36px;border:0;border-radius:7px;background:transparent;color:#6d6761;font-size:13px;font-weight:700;cursor:pointer}
+        .area-mode-switch button.active{background:#fff;color:#2f7756;box-shadow:0 2px 8px rgba(47,119,86,.1)}
+        .room-method[hidden]{display:none}
+        .room-add-action{width:100%;min-height:42px;border:0;border-radius:8px;background:#447c5b;color:#fff;font-size:13px;font-weight:750;cursor:pointer}
+        .tip { background: #f0fff4; border-left: 3px solid #48bb78; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-top: 16px; font-size: 13px; color: #666; line-height: 1.6; }
+        @media (max-width: 768px) { .nav-links { overflow-x: auto; } .size-grid { grid-template-columns: repeat(3, 1fr); } }
+            
+        
+        .nav-more-btn:hover{background:#f0f2f5}
+        
+        
+        
+        
+        .bottom-tab{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8e8e8;z-index:100;padding:6px 0 env(safe-area-inset-bottom,8px)}
+        .bottom-tab-inner{display:flex;justify-content:space-around;max-width:500px;margin:0 auto}
+        .bottom-tab a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#999;font-size:10px;padding:4px 8px;border-radius:8px;transition:all .15s}
+        .bottom-tab a.active{color:#e45b3f}
+        .bottom-tab a .tab-icon{font-size:20px}    </style>
+    <link rel="stylesheet" href="fresh-theme.css?v=20260814-personal-ux-v1">
+    <link rel="stylesheet" href="personal-enterprise.css?v=20261108-narrowfix" data-personal-enterprise="">
+    <script src="fresh-shell.js?v=20261108-accountlink" defer=""></script>
+<link rel="stylesheet" href="assets/yellow/personal-tools.css?v=20261015">
+<link rel="icon" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="assets/icons/icons.css?v=20261023">
+  <script src="assets/icons/image-fallback.js?v=20261023" defer=""></script>
+<script src="platform-entry.js?v=20260801-mobile-reminder-v1" data-platform-entry="true"></script><style id="freshProjectStyles">.fresh-project-card{display:grid;gap:7px;margin:4px 8px 8px 42px;padding:9px 10px;border:1px solid #ece7e2;border-radius:8px;background:#fffdfb}.fresh-project-nav{display:grid;grid-template-columns:minmax(116px,160px) auto;align-items:center;gap:6px;margin:0;padding:0;border:0;background:transparent}.fresh-project-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}.fresh-project-nav .fresh-project-head{display:block;order:2}.fresh-project-head b{font-size:13px;color:#202124;white-space:nowrap}.fresh-project-nav .fresh-project-head b,.fresh-project-nav small{display:none}.fresh-project-head button{height:30px;padding:0 10px;border:1px solid #f0d6cc;border-radius:7px;background:#fff0ea;color:#e45b3f;font-size:12px;font-weight:800;cursor:pointer}.fresh-project-nav .fresh-project-head button{height:34px;white-space:nowrap}.fresh-project-select{width:100%;height:32px;padding:0 8px;border:1px solid #ece7e2;border-radius:7px;background:#fff;color:#202124;font-size:13px}.fresh-project-nav .fresh-project-select{order:1;height:34px;background:#fff}.fresh-project-card small{color:#9b928b;font-size:11px;line-height:1.35}.fresh-project-toggle{display:none;width:38px;height:38px;border:1px solid #f0d6cc;border-radius:12px;background:#fff;color:#e45b3f;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(55,42,31,.05);cursor:pointer}.fresh-project-toggle svg{width:18px;height:18px}.fresh-project-popover[hidden]{display:none}.fresh-project-popover{position:fixed;right:12px;top:58px;z-index:1500;width:min(330px,calc(100vw - 24px));padding:12px;border:1px solid #ece7e2;border-radius:12px;background:#fffdfb;box-shadow:0 18px 46px rgba(55,42,31,.16);display:grid;gap:9px}.fresh-project-popover-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.fresh-project-popover-head b{font-size:14px;color:#202124}.fresh-project-popover .fresh-project-select{height:38px}.fresh-project-popover .fresh-project-new{height:38px;border:1px solid #f0d6cc;border-radius:8px;background:#fff0ea;color:#e45b3f;font-size:13px;font-weight:850;cursor:pointer}.fresh-project-popover small{color:#9b928b;font-size:12px;line-height:1.45}@media(max-width:860px){.fresh-project-nav{grid-template-columns:minmax(96px,1fr) auto;width:100%;grid-column:1/-1;order:8}.fresh-project-nav .fresh-project-head button{padding:0 8px}}@media(max-width:680px){.fresh-navbar{grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;min-height:58px!important}.fresh-navbar .fresh-brand{width:40px!important;min-width:40px!important;overflow:hidden!important}.fresh-navbar .fresh-brand>span:not(.fresh-iconbox){display:none!important}.fresh-navbar .fresh-nav-actions{grid-column:2!important;display:flex!important;gap:6px!important;width:100%!important;align-items:center!important;justify-content:flex-end!important}.fresh-project-nav{display:none!important}.fresh-project-toggle{display:inline-flex!important;order:2}.fresh-navbar .fresh-notice-link{order:3}.fresh-navbar .fresh-account{order:1;max-width:calc(100vw - 190px)!important}.fresh-navbar .fresh-user-link{max-width:150px!important;padding:0 10px!important}.fresh-navbar .fresh-user-link span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.fresh-project-popover{top:56px}}.fresh-project-dialog[hidden]{display:none}.fresh-project-dialog{position:fixed;inset:0;z-index:2600;display:grid;place-items:center;padding:18px}.fresh-project-backdrop{position:absolute;inset:0;background:rgba(32,33,36,.35);backdrop-filter:blur(6px)}.fresh-project-panel{position:relative;width:min(420px,100%);display:grid;gap:12px;padding:22px;border:1px solid #ece7e2;border-radius:12px;background:#fffdfb;box-shadow:0 24px 70px rgba(55,42,31,.22)}.fresh-project-panel h2{margin:0;color:#202124;font-size:20px}.fresh-project-panel p{margin:0;color:#68615b;font-size:14px;line-height:1.7}.fresh-project-panel input{height:40px;padding:0 12px;border:1px solid #ece7e2;border-radius:8px;font-size:14px;outline:none}.fresh-project-panel input:focus{border-color:#e45b3f;box-shadow:0 0 0 3px rgba(228,91,63,.08)}.fresh-project-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}.fresh-project-actions button{height:36px;padding:0 14px;border:1px solid #ece7e2;border-radius:8px;background:#fff;color:#68615b;font-size:13px;font-weight:800;cursor:pointer}.fresh-project-actions .primary{border-color:#e45b3f;background:#e45b3f;color:#fff}.fresh-project-error{color:#c94b3f;font-size:12px;line-height:1.5}.fresh-project-head-actions{display:flex;gap:5px}.fresh-project-nav .fresh-project-head-actions{justify-content:flex-end}.fresh-project-popover-head .fresh-project-head-actions button{height:34px;padding:0 9px;border:1px solid #f0d6cc;border-radius:8px;background:#fff0ea;color:#e45b3f;font-size:12px;font-weight:800;cursor:pointer}.fresh-project-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fresh-project-fields label{display:grid;gap:5px;color:#68615b;font-size:12px;font-weight:700}.fresh-project-fields label:first-child{grid-column:1/-1}.fresh-project-fields input,.fresh-project-fields select{width:100%;height:40px;padding:0 10px;border:1px solid #ece7e2;border-radius:8px;background:#fff;color:#202124;box-sizing:border-box;font-size:14px;outline:none}.fresh-project-fields input:focus,.fresh-project-fields select:focus{border-color:#e45b3f;box-shadow:0 0 0 3px rgba(228,91,63,.08)}@media(max-width:520px){.fresh-project-fields{grid-template-columns:1fr}}.fresh-enterprise-switch{min-height:38px;padding:0 13px;display:inline-flex;align-items:center;gap:7px;border:1px solid #efc6b9;border-radius:10px;background:#fff0ea;color:#c94f36;font-size:13px;font-weight:850;text-decoration:none;white-space:nowrap;box-shadow:0 8px 20px rgba(228,91,63,.10);transition:transform .18s ease,background .18s ease}.fresh-enterprise-switch:hover{background:#ffe6dc;transform:translateY(-1px)}.fresh-enterprise-switch svg{width:17px;height:17px}.fresh-customer-switch{border-color:#cfe5d7;background:#eef7f1;color:#397457;box-shadow:0 8px 20px rgba(63,140,94,.10)}.fresh-customer-switch:hover{background:#e3f2e9}@media(max-width:680px){.fresh-enterprise-switch{width:38px;min-width:38px;padding:0;justify-content:center}.fresh-enterprise-switch span{display:none}}</style></head>
+<body class="page-tile-quantity personal-enterprise-shell fresh-shell-ready" data-inspector-id="html:e8048d86:1"><aside class="fresh-sidebar"><a class="fresh-brand" href="home.html"><span class="fresh-brand-mark"><img src="assets/yellow/logo.svg" alt=""></span><span><b>装修小账本</b></span></a><nav class="fresh-navlinks" aria-label="个人版导航"><span class="fresh-nav-label">我的装修</span><a href="home.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M4.5 11.5 12 5l7.5 6.5"></path><path d="M6.5 10.5V20h4.2v-5.2h2.6V20h4.2v-9.5"></path></svg><span>今日总览</span></a><a href="process.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4h10v5H7zM7 15h10v5H7zM12 9v6"></path></svg><span>装修流程</span></a><a href="procurement.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M6.6 7.4h12.2l-1.4 7H8.7L7.5 4.8H5"></path><circle cx="10" cy="18.7" r=".8"></circle><circle cx="16.8" cy="18.7" r=".8"></circle></svg><span>采购清单</span></a><a href="materials.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5.5 7.5h13A1.5 1.5 0 0 1 20 9v9.2A1.8 1.8 0 0 1 18.2 20H5.8A1.8 1.8 0 0 1 4 18.2V6.8A1.8 1.8 0 0 1 5.8 5h11.7"></path><path d="M15.5 13h4.5"></path><circle cx="16.2" cy="13" r=".7"></circle></svg><span>装修记账</span></a><a href="compare.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg><span>比价选品</span></a><span class="fresh-nav-label fresh-nav-label-support">辅助工具</span><a href="tools.html" class="active" aria-current="page"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M14.9 6.2a4.2 4.2 0 0 0-5.2 5.2l-4.9 4.9a1.9 1.9 0 0 0 2.7 2.7l4.9-4.9a4.2 4.2 0 0 0 5.2-5.2l-3 3-2.7-2.7z"></path></svg><span>实用工具</span></a><a href="diary.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M6 4h11a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><path d="M8 8h7M8 12h7M8 16h4"></path></svg><span>装修日记</span></a><a href="shuidian.html" class=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M7 4.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5z"></path><path d="M14 4.8V9h4.2M9 13h6M9 16.5h4"></path></svg><span>水电知识</span></a></nav><div class="fresh-sidebar-note"><span></span><p><b>装修小提醒</b><small>重要节点先确认，付款与验收都留档。</small></p></div><div class="fresh-nav-actions"><button class="fresh-platform-link" type="button" data-mini-program-entry=""><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M8.5 11.5V7a3.5 3.5 0 1 1 3.5 3.5H8.5a3.5 3.5 0 1 0 3.5 3.5V9.5"></path></svg><span><b>微信小程序</b><small>手机随时记录</small></span></button><a href="account.html"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号管理</span></a></div></aside><header class="fresh-topbar"><div class="fresh-header-project" data-project-host=""><section class="fresh-project-card fresh-project-nav" aria-label="项目管理"><div class="fresh-project-head"><b>项目</b><span class="fresh-project-head-actions"><button type="button" data-account-action="edit-project">项目资料</button></span></div><select class="fresh-project-select" data-project-select="" aria-label="切换装修项目"><option value="4a259235-6ce3-4fcd-b5f2-d190aba028d2">我的装修</option></select><small>不同项目之间的数据相互独立。</small></section></div><div class="fresh-topbar-copy"><small>实用工具 / 面积与用量</small><strong>瓷砖用量计算器</strong></div><div class="fresh-topbar-actions"><a class="fresh-enterprise-switch" href="enterprise.html" title="查看企业版开通或加入方式" aria-label="进入装修小账本企业版"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>企业版 · 开通</span></a><button type="button" class="fresh-project-toggle" title="切换项目" aria-label="切换项目"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg></button><div class="fresh-account"><a class="fresh-user-link" href="#" title="账号菜单" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号：xwq</span></a><div class="fresh-account-menu" role="menu" hidden=""><div class="fresh-account-user"><b>xwq</b><span>普通用户账号</span></div><div class="fresh-account-status" data-state="saved"><i></i><span>已同步</span></div><section class="fresh-douyin-card" aria-label="抖音关注"><div class="fresh-douyin-head"><span class="fresh-douyin-logo"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5.5 7.5h9A2.5 2.5 0 0 1 17 10v4a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 3 14v-4a2.5 2.5 0 0 1 2.5-2.5z"></path><path d="m17 11 4-2.5v7L17 13"></path></svg></span><div><b>关注我的抖音</b><span>装修避坑和选品经验</span></div></div><div class="fresh-douyin-main"><div class="fresh-douyin-qr"><img src="assets/brand/douyin-qr-thumb.png" alt="金大金自装日记抖音二维码" loading="lazy"></div><div class="fresh-douyin-copy"><p><b>主包为爱发电</b><span>网站对你有帮助的话<br>抖音点个免费关注吧</span></p><strong>@金大金自装日记</strong></div></div></section><a href="enterprise.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>绑定装修公司</span></a><a href="enterprise.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5V3h8v2M8 10h8M8 14h5"></path></svg><span>企业版 · 开通</span></a><a href="account.html" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg><span>账号管理</span></a><button type="button" data-account-action="clear" class="account-danger" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 10v8M12 10v8M16 10v8M7 7l1 14h8l1-14"></path></svg><span>清空数据</span></button><button type="button" data-account-action="switch" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M5 7h12M14 4l3 3-3 3M19 17H7M10 14l-3 3 3 3"></path></svg><span>切换账号</span></button><button type="button" data-account-action="logout" role="menuitem"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></svg><span>退出登录</span></button></div></div><div class="fresh-global-search"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg><input type="search" data-shell-search="" aria-label="搜索本页内容或功能" placeholder="搜索本页内容或功能"><span class="fresh-search-status" role="status" aria-live="polite"></span></div><a class="fresh-topbar-primary" href="home.html"><svg viewBox="0 0 24 24" class="fresh-svg" aria-hidden="true"><path d="M4.5 11.5 12 5l7.5 6.5"></path><path d="M6.5 10.5V20h4.2v-5.2h2.6V20h4.2v-9.5"></path></svg><span>返回总览</span></a></div></header>  <div class="container" data-inspector-id="html:e8048d86:10"> <header class="yellow-tool-heading" data-inspector-id="html:e8048d86:11"><div data-inspector-id="html:e8048d86:12"><h1 data-inspector-id="html:e8048d86:13"> 瓷砖用量计算器</h1> <p class="subtitle" data-inspector-id="html:e8048d86:14">计算房间面积和瓷砖用量</p></div><a class="yellow-tool-back" href="tools.html" data-inspector-id="html:e8048d86:15">返回工具</a></header> <div class="yellow-calc-columns" data-inspector-id="html:e8048d86:16">
+<div class="card" data-inspector-id="html:e8048d86:17"> <h3 data-inspector-id="html:e8048d86:18">瓷砖规格</h3> <div class="size-grid" id="sizeGrid" data-inspector-id="html:e8048d86:19"><div class="size-btn " onclick="selectSize(0)" data-inspector-id="html:e8048d86:20">300×300</div><div class="size-btn " onclick="selectSize(1)" data-inspector-id="html:e8048d86:21">300×600</div><div class="size-btn active" onclick="selectSize(2)" data-inspector-id="html:e8048d86:22">600×600</div><div class="size-btn " onclick="selectSize(3)" data-inspector-id="html:e8048d86:23">750×1500</div><div class="size-btn " onclick="selectSize(4)" data-inspector-id="html:e8048d86:24">800×800</div><div class="size-btn " onclick="selectSize(5)" data-inspector-id="html:e8048d86:25">600×1200</div><div class="size-btn " onclick="selectSize(6)" data-inspector-id="html:e8048d86:26">900×1800</div><div class="size-btn " onclick="selectSize(7)" data-inspector-id="html:e8048d86:27">200×1000</div></div> <div class="row" data-inspector-id="html:e8048d86:28"> <div class="input-group" data-inspector-id="html:e8048d86:29"><label data-inspector-id="html:e8048d86:30">自定义规格 长(mm)</label><input type="number" id="customL" placeholder="如 800" data-inspector-id="html:e8048d86:31"></div> <div class="input-group" data-inspector-id="html:e8048d86:32"><label data-inspector-id="html:e8048d86:33">宽(mm)</label><input type="number" id="customW" placeholder="如 800" data-inspector-id="html:e8048d86:34"></div> </div>
+<div class="yellow-tile-illustration" aria-hidden="true" data-inspector-id="html:e8048d86:35"><i data-inspector-id="html:e8048d86:36"></i><i data-inspector-id="html:e8048d86:37"></i><i data-inspector-id="html:e8048d86:38"></i><i data-inspector-id="html:e8048d86:39"></i><i data-inspector-id="html:e8048d86:40"></i><i data-inspector-id="html:e8048d86:41"></i><i data-inspector-id="html:e8048d86:42"></i><i data-inspector-id="html:e8048d86:43"></i><i data-inspector-id="html:e8048d86:44"></i></div> </div> <div class="card" data-inspector-id="html:e8048d86:45"> <h3 data-inspector-id="html:e8048d86:46">添加房间</h3> <div class="area-mode-switch" role="tablist" aria-label="面积输入方式" data-inspector-id="html:e8048d86:47"> <button type="button" class="active" id="areaModeDirect" onclick="setAreaMode('direct')" data-inspector-id="html:e8048d86:48">直接填写面积</button> <button type="button" id="areaModeDimensions" onclick="setAreaMode('dimensions')" data-inspector-id="html:e8048d86:49">按长宽计算</button> </div> <div class="row" data-inspector-id="html:e8048d86:50"> <div class="input-group" data-inspector-id="html:e8048d86:51"><label data-inspector-id="html:e8048d86:52">房间名称</label><input type="text" id="roomName" placeholder="如：客厅" data-inspector-id="html:e8048d86:53"></div> </div> <div class="room-method" id="directAreaFields" data-inspector-id="html:e8048d86:54"> <div class="row" data-inspector-id="html:e8048d86:55"> <div class="input-group" data-inspector-id="html:e8048d86:56"><label data-inspector-id="html:e8048d86:57">面积(m²)</label><input type="number" id="roomArea" placeholder="如 20" step="0.1" data-inspector-id="html:e8048d86:58"></div> </div> </div> <div class="room-method" id="dimensionAreaFields" hidden="" data-inspector-id="html:e8048d86:59"> <div class="row" data-inspector-id="html:e8048d86:60"> <div class="input-group" data-inspector-id="html:e8048d86:61"><label data-inspector-id="html:e8048d86:62">长(m)</label><input type="number" id="roomL" placeholder="如 5" step="0.1" data-inspector-id="html:e8048d86:63"></div> <div class="input-group" data-inspector-id="html:e8048d86:64"><label data-inspector-id="html:e8048d86:65">宽(m)</label><input type="number" id="roomW" placeholder="如 4" step="0.1" data-inspector-id="html:e8048d86:66"></div> </div> </div> <button type="button" class="room-add-action" onclick="addRoom()" data-inspector-id="html:e8048d86:67">计算并添加房间</button> <div class="room-list" id="roomList" data-inspector-id="html:e8048d86:68"></div> <div class="tip" data-inspector-id="html:e8048d86:69"> <b data-inspector-id="html:e8048d86:70"> 说明：</b>损耗率按 5%~10% 计算（异形铺贴建议 10%）。瓷砖一般按片购买，不足1片按1片算。 </div> </div> </div>
+<div class="card" id="resultCard" style="display:none" data-inspector-id="html:e8048d86:71"> <h3 data-inspector-id="html:e8048d86:72">计算结果</h3> <div class="row" style="margin-bottom:10px"> <div class="input-group"><label>损耗率</label><select id="lossRateSelect" onchange="renderResult()"> <option value="0.05">5% · 方正通铺</option> <option value="0.08" selected>8% · 常规</option> <option value="0.10">10% · 异形/大板</option> </select></div> </div> <div id="resultContent" data-inspector-id="html:e8048d86:73"></div> </div> </div> <script>
+        const SIZES = [
+            { l: 300, w: 300, label: '300×300' },
+            { l: 300, w: 600, label: '300×600' },
+            { l: 600, w: 600, label: '600×600' },
+            { l: 750, w: 1500, label: '750×1500' },
+            { l: 800, w: 800, label: '800×800' },
+            { l: 600, w: 1200, label: '600×1200' },
+            { l: 900, w: 1800, label: '900×1800' },
+            { l: 200, w: 1000, label: '200×1000' },
+        ];
+
+        let selectedSize = SIZES[2]; // 默认600x600
+        let rooms = [];
+        let areaMode = 'direct';
+
+        function setAreaMode(mode) {
+            areaMode = mode === 'dimensions' ? 'dimensions' : 'direct';
+            document.getElementById('directAreaFields').hidden = areaMode !== 'direct';
+            document.getElementById('dimensionAreaFields').hidden = areaMode !== 'dimensions';
+            document.getElementById('areaModeDirect').classList.toggle('active', areaMode === 'direct');
+            document.getElementById('areaModeDimensions').classList.toggle('active', areaMode === 'dimensions');
+            (areaMode === 'direct' ? document.getElementById('roomArea') : document.getElementById('roomL')).focus();
+        }
+
+        function renderSizeGrid() {
+            document.getElementById('sizeGrid').innerHTML = SIZES.map((s, i) =>
+                `<div class="size-btn ${selectedSize === s ? 'active' : ''}" onclick="selectSize(${i})">${s.label}</div>`
+            ).join('');
+        }
+
+        function selectSize(i) {
+            selectedSize = SIZES[i];
+            manualBox = null;
+            document.getElementById('customL').value = '';
+            document.getElementById('customW').value = '';
+            /* 大板（长边≥750 或 宽边≥1500）默认按 10% 损耗，减少切割废料低估 */
+            const lossSelect = document.getElementById('lossRateSelect');
+            if (lossSelect) lossSelect.value = (selectedSize.l >= 750 || selectedSize.w >= 1500) ? '0.10' : '0.08';
+            renderSizeGrid();
+            renderResult();
+            saveTile();
+        }
+
+        // 自定义规格
+        document.getElementById('customL').addEventListener('input', function () {
+            const l = parseInt(this.value), w = parseInt(document.getElementById('customW').value);
+            if (l > 0 && w > 0) { selectedSize = { l, w, label: `${l}×${w}` }; manualBox = null; renderSizeGrid(); renderResult(); }
+        });
+        document.getElementById('customW').addEventListener('input', function () {
+            const l = parseInt(document.getElementById('customL').value), w = parseInt(this.value);
+            if (l > 0 && w > 0) { selectedSize = { l, w, label: `${l}×${w}` }; manualBox = null; renderSizeGrid(); renderResult(); }
+        });
+
+        function calcArea() {
+            const l = parseFloat(document.getElementById('roomL').value);
+            const w = parseFloat(document.getElementById('roomW').value);
+            if (l > 0 && w > 0) {
+                document.getElementById('roomArea').value = (l * w).toFixed(1);
+            }
+        }
+
+        function addRoom() {
+            const name = document.getElementById('roomName').value.trim() || '房间' + (rooms.length + 1);
+            let area = parseFloat(document.getElementById('roomArea').value);
+            if (areaMode === 'dimensions') {
+                const l = parseFloat(document.getElementById('roomL').value);
+                const w = parseFloat(document.getElementById('roomW').value);
+                if (!(l > 0) || !(w > 0)) { alert('请输入有效的房间长和宽'); return; }
+                area = l * w;
+            }
+            if (!area || area <= 0) { alert('请输入有效的房间面积'); return; }
+            rooms.push({ id: Date.now(), name, area });
+            document.getElementById('roomName').value = '';
+            document.getElementById('roomArea').value = '';
+            document.getElementById('roomL').value = '';
+            document.getElementById('roomW').value = '';
+            renderRooms();
+            renderResult();
+        }
+
+        function removeRoom(id) {
+            rooms = rooms.filter(r => r.id !== id);
+            renderRooms();
+            renderResult();
+        }
+
+        function renderRooms() {
+            const el = document.getElementById('roomList');
+            if (rooms.length === 0) { el.innerHTML = ''; saveTile(); return; }
+            el.innerHTML = rooms.map(r =>
+                `<div class="room-item"><span style="flex:1">${r.name}</span><span style="color:#999">${r.area}m²</span><button class="del" onclick="removeRoom(${r.id})" aria-label="关闭或删除"><img class=xz-icon src=assets/icons/close.svg alt aria-hidden=true></button></div>`
+            ).join('');
+        }
+
+        /* 常见箱规（片/箱），仅作估算；实际以门店整箱规格为准 */
+        const BOX_SPEC = {
+            '300×300': 11, '300×600': 8, '600×600': 4, '750×1500': 2,
+            '800×800': 3, '600×1200': 2, '900×1800': 2, '200×1000': 5
+        };
+
+        function boxSpecOf(size) {
+            if (BOX_SPEC[size.label]) return BOX_SPEC[size.label];
+            const long = Math.max(size.l, size.w);
+            if (long >= 1200) return 2;
+            if (long >= 750) return 3;
+            return 4;
+        }
+
+        /* 用户手填的每箱片数；为空时回落到常见箱规 */
+        let manualBox = null;
+
+        function setBoxPerBox(v) {
+            const n = parseInt(v, 10);
+            manualBox = n > 0 ? n : null;
+            renderResult();
+            saveTile();
+        }
+
+        function saveTile() {
+            try {
+                const lr = document.getElementById('lossRateSelect');
+                localStorage.setItem('xzreplica.tileCalc', JSON.stringify({
+                    rooms: rooms, sizeLabel: selectedSize.label,
+                    loss: lr ? (parseFloat(lr.value) || 0.08) : 0.08,
+                    boxPerBox: manualBox || 0
+                }));
+            } catch (e) {}
+        }
+
+        function renderResult() {
+            if (rooms.length === 0) { document.getElementById('resultCard').style.display = 'none'; return; }
+            document.getElementById('resultCard').style.display = 'block';
+
+            const tileArea = (selectedSize.l / 1000) * (selectedSize.w / 1000); // 每片面积 m²
+            const totalArea = rooms.reduce((s, r) => s + r.area, 0);
+            const lossSelect = document.getElementById('lossRateSelect');
+            const lossRate = lossSelect ? (parseFloat(lossSelect.value) || 0.08) : 0.08;
+            const totalWithLoss = totalArea * (1 + lossRate);
+            const tilesNeeded = Math.ceil(totalWithLoss / tileArea);
+
+            let html = `<div class="result-row"><span>瓷砖规格</span><span class="val">${selectedSize.label}mm</span></div>`;
+            html += `<div class="result-row"><span>每片面积</span><span class="val">${tileArea.toFixed(3)}m²</span></div>`;
+            html += `<div class="result-row"><span>房间总面积</span><span class="val">${totalArea.toFixed(1)}m²</span></div>`;
+            html += `<div class="result-row"><span>含损耗(${Math.round(lossRate * 100)}%)</span><span class="val">${totalWithLoss.toFixed(1)}m²</span></div>`;
+            html += `<div class="result-row total"><span>需要瓷砖</span><span class="val">${tilesNeeded} 片</span></div>`;
+
+            // 按箱计算：用户手填优先，否则按规格取常见箱规
+            const perBox = (manualBox && manualBox > 0) ? manualBox : boxSpecOf(selectedSize);
+            const boxes = Math.ceil(tilesNeeded / perBox);
+            html += `<div class="result-row"><span>每箱片数</span><span class="val"><input id="boxPerBox" type="number" min="1" step="1" value="${perBox}" onchange="setBoxPerBox(this.value)" aria-label="每箱片数" style="width:64px;padding:4px 6px;border:1px solid #eee;border-radius:6px;text-align:right;font-size:13px"></span></div>`;
+            html += `<div class="result-row total"><span>预计箱数</span><span class="val">${boxes} 箱</span></div>`;
+            html += `<div class="result-row" style="color:#999;font-size:12px"><span>箱规为常见参考值，下单前请与门店核对</span><span class="val"></span></div>`;
+            if (Math.max(selectedSize.l, selectedSize.w) >= 750) {
+                html += `<div class="result-row" style="color:#999;font-size:12px"><span>大板建议让商家出排版图，按图核算损耗</span><span class="val"></span></div>`;
+            }
+
+            document.getElementById('resultContent').innerHTML = html;
+            saveTile();
+        }
+
+        try {
+            const savedTile = JSON.parse(localStorage.getItem('xzreplica.tileCalc') || 'null');
+            if (savedTile) {
+                if (Array.isArray(savedTile.rooms)) rooms = savedTile.rooms.filter(r => r && typeof r.area === 'number');
+                const hit = SIZES.filter(s => s.label === savedTile.sizeLabel)[0];
+                if (hit) selectedSize = hit;
+                const lr = document.getElementById('lossRateSelect');
+                if (lr && savedTile.loss) lr.value = String(savedTile.loss);
+                if (savedTile.boxPerBox > 0) manualBox = parseInt(savedTile.boxPerBox, 10);
+            }
+        } catch (e) {}
+        renderSizeGrid();
+        renderRooms();
+        renderResult();
+    </script> <!-- 底部Tab栏（移动端） -->  <!-- Toast提示 --> <div id="toast" style="display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:10px 20px;border-radius:10px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .3s" data-inspector-id="html:e8048d86:86"></div> <div class="fresh-project-popover" hidden=""><div class="fresh-project-popover-head"><b>项目</b><span class="fresh-project-head-actions"><button type="button" data-account-action="edit-project">项目资料</button></span></div><select class="fresh-project-select" data-project-select="" aria-label="切换装修项目"><option value="4a259235-6ce3-4fcd-b5f2-d190aba028d2">我的装修</option></select><small>不同项目之间的数据相互独立。</small></div></body></html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 采购清单</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 采购清单（对齐原版 purchase 页） */
+    .workflow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin: 0 0 26px; }
+    .workflow-heading h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; line-height: 1.4; }
+    .workflow-heading p { margin: 0; color: var(--text-3); font-size: 14px; }
+    .workflow-heading .btn {
+      min-height: 0;
+      padding: 11px 17px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+
+    .workflow-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 124px;
+      padding: 26px 28px;
+      margin: 0 0 24px;
+      border-radius: 18px;
+      background: linear-gradient(118deg, #FFE96E, #FFE347);
+    }
+    .workflow-summary-counts { display: flex; gap: 56px; }
+    .workflow-summary-count .value { font-size: 32px; font-weight: 500; line-height: 1.2; }
+    .workflow-summary-count .label { margin-top: 6px; color: #786825; font-size: 13px; }
+    .workflow-summary .btn {
+      min-height: 0;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 11px;
+      background: #FFFDF0;
+      color: #414744;
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+
+    .purchase-quick-add {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 160px 90px 120px auto;
+      gap: 10px;
+      padding: 14px;
+      margin: 0 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .workflow-tabs { display: flex; gap: 26px; margin: 0 0 18px; border-bottom: 1px solid var(--line); }
+    .workflow-tabs button { position: relative; padding: 10px 0 12px; border: 0; background: none; color: var(--text-3); font-size: 14px; font-weight: 500; }
+    .workflow-tabs button.active { color: var(--text); font-weight: 600; }
+    .workflow-tabs button.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: #E9C93F; }
+
+    .purchase-stage-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
+    .purchase-stage-chips button {
+      min-height: 34px;
+      padding: 0 15px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #F6F6F6;
+      color: var(--text-2);
+      font-size: 13px;
+    }
+    .purchase-stage-chips button.active { background: #FFF7D6; color: #75642C; font-weight: 600; }
+
+    .purchase-panel { border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .purchase-panel-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 22px 24px 14px; }
+    .purchase-panel-hd h2 { margin: 0; font-size: 19px; font-weight: 600; }
+    .purchase-panel-hd p { margin: 5px 0 0; color: var(--text-3); font-size: 13px; }
+    .purchase-panel-hd .btn { min-height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 600; box-shadow: none; }
+    .purchase-panel > #buyList, .purchase-panel > #libCats { padding: 0 10px; }
+    .purchase-panel > .empty { padding: 30px 10px; }
+
+    .purchase-table { width: 100%; border-collapse: collapse; }
+    .purchase-table th { padding: 11px 12px; border-bottom: 1px solid var(--line); color: var(--text-3); font-size: 12px; font-weight: 500; text-align: left; }
+    .purchase-table td { padding: 13px 12px; border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: middle; }
+    .purchase-table tr:last-child td { border-bottom: 0; }
+    .purchase-table .c-check { width: 46px; }
+    .purchase-table .c-qty { width: 12%; white-space: nowrap; }
+    .purchase-table .c-price { width: 15%; white-space: nowrap; }
+    .purchase-table .price-input {
+      width: 78px;
+      padding: 4px 6px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fafafa;
+      color: var(--text);
+      font-size: 13px;
+      text-align: right;
+    }
+    .purchase-table .price-input:focus { outline: none; border-color: #E9C93F; background: #fff; }
+    .purchase-table .price-input::-webkit-outer-spin-button,
+    .purchase-table .price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .purchase-table .price-sub { display: block; margin-top: 4px; color: var(--text-3); font-size: 12px; }
+    .purchase-table .c-status { width: 12%; }
+    .purchase-table .c-op { width: 9%; text-align: right; }
+    .purchase-table .nm { font-size: 13px; font-weight: 600; }
+    .purchase-table tr.bought .nm { color: var(--text-3); text-decoration: line-through; }
+    .purchase-table .status { display: inline-flex; padding: 2px 9px; border-radius: 6px; background: #F4F4F4; color: var(--text-2); font-size: 12px; }
+    .purchase-table .status.picked { background: #EAF5EE; color: var(--green); }
+    .purchase-table .op { padding: 4px; border: 0; background: none; color: #c4bab2; }
+    .purchase-table .op:hover { color: var(--red); }
+
+    .lib-cat + .lib-cat { border-top: 1px solid var(--line); }
+    .lib-cat-hd {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 15px 12px;
+      border: 0;
+      background: none;
+      text-align: left;
+    }
+    .lib-cat-hd .nm { font-size: 14px; font-weight: 600; }
+    .lib-cat-hd .cnt { color: var(--text-3); font-size: 12px; }
+    .lib-cat-hd .arr { margin-left: auto; color: var(--text-3); font-size: 14px; transition: transform .18s; }
+    .lib-cat.open .lib-cat-hd .arr { transform: rotate(90deg); }
+    .lib-cat-bd { display: none; padding: 0 12px 6px; }
+    .lib-cat.open .lib-cat-bd { display: block; }
+
+    .pick-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 24px 20px;
+      color: var(--text-3);
+      font-size: 12px;
+    }
+    .pick-summary a { color: #8B7425; text-decoration: none; }
+
+    @media (max-width: 860px) {
+      .workflow-summary { flex-direction: column; align-items: flex-start; }
+      .workflow-summary-counts { gap: 32px; }
+      .purchase-quick-add { grid-template-columns: 1fr 1fr; }
+      .purchase-quick-add #qaName { grid-column: 1 / -1; }
+
+      /* 移动端采购表卡片化：状态与删除均保留 */
+      .purchase-table thead { display: none; }
+      .purchase-table, .purchase-table tbody, .purchase-table tr, .purchase-table td { display: block; width: auto; }
+      .purchase-table tr { position: relative; padding: 12px 0 12px 34px; border-bottom: 1px solid var(--line); }
+      .purchase-table tr:last-child { border-bottom: 0; }
+      .purchase-table td {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 3px 0;
+        border: 0;
+        text-align: right;
+      }
+      .purchase-table td::before {
+        content: attr(data-label);
+        flex: none;
+        color: var(--text-3);
+        font-size: 12px;
+        text-align: left;
+      }
+      .purchase-table td.c-check, .purchase-table td.c-qty, .purchase-table td.c-status,
+      .purchase-table td.c-op, .purchase-table td.c-name, .purchase-table td.c-price { width: auto; }
+      .purchase-table td.c-price .price-input { text-align: right; }
+      .purchase-table td.c-price .price-sub { margin-top: 0; }
+      .purchase-table td.c-check { position: absolute; left: 0; top: 12px; width: auto; padding: 0; }
+      .purchase-table td.c-name { justify-content: flex-start; padding-bottom: 4px; font-size: 14px; }
+      .purchase-table td.c-name::before, .purchase-table td.c-op::before { display: none; }
+      .purchase-table td.c-op { position: absolute; right: 0; top: 8px; width: auto; padding: 0; }
+      .purchase-table td.c-status { display: flex; }
+      .purchase-table td.c-status .status { flex: none; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="workflow-heading">
+      <div>
+        <h1>采购清单</h1>
+        <p>集中管理所有来源的待购物品，需要时先比价</p>
+      </div>
+      <a class="btn" href="compare.html">打开比价选品</a>
+    </header>
+
+    <section class="workflow-summary">
+      <div class="workflow-summary-counts">
+        <div class="workflow-summary-count"><div class="value" id="cntPending">0</div><div class="label">待处理</div></div>
+        <div class="workflow-summary-count"><div class="value" id="cntDone">0</div><div class="label">已购买</div></div>
+        <div class="workflow-summary-count"><div class="value" id="cntAll">0</div><div class="label">全部物品</div></div>
+      </div>
+      <button class="btn" id="btnQuickAdd">新增自定义待购物品</button>
+    </section>
+
+    <div class="purchase-quick-add" id="quickAddPanel" hidden>
+      <input class="input" id="qaName" aria-label="待购物品" placeholder="待购物品，例如：浴室柜">
+      <select class="input" id="qaStage" aria-label="所属阶段"></select>
+      <input class="input" id="qaQty" aria-label="数量" type="number" min="1" value="1" placeholder="数量">
+      <input class="input" id="qaPrice" aria-label="预算单价" type="number" min="0" step="0.01" placeholder="预算单价，例如 1299">
+      <button class="btn primary" id="qaSubmit">添加</button>
+    </div>
+
+    <div class="workflow-tabs">
+      <button id="tabBuy" class="active">我的待购</button>
+      <button id="tabLib">采购参考库</button>
+    </div>
+
+    <!-- 我的待购 -->
+    <section id="panelBuy">
+      <div class="purchase-panel">
+        <div class="purchase-panel-hd">
+          <h2 id="buyListTitle">我的待购</h2>
+          <span class="badge coral" id="buyListBadge"></span>
+        </div>
+        <div id="buyList"></div>
+      </div>
+    </section>
+
+    <!-- 采购参考库 -->
+    <section id="panelLib" hidden>
+      <div class="purchase-stage-chips" id="stageNav"></div>
+      <div class="purchase-panel">
+        <div class="purchase-panel-hd">
+          <div>
+            <h2 id="libStageName">--</h2>
+            <p>勾选后自动加入待购清单</p>
+          </div>
+          <button class="btn sm" id="btnExpand">全部展开</button>
+        </div>
+        <div id="libCats"></div>
+        <div class="pick-summary">
+          <span>已选入待购 <b id="pickedCnt">0</b> 项 · 参考库共 <span id="refTotal">0</span> 项</span>
+          <a href="home.html">去首页查看待购清单 ›</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    shell.renderNav('buy');
+    shell.store.seed();
+    const $ = id => document.getElementById(id);
+    const stageName = k => (shell.stages.find(s => s.key === k) || {}).name || '其他';
+
+    /* ---------- 采购参考库演示数据（行业通用材料清单） ---------- */
+    const LIB = [
+      { stage: 'prepare', cats: [
+        { name: '临时设施', items: [
+          { name: '临时马桶', spec: '工人施工用', qty: 1, unit: '个' },
+          { name: '临时水龙头', spec: '', qty: 1, unit: '个' },
+          { name: '临时照明', spec: 'LED 灯泡', qty: 3, unit: '个' } ]},
+        { name: '前置设备', items: [
+          { name: '前置过滤器', spec: '40μm 反冲洗', qty: 1, unit: '个' },
+          { name: '弱电箱', spec: '大号带模块', qty: 1, unit: '个' } ]}
+      ]},
+      { stage: 'water', cats: [
+        { name: '电线网线', items: [
+          { name: 'BV 铜线 1.5方', spec: '照明回路', qty: 2, unit: '卷' },
+          { name: 'BV 铜线 2.5方', spec: '普通插座', qty: 3, unit: '卷' },
+          { name: 'BV 铜线 4方', spec: '厨卫空调', qty: 3, unit: '卷' },
+          { name: '六类网线', spec: '非屏蔽', qty: 1, unit: '箱' } ]},
+        { name: '线管配件', items: [
+          { name: 'PVC 线管', spec: '20mm', qty: 30, unit: '根' },
+          { name: '接线盒', spec: '86 型', qty: 40, unit: '个' },
+          { name: '杯梳锁扣', spec: '20mm', qty: 80, unit: '个' } ]},
+        { name: '水路材料', items: [
+          { name: 'PPR 热水管', spec: 'DN25', qty: 6, unit: '根' },
+          { name: 'PPR 管件', spec: '弯头/三通/直接', qty: 40, unit: '个' },
+          { name: '角阀', spec: '全铜', qty: 8, unit: '个' },
+          { name: '生料带', spec: '', qty: 5, unit: '卷' } ]},
+        { name: '开关插座', items: [
+          { name: '五孔插座', spec: '10A', qty: 24, unit: '个' },
+          { name: '五孔带开关', spec: '厨房台面', qty: 6, unit: '个' },
+          { name: '16A 三孔', spec: '空调专用', qty: 4, unit: '个' },
+          { name: '防水盒', spec: '卫生间', qty: 4, unit: '个' } ]}
+      ]},
+      { stage: 'masonry', cats: [
+        { name: '基础材料', items: [
+          { name: '水泥', spec: '32.5 级', qty: 12, unit: '袋' },
+          { name: '河沙', spec: '中沙', qty: 5, unit: '方' },
+          { name: '红砖', spec: '砌墙', qty: 200, unit: '块' } ]},
+        { name: '防水贴砖', items: [
+          { name: '防水涂料', spec: '墙刚地柔', qty: 3, unit: '桶' },
+          { name: '瓷砖胶', spec: 'C2 级', qty: 10, unit: '袋' },
+          { name: '十字卡', spec: '2mm', qty: 2, unit: '包' },
+          { name: '美缝剂', spec: '聚脲', qty: 16, unit: '支' } ]},
+        { name: '五金配件', items: [
+          { name: '地漏', spec: '防臭回字形', qty: 3, unit: '个' },
+          { name: '烟道止逆阀', spec: '', qty: 1, unit: '个' },
+          { name: '门槛石', spec: '', qty: 3, unit: '条' } ]}
+      ]},
+      { stage: 'wood', cats: [
+        { name: '龙骨板材', items: [
+          { name: '轻钢龙骨', spec: '主骨+副骨', qty: 60, unit: '根' },
+          { name: '石膏板', spec: '9.5mm', qty: 20, unit: '张' },
+          { name: '防潮石膏板', spec: '厨卫', qty: 5, unit: '张' } ]},
+        { name: '木工辅料', items: [
+          { name: '白乳胶', spec: '', qty: 1, unit: '桶' },
+          { name: '自攻螺丝', spec: '25mm', qty: 2, unit: '盒' } ]}
+      ]},
+      { stage: 'paint', cats: [
+        { name: '基层处理', items: [
+          { name: '界面剂', spec: '', qty: 2, unit: '桶' },
+          { name: '耐水腻子', spec: '', qty: 15, unit: '袋' },
+          { name: '网格布', spec: '防裂', qty: 5, unit: '卷' },
+          { name: '阴阳角条', spec: '', qty: 20, unit: '根' } ]},
+        { name: '涂料', items: [
+          { name: '底漆', spec: '抗碱', qty: 2, unit: '桶' },
+          { name: '面漆', spec: '优等品', qty: 3, unit: '桶' },
+          { name: '美纹纸', spec: '', qty: 10, unit: '卷' } ]}
+      ]},
+      { stage: 'install', cats: [
+        { name: '卫浴', items: [
+          { name: '马桶', spec: '虹吸式', qty: 1, unit: '个' },
+          { name: '恒温花洒', spec: '', qty: 1, unit: '套' },
+          { name: '浴室柜', spec: '80cm', qty: 1, unit: '套' },
+          { name: '大单槽水槽', spec: 'SUS304', qty: 1, unit: '个' } ]},
+        { name: '灯具', items: [
+          { name: '客厅主灯', spec: '', qty: 1, unit: '个' },
+          { name: '防眩射灯', spec: '显指≥90', qty: 12, unit: '个' },
+          { name: '厨卫平板灯', spec: '', qty: 2, unit: '个' } ]},
+        { name: '家电', items: [
+          { name: '冰箱', spec: '一级能效', qty: 1, unit: '台' },
+          { name: '洗衣机', spec: '滚筒 10kg', qty: 1, unit: '台' },
+          { name: '烟灶套装', spec: '', qty: 1, unit: '套' },
+          { name: '燃气热水器', spec: '16L', qty: 1, unit: '台' } ]},
+        { name: '全屋定制', items: [
+          { name: '橱柜', spec: '按延米', qty: 1, unit: '项' },
+          { name: '衣柜', spec: '按投影面积', qty: 1, unit: '项' },
+          { name: '地板', spec: '多层实木', qty: 60, unit: '平方' } ]}
+      ]},
+      { stage: 'soft', cats: [
+        { name: '家具', items: [
+          { name: '沙发', spec: '三人位', qty: 1, unit: '套' },
+          { name: '床+床垫', spec: '1.8m', qty: 2, unit: '套' },
+          { name: '餐桌椅', spec: '一桌四椅', qty: 1, unit: '套' } ]},
+        { name: '布艺', items: [
+          { name: '窗帘', spec: '褶皱 2 倍', qty: 3, unit: '套' },
+          { name: '四件套', spec: '纯棉', qty: 3, unit: '套' } ]}
+      ]}
+    ];
+
+    /* ---------- 我的待购 ---------- */
+    let list = shell.store.read('buylist', []);
+
+    function saveList() { shell.store.write('buylist', list); }
+
+    function renderCounts() {
+      const pending = list.filter(i => !i.bought).length;
+      $('cntPending').textContent = pending;
+      $('cntDone').textContent = list.length - pending;
+      $('cntAll').textContent = list.length;
+    }
+
+    function renderBuyList() {
+      const pending = list.filter(i => !i.bought);
+      const budget = pending.reduce((s, i) => s + (i.price > 0 ? i.price * (i.qty || 1) : 0), 0);
+      $('buyListBadge').textContent = pending.length + ' 项待买' + (budget > 0 ? ' · 预算 ' + shell.fmt.money(budget) : '');
+      const box = $('buyList');
+      if (!list.length) {
+        box.innerHTML = '<div class="empty">还没有待购物品，去「采购参考库」挑一些吧</div>';
+        return;
+      }
+      box.innerHTML = '<table class="purchase-table"><thead><tr>' +
+        '<th class="c-check"></th><th>物品名称</th><th>规格 / 用途</th>' +
+        '<th class="c-qty">数量</th><th class="c-price">预算单价</th><th class="c-status">状态</th><th class="c-op">操作</th>' +
+        '</tr></thead><tbody>' + list.map(item =>
+          '<tr class="' + (item.bought ? 'bought' : '') + '">' +
+          '<td class="c-check"><button class="check-dot' + (item.bought ? ' done' : '') + '" aria-label="标记「' + item.name + '」' + (item.bought ? '为待购买' : '为已购买') + '">' + shell.icon('check') + '</button></td>' +
+          '<td class="c-name" data-label="物品名称"><span class="nm">' + item.name + '</span></td>' +
+          '<td data-label="规格 / 用途">' + (item.spec ? item.spec + ' · ' : '') + stageName(item.stage) + '</td>' +
+          '<td class="c-qty" data-label="数量">× ' + (item.qty || 1) + '</td>' +
+          '<td class="c-price" data-label="预算单价"><input class="price-input" type="number" min="0" step="0.01" data-price="' + item.id + '" value="' + (item.price > 0 ? item.price : '') + '" placeholder="未填" aria-label="「' + item.name + '」预算单价">' +
+          (item.price > 0 ? '<span class="price-sub">小计 ' + shell.fmt.money(item.price * (item.qty || 1)) + '</span>' : '') + '</td>' +
+          '<td class="c-status" data-label="状态"><span class="status' + (item.bought ? ' picked' : '') + '">' + (item.bought ? '已购买' : '待购买') + '</span></td>' +
+          '<td class="c-op"><button class="op" data-del="' + item.id + '" title="删除" aria-label="删除「' + item.name + '」">' + shell.icon('trash', 'ic-sm') + '</button></td>' +
+          '</tr>').join('') + '</tbody></table>';
+      box.querySelectorAll('.check-dot').forEach((dot, i) => {
+        dot.onclick = () => {
+          const item = list[i];
+          item.bought = !item.bought;
+          saveList(); renderCounts(); renderBuyList();
+          shell.toast(item.bought ? '已标记为已购买' : '已恢复为待购');
+        };
+      });
+      box.querySelectorAll('.price-input').forEach(inp => {
+        inp.onchange = () => {
+          const item = list.find(i => i.id === inp.dataset.price);
+          if (!item) return;
+          const v = Math.max(0, parseFloat(inp.value) || 0);
+          if (v === (item.price || 0)) return;
+          item.price = v;
+          saveList(); renderCounts(); renderBuyList();
+          shell.toast(v > 0 ? '已记录单价 ' + shell.fmt.money(v) : '已清除单价');
+        };
+      });
+      box.querySelectorAll('.op').forEach(btn => {
+        btn.onclick = () => {
+          list = list.filter(i => i.id !== btn.dataset.del);
+          saveList(); renderCounts(); renderBuyList();
+          shell.toast('已删除');
+        };
+      });
+    }
+
+    /* 快速添加 */
+    $('qaStage').innerHTML = shell.stages.map(s => '<option value="' + s.key + '">' + s.name + '</option>').join('');
+    $('btnQuickAdd').onclick = () => {
+      const p = $('quickAddPanel');
+      p.hidden = !p.hidden;
+      if (!p.hidden) $('qaName').focus();
+    };
+    $('qaSubmit').onclick = () => {
+      const name = $('qaName').value.trim();
+      if (!name) { shell.toast('请先填写物品名称'); return; }
+      const price = Math.max(0, parseFloat($('qaPrice').value) || 0);
+      list.push({ id: shell.store.uid(), name, spec: '', qty: Math.max(1, +$('qaQty').value || 1), stage: $('qaStage').value, bought: false, price });
+      saveList(); renderCounts(); renderBuyList();
+      $('qaName').value = ''; $('qaQty').value = 1; $('qaPrice').value = '';
+      shell.toast(price > 0 ? '已加入待购清单，单价 ' + shell.fmt.money(price) : '已加入待购清单，可稍后补录单价');
+    };
+
+    /* ---------- 视图切换 ---------- */
+    function switchView(lib) {
+      $('panelBuy').hidden = lib;
+      $('panelLib').hidden = !lib;
+      $('tabBuy').classList.toggle('active', !lib);
+      $('tabLib').classList.toggle('active', lib);
+    }
+    $('tabBuy').onclick = () => switchView(false);
+    $('tabLib').onclick = () => switchView(true);
+
+    /* ---------- 参考库 ---------- */
+    let activeStage = LIB[0].stage;
+    const expanded = new Set();
+    const refTotal = LIB.reduce((n, st) => n + st.cats.reduce((m, c) => m + c.items.length, 0), 0);
+    $('refTotal').textContent = refTotal;
+
+    function isPicked(ref) {
+      return list.some(i => i.refKey === ref.name + '|' + ref.spec);
+    }
+
+    function renderStageNav() {
+      const nav = $('stageNav');
+      nav.innerHTML = LIB.map(st => {
+        const cnt = st.cats.reduce((m, c) => m + c.items.length, 0);
+        return '<button data-stage="' + st.stage + '" class="' + (st.stage === activeStage ? 'active' : '') + '">' +
+          stageName(st.stage) + ' · ' + cnt + '</button>';
+      }).join('');
+      nav.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          activeStage = btn.dataset.stage;
+          renderStageNav();
+          renderLib();
+        };
+      });
+    }
+
+    function renderLib() {
+      const st = LIB.find(s => s.stage === activeStage);
+      $('libStageName').textContent = stageName(activeStage);
+      const box = $('libCats');
+      box.innerHTML = st.cats.map(cat => {
+        const key = activeStage + '/' + cat.name;
+        const open = expanded.has(key);
+        return '<div class="lib-cat' + (open ? ' open' : '') + '">' +
+          '<button class="lib-cat-hd" data-key="' + key + '"><span class="nm">' + cat.name + '</span>' +
+          '<span class="cnt">' + cat.items.length + ' 项</span><span class="arr">›</span></button>' +
+          '<div class="lib-cat-bd"><table class="purchase-table"><thead><tr>' +
+          '<th class="c-check"></th><th>物品名称</th><th>规格 / 用途</th>' +
+          '<th class="c-qty">参考数量</th><th class="c-status">状态</th><th class="c-op">操作</th>' +
+          '</tr></thead><tbody>' + cat.items.map(ref => {
+            const picked = isPicked(ref);
+            return '<tr>' +
+              '<td class="c-check"><button class="check-dot' + (picked ? ' done' : '') + '" data-ref="' + ref.name + '|' + ref.spec + '">' + shell.icon('check') + '</button></td>' +
+              '<td class="c-name" data-label="物品名称"><span class="nm">' + ref.name + '</span></td>' +
+              '<td data-label="规格 / 用途">' + (ref.spec || '—') + '</td>' +
+              '<td class="c-qty" data-label="参考数量">' + (ref.qty || '') + ' ' + (ref.unit || '') + '</td>' +
+              '<td class="c-status" data-label="状态"><span class="status' + (picked ? ' picked' : '') + '">' + (picked ? '已加入' : '参考') + '</span></td>' +
+              '<td class="c-op">' + (picked ? '<button class="op" data-del-ref="' + ref.name + '|' + ref.spec + '" title="移出" aria-label="移出「' + ref.name + '」">' + shell.icon('trash', 'ic-sm') + '</button>' : '') + '</td>' +
+              '</tr>';
+          }).join('') + '</tbody></table></div></div>';
+      }).join('');
+
+      box.querySelectorAll('.lib-cat-hd').forEach(hd => {
+        hd.onclick = () => {
+          const key = hd.dataset.key;
+          expanded.has(key) ? expanded.delete(key) : expanded.add(key);
+          renderLib();
+        };
+      });
+      box.querySelectorAll('[data-ref]').forEach(dot => {
+        dot.onclick = () => {
+          const key = dot.dataset.ref;
+          const ref = st.cats.flatMap(c => c.items).find(i => i.name + '|' + i.spec === key);
+          if (isPicked(ref)) {
+            list = list.filter(i => i.refKey !== key);
+            shell.toast('已移出待购');
+          } else {
+            list.push({ id: shell.store.uid(), refKey: key, name: ref.name, spec: ref.spec, qty: ref.qty, unit: ref.unit, stage: activeStage, bought: false });
+            shell.toast('已加入待购清单');
+          }
+          saveList(); renderCounts(); renderBuyList(); renderLib(); renderPickCnt();
+        };
+      });
+      box.querySelectorAll('[data-del-ref]').forEach(btn => {
+        btn.onclick = () => {
+          list = list.filter(i => i.refKey !== btn.dataset.delRef);
+          saveList(); renderCounts(); renderBuyList(); renderLib(); renderPickCnt();
+          shell.toast('已移出待购');
+        };
+      });
+    }
+
+    function renderPickCnt() {
+      $('pickedCnt').textContent = list.filter(i => i.refKey).length;
+    }
+
+    $('btnExpand').onclick = () => {
+      const st = LIB.find(s => s.stage === activeStage);
+      const allIn = st.cats.every(c => expanded.has(activeStage + '/' + c.name));
+      st.cats.forEach(c => allIn ? expanded.delete(activeStage + '/' + c.name) : expanded.add(activeStage + '/' + c.name));
+      $('btnExpand').textContent = allIn ? '全部展开' : '全部折叠';
+      renderLib();
+    };
+
+    /* ---------- 初始化 ---------- */
+    expanded.add('prepare/临时设施');
+    renderCounts();
+    renderBuyList();
+    renderStageNav();
+    renderLib();
+    renderPickCnt();
+  </script>
+</body>
+</html>

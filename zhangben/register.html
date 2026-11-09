@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 注册</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <header class="page-head">
+    <a class="brand" href="login.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 3h13a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5zM3 3v18M8 7h8M8 12h8M8 17h5"/></svg>
+      </span>
+      <span>装修小账本</span>
+    </a>
+    <a class="back" href="login.html">返回首页</a>
+  </header>
+
+  <main class="auth-wrap">
+    <section class="intro">
+      <h1>回到你的装修管理台，<br>继续推进每一步。</h1>
+      <p>集中整理预算、记账、采购、待办和施工进度，让重要决定和每笔支出都有记录。</p>
+      <div class="features">
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></i>
+          <b>待办同步</b><span>装修节点、提醒事项统一管理。</span>
+        </div>
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M5.5 7.5h13A1.5 1.5 0 0 1 20 9v9.2A1.8 1.8 0 0 1 18.2 20H5.8A1.8 1.8 0 0 1 4 18.2V6.8A1.8 1.8 0 0 1 5.8 5h11.7"/><path d="M15.5 13h4.5"/></svg></i>
+          <b>预算记账</b><span>支出、分类和预算分配保留记录。</span>
+        </div>
+        <div class="feature">
+          <i><svg viewBox="0 0 24 24"><path d="M6.6 7.4h12.2l-1.4 7H8.7L7.5 4.8H5"/><circle cx="10" cy="18.7" r=".8"/><circle cx="16.8" cy="18.7" r=".8"/></svg></i>
+          <b>采购清单</b><span>待购物品和比价信息持续跟进。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <h2>注册账号</h2>
+      <p class="hint">邮箱验证通过后才会创建账号，方便后续管理和找回密码。</p>
+      <p class="note-card">已用过小程序？<a href="login.html">用原账号确认登录</a>，原有项目会继续保留。</p>
+
+      <div class="msg error" id="msgError" role="alert"></div>
+      <div class="msg ok" id="msgOk" role="status"></div>
+
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="email">邮箱</label>
+          <input type="email" id="email" placeholder="name@example.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="emailCode">邮箱验证码</label>
+          <div class="code-row">
+            <input type="text" id="emailCode" placeholder="6 位验证码" inputmode="numeric" autocomplete="one-time-code" required>
+            <button type="button" class="btn-primary" id="sendCodeBtn">发送验证码</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input type="text" id="username" placeholder="3-20 个字符" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input type="password" id="password" placeholder="至少 8 个字符" autocomplete="new-password" required>
+          <div class="pwd-meter"><i id="pwdBar"></i></div>
+        </div>
+        <div class="form-group">
+          <label for="password2">确认密码</label>
+          <input type="password" id="password2" placeholder="再次输入密码" autocomplete="new-password" required>
+        </div>
+        <label class="check-row">
+          <input type="checkbox" id="acceptTerms">
+          <span>我已阅读并同意<a href="#" onclick="return false">《用户协议》</a>和<a href="#" onclick="return false">《隐私政策》</a></span>
+        </label>
+        <button type="submit" class="btn-primary" id="submitBtn">注册</button>
+      </form>
+
+      <div class="switch-link">已有账号？<a href="login.html">去登录</a></div>
+
+      <button class="mini-entry" type="button" onclick="location.href='login.html'">
+        <span class="mini-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M8 3.5A4.5 4.5 0 0 0 3.5 8v.5A4.5 4.5 0 0 0 8 13h.2A6 6 0 0 1 8 11.5a6 6 0 0 1 6-6c.24 0 .48.01.71.04A4.5 4.5 0 0 0 8 3.5z"/><path d="M14.5 7.5a5 5 0 0 0-5 5c0 2.76 2.24 5 5 5 .63 0 1.23-.11 1.78-.32l2.22 1.07-.62-2.02A5 5 0 0 0 14.5 7.5z"/></svg>
+        </span>
+        <span><b>使用微信小程序</b><small>打开微信，搜索“装修小账本”</small></span>
+        <span class="mini-arrow" aria-hidden="true">›</span>
+      </button>
+    </section>
+  </main>
+
+  <script src="js/register.js"></script>
+</body>
+</html>

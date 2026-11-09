@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 装修流程</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 装修流程（对齐原版 yellow-workflow） */
+    .workflow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin: 0 0 26px; }
+    .workflow-heading h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; line-height: 1.4; }
+    .workflow-heading p { margin: 0; color: var(--text-3); font-size: 14px; }
+    .workflow-heading .btn {
+      min-height: 0;
+      padding: 11px 17px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+
+    .workflow-control-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 20px; }
+    .workflow-type-switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 10px; background: #F6F7F7; }
+    .workflow-type-switch button {
+      min-height: 32px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 7px;
+      background: none;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .workflow-type-switch button.active { background: #FFF7D6; color: #564A25; font-weight: 600; }
+    .workflow-search {
+      width: 220px;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .workflow-progress {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 90px;
+      padding: 22px 28px;
+      margin: 0 0 24px;
+      border-radius: 18px;
+      background: linear-gradient(118deg, #FFE96E, #FFE347);
+    }
+    .workflow-progress span { display: block; color: #786825; font-size: 13px; }
+    .workflow-progress strong { display: block; margin-top: 6px; font-size: 32px; font-weight: 500; line-height: 1.2; }
+    .workflow-progress-next { text-align: right; }
+    .workflow-progress-next strong { font-size: 16px; font-weight: 600; }
+
+    .workflow-main { display: grid; grid-template-columns: minmax(0, .69fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+
+    .workflow-stage-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 18px; }
+    .workflow-stage-heading h2 { margin: 0; font-size: 19px; font-weight: 600; }
+    .workflow-bulk { display: flex; gap: 14px; }
+    .workflow-bulk button { padding: 0; border: 0; background: none; color: var(--text-3); font-size: 12px; }
+    .workflow-bulk button:hover { color: var(--text); }
+
+    .workflow-stage-list { display: grid; }
+    .workflow-stage-row {
+      display: grid;
+      grid-template-columns: 20px 26px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 45px;
+      padding: 9px 14px;
+      margin: 0 -14px;
+      border-bottom: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+    }
+    .workflow-stage-row:last-child { border-bottom: 0; }
+    .workflow-stage-row.active { background: #FFF9DF; border-bottom-color: transparent; }
+    .workflow-stage-row input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: #B39727; }
+    .workflow-stage-row .no { color: var(--text-3); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .workflow-stage-row .name { padding: 0; border: 0; background: none; color: inherit; font-size: 14px; text-align: left; }
+    .workflow-stage-row.active .name { font-weight: 600; }
+    .workflow-stage-row .days { color: var(--text-3); font-size: 12px; white-space: nowrap; }
+    .workflow-stage-row.done .name { color: var(--text-3); text-decoration: line-through; }
+
+    .workflow-detail-card { padding: 28px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .detail-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+    .detail-hd h2 { margin: 0 0 8px; font-size: 19px; font-weight: 600; }
+    .detail-day { display: inline-flex; padding: 3px 9px; border-radius: 6px; background: #FFF7D6; color: #786825; font-size: 12px; }
+    .detail-mark { display: flex; align-items: center; gap: 8px; color: var(--text-2); font-size: 13px; white-space: nowrap; }
+    .detail-mark input { width: 17px; height: 17px; margin: 0; accent-color: #B39727; }
+    .detail-note { margin: 20px 0 0; padding: 16px 18px; border-radius: 12px; background: #FFF9DF; color: #786825; font-size: 13px; }
+    .detail-desc { margin: 18px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.8; }
+    .detail-tip { display: flex; gap: 12px; margin-top: 18px; padding: 16px 18px; border-radius: 12px; background: #F7F8F8; font-size: 13px; line-height: 1.7; }
+    .detail-tip b { flex: none; color: var(--text); font-weight: 600; }
+    .detail-tip span { color: var(--text-2); }
+    .detail-accept { margin-top: 18px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .accept-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .accept-hd b { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+    .accept-hd span { color: var(--text-3); font-size: 12px; }
+    .accept-badge { display: inline-flex; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; background: #F7F8F8; color: #818A8F; }
+    .accept-badge.pass { background: #EEF7F1; color: #286344; }
+    .accept-badge.fix { background: #FFF4F1; color: #A94432; }
+    .accept-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; }
+    .accept-grid label { display: block; color: var(--text-2); font-size: 12px; }
+    .accept-grid .full { grid-column: 1 / -1; }
+    .accept-grid input, .accept-grid select { width: 100%; height: 36px; margin-top: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); font-size: 13px; outline: none; }
+    .accept-grid input:focus, .accept-grid select:focus { border-color: #B39727; box-shadow: 0 0 0 3px rgba(179, 151, 39, .1); }
+    .accept-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .accept-actions .btn { min-height: 0; padding: 8px 16px; border-radius: 8px; font-size: 13px; box-shadow: none; }
+    .acc-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: transparent; }
+    .acc-dot.pass { background: #5F9F77; }
+    .acc-dot.fix { background: #C94B3F; }
+    @media (max-width: 640px) { .accept-grid { grid-template-columns: 1fr; } }
+    .detail-foot { display: flex; justify-content: flex-end; margin-top: 24px; }
+    .detail-foot .btn { min-height: 0; padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 500; box-shadow: none; }
+    .detail-empty { padding: 60px 0; color: var(--text-3); font-size: 13px; text-align: center; }
+
+    @media (max-width: 960px) {
+      .workflow-main { grid-template-columns: 1fr; }
+      .workflow-control-row { flex-wrap: wrap; }
+      .workflow-search { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="workflow-heading">
+      <div>
+        <h1>装修流程</h1>
+        <p>按阶段推进，少漏项、少返工</p>
+      </div>
+      <button class="btn" id="btnReset">重置进度</button>
+    </header>
+
+    <div class="workflow-control-row">
+      <div class="workflow-type-switch" id="typeSwitch">
+        <button data-type="new" class="active">新房毛坯</button>
+        <button data-type="old">旧房改造</button>
+      </div>
+      <input class="workflow-search" id="stepSearch" aria-label="搜索流程节点" placeholder="按名称快速定位节点">
+    </div>
+
+    <section class="workflow-progress">
+      <div>
+        <span>整体进度</span>
+        <strong id="flowDone">0 / 22</strong>
+      </div>
+      <div class="workflow-progress-next">
+        <span>当前建议关注</span>
+        <strong id="flowNext">设计与开工准备</strong>
+      </div>
+    </section>
+
+    <div class="workflow-main">
+      <section class="workflow-stages">
+        <div class="workflow-stage-heading">
+          <h2>流程阶段</h2>
+          <div class="workflow-bulk">
+            <button id="btnExpand">全部展开</button>
+            <button id="btnCollapse">全部折叠</button>
+          </div>
+        </div>
+        <div class="workflow-stage-list" id="stepList"></div>
+      </section>
+      <section class="workflow-details" id="stepDetail"></section>
+    </div>
+  </main>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    shell.renderNav('process');
+    const STEPS = shell.flowSteps;
+    const DAYS = [
+      '7-15天', '2-4天', '2-3天', '1-3天', '5-10天', '1-2天', '2-3天', '5-7天',
+      '1-2天', '1天', '3-5天', '3-5天', '2-3天', '1-2天', '1天', '1-2天',
+      '1-2天', '1-2天', '1-2天', '1-2天', '1天', '1-3天'
+    ];
+
+    let checked = shell.flow.read();
+    let activeIndex = 0;
+    let acceptance = shell.store.read('acceptance', {});
+    const accOf = i => acceptance[i] || {};
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    function renderProgress() {
+      const done = checked.filter(Boolean).length;
+      $('flowDone').textContent = done + ' / ' + STEPS.length;
+      const next = checked.indexOf(false);
+      $('flowNext').textContent = next === -1 ? '全部节点已完成' : STEPS[next].t;
+      return done;
+    }
+
+    function renderList() {
+      const done = renderProgress();
+      $('stepList').innerHTML = STEPS.map((s, i) =>
+        '<div class="workflow-stage-row' + (i === activeIndex ? ' active' : '') +
+        (checked[i] ? ' done' : '') + '" data-i="' + i + '">' +
+        '<input type="checkbox" data-check="' + i + '" aria-label="标记「' + s.t + '」完成"' + (checked[i] ? ' checked' : '') + '>' +
+        '<span class="no">' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<button class="name" data-select="' + i + '">' + s.t + '</button>' +
+        '<span class="acc-dot ' + (accOf(i).result || '') + '" title="' +
+        (accOf(i).result === 'pass' ? '验收通过' : accOf(i).result === 'fix' ? '需整改' : '未验收') + '"></span>' +
+        '<span class="days">' + DAYS[i] + '</span>' +
+        '</div>').join('');
+      $('stepList').querySelectorAll('[data-select]').forEach(btn => {
+        btn.onclick = () => selectStep(+btn.dataset.select);
+      });
+      $('stepList').querySelectorAll('[data-check]').forEach(box => {
+        box.onchange = () => {
+          checked[+box.dataset.check] = box.checked;
+          shell.flow.write(checked);
+          renderList();
+          renderDetail();
+        };
+      });
+      return done;
+    }
+
+    function selectStep(i) {
+      activeIndex = i;
+      renderList();
+      renderDetail();
+    }
+
+    function renderDetail() {
+      const s = STEPS[activeIndex];
+      const done = checked[activeIndex];
+      $('stepDetail').innerHTML =
+        '<article class="workflow-detail-card">' +
+        '<div class="detail-hd"><div><h2>' + s.t + '</h2>' +
+        '<span class="detail-day">' + DAYS[activeIndex] + '</span></div>' +
+        '<label class="detail-mark"><input type="checkbox" id="detailCheck"' + (done ? ' checked' : '') + '> 标记完成</label></div>' +
+        '<p class="detail-note">' + (s.tip || '按节点逐步推进，完成后勾选。') + '</p>' +
+        '<div class="detail-bd" id="detailBd">' +
+        '<p class="detail-desc">' + s.d + '</p>' +
+        '<div class="detail-tip"><b>避坑提示</b><span>' + (s.tip || '施工前确认材料与工艺，验收留档。') + '</span></div>' +
+        renderAcceptance(activeIndex) +
+        '<div class="detail-foot"><button class="btn" id="detailDone">' + (done ? '已完成' : '标记完成') + '</button></div>' +
+        '</div></article>';
+      $('detailCheck').onchange = e => {
+        checked[activeIndex] = e.target.checked;
+        shell.flow.write(checked);
+        renderList();
+        renderDetail();
+      };
+      $('detailDone').onclick = () => {
+        checked[activeIndex] = !checked[activeIndex];
+        shell.flow.write(checked);
+        renderList();
+        renderDetail();
+      };
+      bindAcceptance(activeIndex);
+    }
+
+    function renderAcceptance(i) {
+      const a = accOf(i);
+      const badge = a.result === 'pass' ? '<span class="accept-badge pass">验收通过</span>'
+        : a.result === 'recheck' ? '<span class="accept-badge pass">复验通过</span>'
+          : a.result === 'fix' ? '<span class="accept-badge fix">需整改</span>'
+            : '<span class="accept-badge">未验收</span>';
+      return '<div class="detail-accept">' +
+        '<div class="accept-hd"><b>验收记录 ' + badge + '</b><span>保存后写入本机，随数据备份导出</span></div>' +
+        '<div class="accept-grid">' +
+        '<label>验收结论<select id="accResult" aria-label="验收结论">' +
+        '<option value=""' + (!a.result ? ' selected' : '') + '>未验收</option>' +
+        '<option value="pass"' + (a.result === 'pass' ? ' selected' : '') + '>通过</option>' +
+        '<option value="fix"' + (a.result === 'fix' ? ' selected' : '') + '>需整改</option>' +
+        '<option value="recheck"' + (a.result === 'recheck' ? ' selected' : '') + '>复验通过</option>' +
+        '</select></label>' +
+        '<label>验收人<input id="accInspector" aria-label="验收人" placeholder="姓名" value="' + esc(a.inspector) + '"></label>' +
+        '<label>验收日期<input id="accDate" type="date" aria-label="验收日期" value="' + esc(a.date || shell.fmt.today()) + '"></label>' +
+        '<label class="full">验收备注<input id="accNote" aria-label="验收备注" placeholder="例如：空鼓 2 处，已要求返工" value="' + esc(a.note) + '"></label>' +
+        '</div>' +
+        '<div class="accept-actions"><button class="btn" id="accSave">保存验收记录</button></div>' +
+        '</div>';
+    }
+
+    function bindAcceptance(i) {
+      const btn = $('accSave');
+      if (!btn) return;
+      btn.onclick = () => {
+        const result = $('accResult').value;
+        const inspector = $('accInspector').value.trim();
+        const date = $('accDate').value;
+        const note = $('accNote').value.trim();
+        if (result && !inspector) { shell.toast('请填写验收人'); return; }
+        if (result && !date) { shell.toast('请选择验收日期'); return; }
+        if (!result) {
+          delete acceptance[i];
+          if (!shell.store.write('acceptance', acceptance)) return;
+          renderList();
+          renderDetail();
+          shell.toast('验收记录已清除');
+          return;
+        }
+        acceptance[i] = { result, inspector, date, note, savedAt: new Date().toISOString() };
+        if (!shell.store.write('acceptance', acceptance)) return;
+        renderList();
+        renderDetail();
+        shell.toast(result === 'pass' ? '验收记录已保存：通过' : result === 'recheck' ? '验收记录已保存：复验通过' : '验收记录已保存：需整改');
+      };
+    }
+
+    $('typeSwitch').querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => {
+        $('typeSwitch').querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      };
+    });
+
+    $('stepSearch').oninput = e => {
+      const q = e.target.value.trim();
+      if (!q) return;
+      const i = STEPS.findIndex(s => s.t.indexOf(q) !== -1);
+      if (i !== -1) selectStep(i);
+    };
+
+    $('btnExpand').onclick = () => {
+      const bd = $('detailBd');
+      if (bd) bd.hidden = false;
+    };
+    $('btnCollapse').onclick = () => {
+      const bd = $('detailBd');
+      if (bd) bd.hidden = true;
+    };
+
+    $('btnReset').onclick = () => {
+      if (!confirm('确定重置全部流程进度吗？')) return;
+      checked = STEPS.map(() => false);
+      shell.flow.write(checked);
+      activeIndex = 0;
+      renderList();
+      renderDetail();
+      shell.toast('进度已重置');
+    };
+
+    renderList();
+    renderDetail();
+  </script>
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装修小账本 - 装修总览</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yellow/logo.svg">
+  <link rel="stylesheet" href="css/fresh.css">
+  <style>
+    /* 主页专属样式（对齐原版 home-pro） */
+    .page-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 0 0 26px;
+    }
+    .page-head-row h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; line-height: 1.4; }
+    .page-head-row p { margin: 0; color: var(--text-3); font-size: 14px; }
+    .page-head-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .backup-state { color: var(--text-3); font-size: 12px; white-space: nowrap; }
+    .backup-state.warn { color: var(--amber); font-weight: 600; }
+    .page-head-actions .btn {
+      min-height: 0;
+      padding: 11px 17px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+
+    /* 首屏数据模式提示 */
+    .data-mode-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 0 26px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: #FFF9DF;
+      color: #776726;
+    }
+    .data-mode-bar .dmb-text { display: grid; gap: 6px; font-size: 13px; line-height: 1.6; }
+    .data-mode-bar .dmb-text b { color: #4F4630; font-size: 14px; font-weight: 600; }
+    .data-mode-bar .dmb-actions { display: flex; gap: 10px; flex: none; }
+    .data-mode-bar .btn {
+      min-height: 0;
+      padding: 9px 15px;
+      border: 1px solid #E7DB9F;
+      border-radius: 9px;
+      background: #fff;
+      color: #4F4630;
+      font-size: 13px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+    .data-mode-bar .btn:hover { background: #FFFBEA; }
+    @media (max-width: 760px) {
+      .data-mode-bar { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* 首屏：预算卡 + 快捷卡 */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .budget-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 212px;
+      padding: 25px 28px;
+      border-radius: 18px;
+      background: linear-gradient(118deg, #FFE96E, #FFE347);
+    }
+    .budget-card .lbl { color: #776726; font-size: 15px; }
+    .budget-card .amt {
+      margin: 12px 0 20px;
+      color: #292D2E;
+      font-size: 44px;
+      font-weight: 500;
+      letter-spacing: -1px;
+      line-height: 1.3;
+      font-variant-numeric: tabular-nums;
+    }
+    .budget-card .foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; margin-top: auto; }
+    .budget-card .foot p { margin: 0; color: #776726; font-size: 14px; }
+    .budget-card .foot b { margin-left: 12px; color: #292D2E; font-size: 20px; font-weight: 500; }
+    .budget-card .btn {
+      min-height: 0;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 11px;
+      background: #FFFDF0;
+      color: #414744;
+      font-size: 14px;
+      font-weight: 400;
+      box-shadow: none;
+    }
+    .budget-card .btn:hover { background: #fff; }
+
+    .quick-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 22px;
+      min-height: 212px;
+      padding: 24px 20px;
+      border-radius: 18px;
+      background: #F7F8F8;
+    }
+    .quick-entries { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .quick-card {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #292D2E;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+    }
+    .quick-card:hover { transform: none; box-shadow: none; }
+    .quick-card .iconbox { width: 44px; height: 44px; border-radius: 12px; }
+    .quick-card b { font-size: 14px; font-weight: 400; }
+
+    .budget-set-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      background: #FFF9DF;
+      font-size: 13px;
+    }
+    .budget-set-bar span { flex: 1; color: var(--text-3); }
+    .budget-set-bar b { color: var(--text-3); font-weight: 400; }
+    .budget-set-bar .more { color: #8B7425; }
+
+    /* 首页卡片 */
+    .layout-2 { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+    .layout-2 .card { border-radius: 16px; box-shadow: none; }
+    .layout-2 .card-hd { min-height: 65px; padding: 22px 24px 10px; border-bottom: 0; }
+    .layout-2 .card-hd h3 { font-size: 19px; font-weight: 600; }
+    .layout-2 .card-hd .iconbox { display: none; }
+    .layout-2 .card-bd { padding: 10px 24px 24px; }
+    .layout-2 .tabs { gap: 4px; padding: 4px; border-radius: 10px; background: #F6F7F7; }
+    .layout-2 .tabs button { padding: 8px 16px; border-radius: 8px; font-size: 13px; }
+    .layout-2 .todo-item {
+      margin: 0;
+      padding: 17px 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      background: #fff;
+    }
+    .layout-2 .todo-item:last-child { border-bottom: 0; }
+    .layout-2 .todo-item .check-dot { border-width: 1.5px; }
+    .layout-2 .todo-item .check-dot .ic { visibility: hidden; }
+    .layout-2 .todo-item .check-dot.done .ic { visibility: visible; }
+    .layout-2 .todo-text { font-weight: 400; }
+    .layout-2 .empty {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      min-height: 82px;
+      padding: 10px;
+    }
+    .layout-2 .empty.with-icon { min-height: 148px; }
+
+    .yellow-stage-current { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+    .yellow-stage-current span { display: block; color: #7B8489; font-size: 13px; }
+    .yellow-stage-current b { display: block; margin-top: 8px; font-size: 16px; font-weight: 600; }
+    .yellow-stage-count { text-align: right; }
+    .yellow-stage-count strong { font-size: 27px; font-weight: 500; line-height: 1.4; }
+    .yellow-stage-track { height: 7px; margin: 20px 0 17px; border-radius: 8px; background: #ECEFEF; overflow: hidden; }
+    .yellow-stage-track i { display: block; height: 100%; border-radius: 8px; background: #F0D348; transition: width .2s; }
+    .yellow-stage-route { display: flex; align-items: center; gap: 12px; color: #818A8F; font-size: 12px; overflow: hidden; }
+    .yellow-stage-route span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .yellow-stage-route .sep { flex: none; color: #C4C9CB; }
+    .yellow-stage-tip { margin: 18px 0 0; padding: 16px 18px; border-radius: 12px; background: #FFF9DF; color: #8B7840; font-size: 13px; }
+
+    .yellow-recent-list { display: grid; }
+    .yellow-recent-row {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+    }
+    .yellow-recent-row:last-child { border-bottom: 0; }
+    .yellow-recent-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #FFF7D8; color: #937C2E; }
+    .yellow-recent-row b { display: block; font-size: 14px; font-weight: 400; }
+    .yellow-recent-row small { display: block; margin-top: 7px; color: #818A8F; font-size: 12px; }
+    .yellow-recent-row > span:last-child { text-align: right; }
+    .yellow-recent-row strong { font-size: 20px; font-weight: 500; }
+
+    /* 搜索 */
+    .search-card { margin-bottom: 16px; }
+    .search-card .card-bd { padding: 12px; }
+    .search-card .input { min-height: 42px; }
+
+    /* 预算分配 */
+    .budget-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .budget-row:last-child { border-bottom: 0; }
+    .budget-row .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .budget-row .name { font-size: 13px; font-weight: 600; }
+    .budget-row .num { font-size: 12px; color: var(--text-2); }
+    .budget-row .num b { color: var(--text); font-size: 13px; }
+
+    /* 待办 */
+    .todo-add-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 120px 150px auto;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .todo-head-row { display: flex; align-items: center; gap: 10px; }
+    .todo-head-row .grow { flex: 1; min-width: 0; }
+    .todo-meta { display: flex; gap: 8px; align-items: center; margin-top: 4px; font-size: 12px; color: var(--text-3); }
+    .todo-del { border: 0; background: none; color: #c4bab2; padding: 4px; }
+    .todo-del:hover { color: var(--red); }
+
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; }
+      .layout-2 { grid-template-columns: 1fr; }
+      .todo-add-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <!-- 页头 -->
+    <div class="page-head-row">
+      <div>
+        <h1>装修总览</h1>
+        <p id="heroSub">先确认，再付款；先留档，再封槽。</p>
+      </div>
+      <div class="page-head-actions">
+        <span class="backup-state" id="backupState">尚未备份 · 数据仅存本机</span>
+        <button class="btn" id="resetDemoBtn">清空示例数据</button>
+        <button class="btn" id="exportBtnTop">备份数据</button>
+        <a class="btn" href="account.html">项目资料</a>
+      </div>
+    </div>
+
+    <!-- 首屏数据模式提示 -->
+    <section class="data-mode-bar" id="dataModeBar" hidden>
+      <div class="dmb-text">
+        <b id="dmbTitle">当前使用示例数据</b>
+        <span id="dmbDesc">示例数据方便你先了解各页面。也可以清空它们，从空白项目开始记录自己的装修。</span>
+      </div>
+      <div class="dmb-actions">
+        <button class="btn" id="dmbKeep">保留示例</button>
+        <button class="btn" id="dmbClear">清空示例，空白开始</button>
+      </div>
+    </section>
+
+    <!-- 预算卡 + 快捷入口 -->
+    <section class="hero">
+      <div class="budget-card">
+        <span class="lbl">装修预算占用</span>
+        <div class="amt" id="budSpent">¥0.00</div>
+        <div class="foot">
+          <p>待付款 <b id="budPending">¥0.00</b></p>
+          <a class="btn" href="materials.html">记一笔</a>
+        </div>
+      </div>
+      <div class="quick-panel">
+        <div class="quick-entries">
+          <a class="quick-card" href="materials.html"><span class="iconbox" id="q1"></span><b>分类统计</b></a>
+          <a class="quick-card" href="process.html"><span class="iconbox blue" id="q2"></span><b>查看流程</b></a>
+          <a class="quick-card" href="process.html"><span class="iconbox green" id="q3"></span><b>验收要点</b></a>
+        </div>
+        <div class="budget-set-bar">
+          <span>总预算 <b id="budTotal">未设置预算</b></span>
+          <a class="more" href="materials.html">设置预算 ›</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第一行：待办 + 进度 -->
+    <section class="layout-2">
+      <!-- 待办事项 -->
+      <div class="card">
+        <div class="card-hd">
+          <h3><span class="iconbox" id="todoIcon"></span>待办事项</h3>
+          <span style="display:flex;align-items:center;gap:10px">
+            <button class="btn sm" id="detailMode" title="详细模式">详细模式</button>
+            <span id="todoCount" style="color:var(--text-3);font-size:12px">0 项待办 · 0 项优先</span>
+          </span>
+        </div>
+        <div class="card-bd">
+          <div class="tabs" style="margin-bottom:10px">
+            <button id="tabToday" class="active">今日优先</button>
+            <button id="tabAll">全部待办</button>
+          </div>
+          <div id="todoList"></div>
+          <button class="btn sm" id="todoToggleBtn" style="margin-top:10px;background:none;color:var(--text-2);border:0;padding:0;font-weight:700">▸ 新增待办</button>
+          <div class="todo-add-grid" id="todoAddGrid" hidden style="margin-top:10px">
+            <input type="text" class="input" id="todoText" aria-label="待办内容" placeholder="添加待办，例如：水电定位确认">
+            <select class="input" id="todoStage" aria-label="关联阶段"></select>
+            <input type="date" class="input" id="todoDue" aria-label="截止日期">
+            <button class="btn primary sm" id="todoAddBtn">添加</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 装修进度 -->
+      <div class="card">
+        <div class="card-hd"><h3><span class="iconbox" id="progressIcon"></span>装修进度</h3><a class="more" href="process.html">查看全部 ›</a></div>
+        <div class="card-bd">
+          <div class="yellow-stage-current">
+            <div>
+              <span>当前阶段</span>
+              <b id="progressCurrent">设计与开工准备</b>
+            </div>
+            <div class="yellow-stage-count">
+              <strong id="progressDone">0 / 22</strong>
+              <span>已完成节点</span>
+            </div>
+          </div>
+          <div class="yellow-stage-track"><i id="progressBar" style="width:0%"></i></div>
+          <div class="yellow-stage-route" id="stepChips"></div>
+          <div class="yellow-stage-tip" id="progressTip">先完成验房、量房和物业报备。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第二行：账目 + 待购 -->
+    <section class="layout-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-hd"><h3><span class="iconbox" id="billIcon"></span>最近账目</h3><a class="more" href="materials.html">全部账单 ›</a></div>
+        <div class="card-bd" id="billSummary"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><h3><span class="iconbox blue" id="buyIcon"></span>待购清单</h3><a class="more" href="procurement.html">采购参考库</a></div>
+        <div class="card-bd" id="buyList"></div>
+      </div>
+    </section>
+
+    <!-- 预算设置与数据备份（折叠） -->
+    <details style="margin-top:16px;border-top:1px solid var(--line);padding-top:6px">
+      <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;min-height:44px;color:var(--text-2);font-size:14px;font-weight:700">
+        <span style="font-size:11px;color:var(--text-3)">▸</span>预算设置与数据备份
+      </summary>
+      <div style="padding:14px 0 4px" id="budgetArea"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line)">
+        <button class="btn primary sm" id="exportBtn">导出全部数据</button>
+        <button class="btn sm" id="importBtn">导入数据</button>
+        <button class="btn sm" id="restoreSnapBtn">恢复上一版</button>
+        <input type="file" id="importFile" accept=".json" aria-label="导入备份文件" hidden>
+        <span style="font-size:12px;color:var(--text-3);align-self:center">数据存在浏览器本地，建议定期备份</span>
+      </div>
+    </details>
+  </main>
+
+  <script src="js/shell.js?v=20261109-snap"></script>
+  <script>
+    (function () {
+      var S = window.shell, store = S.store, fmt = S.fmt, icon = S.icon;
+      store.seed();
+      S.renderNav('home');
+
+      /* 图标注入 */
+      var iconMap = {
+        q1: 'chart', q2: 'clock', q3: 'check',
+        progressIcon: 'clock', budgetIcon: 'wallet', todoIcon: 'list',
+        buyIcon: 'cart', billIcon: 'chart'
+      };
+      Object.keys(iconMap).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = icon(iconMap[id]);
+      });
+
+      var stageSel = document.getElementById('todoStage');
+      stageSel.innerHTML = S.stages.map(function (s) {
+        return '<option value="' + s.key + '">' + s.name + '</option>';
+      }).join('');
+
+      /* ---------- 数据渲染 ---------- */
+      function stageName(key) {
+        var s = S.stages.filter(function (x) { return x.key === key; })[0];
+        return s ? s.name : '其他';
+      }
+
+      function renderOverview() {
+        var bills = store.read('bills', []);
+        var budget = store.read('budget', { total: 0, groups: [] });
+        var flow = S.flow.summary();
+        var totals = S.ledgerTotals(bills);
+
+        /* 预算卡 */
+        var pendingAmt = bills.filter(function (b) { return b.status === 'pending'; })
+          .reduce(function (s, b) { return s + Math.abs(Number(b.amount) || 0); }, 0);
+        document.getElementById('budSpent').textContent = fmt.money(totals.spent);
+        document.getElementById('budPending').textContent = fmt.money(pendingAmt);
+        document.getElementById('budTotal').textContent = budget.total ? fmt.money(budget.total) : '未设置预算';
+
+        /* 22 节点进度 */
+        document.getElementById('progressCurrent').textContent = flow.stage.name;
+        document.getElementById('progressDone').textContent = flow.done + '/' + flow.total;
+        document.getElementById('progressBar').style.width = flow.pct + '%';
+        document.getElementById('progressTip').textContent =
+          flow.allDone ? '所有节点都已完成，准备入住吧。' :
+          (flow.done === 0 ? '先完成验房、量房和物业报备。' :
+            '已完成 ' + flow.done + ' 个节点，继续推进「' + flow.current.t + '」。');
+
+        var route = flow.allDone ? [] : flow.route.slice(0, 3);
+        document.getElementById('stepChips').innerHTML = route.map(function (s) {
+          return '<span>' + s.t + '</span>';
+        }).join('<i class="sep">›</i>');
+      }
+
+      function renderBudget() {
+        var budget = store.read('budget', { total: 0, groups: [] });
+        var bills = store.read('bills', []);
+        var used = {};
+        bills.forEach(function (b) {
+          if (b.status === 'refund') return;
+          used[b.cat] = (used[b.cat] || 0) + Math.abs(Number(b.amount) || 0);
+        });
+        var html = budget.groups.map(function (g) {
+          var u = used[g.key] || 0;
+          var pct = g.budget ? Math.min(100, Math.round(u / g.budget * 100)) : 0;
+          return '<div class="budget-row"><div class="top"><span class="name">' + g.name +
+            '</span><span class="num"><b>' + fmt.money(u) + '</b> / ' + fmt.money(g.budget) + '</span></div>' +
+            '<div class="bar"><i style="width:' + pct + '%;background:' + g.color + '"></i></div></div>';
+        }).join('');
+        document.getElementById('budgetArea').innerHTML = html;
+      }
+
+      var todoTab = 'today';
+
+      function renderTodos() {
+        var todos = store.read('todos', []);
+        var list = document.getElementById('todoList');
+        var undone = todos.filter(function (t) { return !t.done; });
+        var prior = todos.filter(function (t) { return !t.done && t.priority; }).length;
+        document.getElementById('todoCount').textContent = undone.length + ' 项待办 · ' + prior + ' 项优先';
+
+        var shown = todos;
+        if (todoTab === 'today') {
+          shown = todos.filter(function (t) {
+            return t.priority || (t.due && t.due <= fmt.today());
+          });
+        }
+        if (!shown.length) {
+          list.innerHTML = '<div class="empty"><div class="empty-icon">✓</div>今天还没有待办，可以先添加一项。</div>';
+          return;
+        }
+        list.innerHTML = '';
+        shown.forEach(function (t) {
+          var item = document.createElement('div');
+          item.className = 'todo-item ' + (t.priority ? 'warning' : 'normal');
+          var overdue = !t.done && t.due && t.due < fmt.today();
+          if (overdue) item.className = 'todo-item urgent';
+          item.innerHTML =
+            '<div class="todo-head-row">' +
+              '<button class="check-dot ' + (t.done ? 'done' : '') + '" title="标记完成">' + icon('check') + '</button>' +
+              '<div class="grow"><div class="todo-text ' + (t.done ? 'done' : '') + '"></div>' +
+              '<div class="todo-meta"><span class="badge">' + stageName(t.stage) + '</span>' +
+              (t.due ? '<span>截止 ' + t.due + (overdue ? '（已过期）' : '') + '</span>' : '') + '</div></div>' +
+              '<button class="todo-del" title="删除">' + icon('trash', 'ic-sm') + '</button>' +
+            '</div>';
+          item.querySelector('.todo-text').textContent = t.text;
+          item.querySelector('.check-dot').onclick = function () {
+            t.done = !t.done; store.write('todos', todos); refresh();
+          };
+          item.querySelector('.todo-del').onclick = function () {
+            store.write('todos', todos.filter(function (x) { return x.id !== t.id; }));
+            S.toast('已删除待办'); refresh();
+          };
+          list.appendChild(item);
+        });
+      }
+
+      function renderBuy() {
+        var buys = store.read('buylist', []).filter(function (b) { return !b.bought; });
+        var box = document.getElementById('buyList');
+        if (!buys.length) {
+          box.innerHTML = '<div class="empty"><div class="empty-icon">🛒</div>暂无待购材料，可从采购参考库添加。</div>';
+          return;
+        }
+        box.innerHTML = buys.slice(0, 6).map(function (b) {
+          return '<div class="row-item"><span class="iconbox blue" style="width:30px;height:30px;border-radius:8px">' +
+            icon('cart', 'ic-sm') + '</span><div class="grow"><div class="name">' + b.name +
+            '</div><div class="sub">' + (b.spec || '') + ' × ' + b.qty + '</div></div>' +
+            '<span class="badge blue">' + stageName(b.stage) + '</span></div>';
+        }).join('');
+      }
+
+      function renderBills() {
+        var bills = store.read('bills', []);
+        var box = document.getElementById('billSummary');
+        if (!bills.length) {
+          box.innerHTML = '<div class="empty with-icon"><div class="empty-icon">📒</div>还没有记账记录<div style="margin-top:6px;font-size:12px">每一笔装修支出，都记在这里</div>' +
+            '<a class="more" href="materials.html" style="display:inline-block;margin-top:10px">记下第一笔 ›</a></div>';
+          return;
+        }
+        box.innerHTML = '<div class="yellow-recent-list">' + bills.slice(-5).reverse().map(function (b) {
+          return '<a class="yellow-recent-row" href="materials.html">' +
+            '<span class="yellow-recent-icon">' + icon(b.status === 'pending' ? 'clock' : 'wallet', 'ic-sm') + '</span>' +
+            '<div><b>' + b.sub + '</b><small>' + b.date + (b.note ? ' · ' + b.note : '') + '</small></div>' +
+            '<span><strong>' + (b.status === 'pending' ? '待付 ' : '') + fmt.money(b.amount) + '</strong></span>' +
+            '</a>';
+        }).join('') + '</div>';
+      }
+
+      function refresh() { renderOverview(); renderBudget(); renderTodos(); renderBuy(); renderBills(); }
+      refresh();
+
+      /* ---------- 首屏数据模式（示例数据 / 空白开始） ---------- */
+      var dataBar = document.getElementById('dataModeBar');
+      var dmbTitle = document.getElementById('dmbTitle');
+      var dmbDesc = document.getElementById('dmbDesc');
+      var dmbKeep = document.getElementById('dmbKeep');
+      var dmbClear = document.getElementById('dmbClear');
+      var resetDemoBtn = document.getElementById('resetDemoBtn');
+
+      function renderDataMode() {
+        var mode = store.dataMode();
+        resetDemoBtn.hidden = false;
+        resetDemoBtn.textContent = mode === 'demo' ? '清空示例数据' : '填充示例数据';
+        dataBar.hidden = store.read('dataModeAck', false);
+        if (mode === 'demo') {
+          dmbTitle.textContent = '当前使用示例数据';
+          dmbDesc.textContent = '示例数据方便你先了解各页面。也可以清空它们，从空白项目开始记录自己的装修。';
+          dmbKeep.textContent = '保留示例';
+          dmbClear.textContent = '清空示例，空白开始';
+        } else {
+          dmbTitle.textContent = '当前是空白项目';
+          dmbDesc.textContent = '已清空示例数据，各页面从 0 开始。想先看看效果，可以重新填充示例数据。';
+          dmbKeep.textContent = '填充示例数据';
+          dmbClear.textContent = '继续空白记录';
+        }
+      }
+
+      function ackBanner() { store.write('dataModeAck', true); dataBar.hidden = true; }
+
+      function confirmClear() {
+        if (!confirm('清空后，示例数据和已记录的内容都会删除，确定清空？')) return false;
+        store.resetBlank();
+        ackBanner();
+        refresh();
+        renderDataMode();
+        S.toast('已清空，开始记录自己的装修');
+        return true;
+      }
+
+      function confirmFill() {
+        if (!confirm('填充示例数据会覆盖当前已记录的内容，确定继续？')) return false;
+        store.resetDemo();
+        ackBanner();
+        refresh();
+        renderDataMode();
+        S.toast('已填充示例数据');
+        return true;
+      }
+
+      dmbKeep.onclick = function () {
+        if (store.dataMode() === 'demo') { ackBanner(); S.toast('继续使用示例数据'); return; }
+        confirmFill();
+      };
+
+      dmbClear.onclick = function () {
+        if (store.dataMode() === 'demo') { confirmClear(); return; }
+        ackBanner();
+        S.toast('继续空白记录');
+      };
+
+      resetDemoBtn.onclick = function () {
+        if (store.dataMode() === 'demo') confirmClear();
+        else confirmFill();
+      };
+
+      renderDataMode();
+
+      /* ---------- 交互 ---------- */
+      function addTodo() {
+        var text = document.getElementById('todoText').value.trim();
+        if (!text) { S.toast('先输入待办内容'); return; }
+        var todos = store.read('todos', []);
+        todos.push({
+          id: store.uid(), text: text,
+          stage: stageSel.value,
+          due: document.getElementById('todoDue').value || '',
+          done: false, priority: false
+        });
+        store.write('todos', todos);
+        document.getElementById('todoText').value = '';
+        S.toast('已添加待办');
+        refresh();
+      }
+      document.getElementById('todoAddBtn').onclick = addTodo;
+      document.getElementById('todoText').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') addTodo();
+      });
+
+      /* 新增待办展开/收起 */
+      var todoToggle = document.getElementById('todoToggleBtn');
+      var todoGrid = document.getElementById('todoAddGrid');
+      todoToggle.onclick = function () {
+        var open = !todoGrid.hidden;
+        todoGrid.hidden = open;
+        todoToggle.textContent = (open ? '▸ ' : '▾ ') + '新增待办';
+        if (!open) document.getElementById('todoText').focus();
+      };
+
+      /* 待办 tab 切换 */
+      var tabToday = document.getElementById('tabToday');
+      var tabAll = document.getElementById('tabAll');
+      function setTodoTab(t) {
+        todoTab = t;
+        tabToday.classList.toggle('active', t === 'today');
+        tabAll.classList.toggle('active', t === 'all');
+        renderTodos();
+      }
+      tabToday.onclick = function () { setTodoTab('today'); };
+      tabAll.onclick = function () { setTodoTab('all'); };
+      document.getElementById('detailMode').onclick = function () { S.toast('详细模式切换（演示）'); };
+
+      /* 数据备份：覆盖全部业务数据，并记录最近备份时间 */
+      var BACKUP_KEYS = ['budget', 'bills', 'todos', 'buylist', 'diary', 'flowSteps', 'compare', 'acceptance', 'customerProjects'];
+      var KEY_NAMES = {
+        budget: '预算设置', bills: '装修记账', todos: '待办事项', buylist: '采购清单',
+        diary: '装修日记', flowSteps: '流程进度', compare: '比价选品',
+        acceptance: '验收记录', customerProjects: '客户项目'
+      };
+      var backupState = document.getElementById('backupState');
+
+      function renderBackupState() {
+        var last = store.read('lastBackupAt', '');
+        var days = null;
+        if (last) {
+          var t = new Date(last).getTime();
+          if (!isNaN(t)) days = Math.floor((Date.now() - t) / 86400000);
+        }
+        if (days === null) {
+          backupState.textContent = '尚未备份 · 数据仅存本机';
+          backupState.classList.add('warn');
+          return;
+        }
+        backupState.textContent = (days <= 0 ? '今日已备份' : '上次备份 ' + days + ' 天前') + ' · 数据仅存本机';
+        backupState.classList.toggle('warn', days >= 7);
+      }
+
+      function doExport() {
+        var data = {
+          __meta: {
+            app: '装修小管家',
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            dataMode: store.dataMode()
+          }
+        };
+        BACKUP_KEYS.forEach(function (k) { data[k] = store.read(k, null); });
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '装修小管家-数据备份-' + fmt.today() + '.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        store.write('lastBackupAt', new Date().toISOString());
+        renderBackupState();
+        S.toast('备份已导出，请保存到微信或网盘');
+      }
+      document.getElementById('exportBtn').onclick = doExport;
+      var topBtn = document.getElementById('exportBtnTop');
+      if (topBtn) topBtn.onclick = doExport;
+      document.getElementById('importBtn').onclick = function () {
+        document.getElementById('importFile').click();
+      };
+
+      /* 恢复上一版：取最近一次写入前的本机快照（最多保留 3 份） */
+      document.getElementById('restoreSnapBtn').onclick = function () {
+        var snaps = store.snapshots();
+        if (!snaps.length) { S.toast('暂无可恢复的上一版'); return; }
+        var item = snaps[0];
+        var d = new Date(item.at);
+        var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+        var when = (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        var name = KEY_NAMES[item.key] || item.key;
+        if (!confirm('将把「' + name + '」恢复到 ' + when + ' 的版本，当前内容会被覆盖。确定继续？')) return;
+        var done = store.restoreSnapshot(0);
+        if (!done) { S.toast('恢复失败：本机存储空间不足'); return; }
+        refresh();
+        renderDataMode();
+        renderBackupState();
+        S.toast('已恢复「' + name + '」的上一版');
+      };
+
+      /* 兼容三种备份：新版（含 __meta）、旧版（直接键值）、账号页（xzreplica. 前缀） */
+      function normalizeBackup(raw) {
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+        var src = raw;
+        var hasNs = Object.keys(raw).some(function (k) { return k.indexOf('xzreplica.') === 0; });
+        if (hasNs) {
+          src = {};
+          Object.keys(raw).forEach(function (k) {
+            if (k.indexOf('xzreplica.') === 0) src[k.slice(10)] = raw[k];
+          });
+        }
+        var out = {};
+        BACKUP_KEYS.forEach(function (k) {
+          if (src[k] !== undefined && src[k] !== null) out[k] = src[k];
+        });
+        return Object.keys(out).length ? out : null;
+      }
+
+      document.getElementById('importFile').addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var data = null;
+          try { data = normalizeBackup(JSON.parse(reader.result)); } catch (err) { data = null; }
+          if (!data) {
+            S.toast('文件格式不正确，请选择装修小管家导出的备份');
+            e.target.value = '';
+            return;
+          }
+          if (!confirm('导入会覆盖当前项目数据，建议先点「备份数据」保存一份。确定继续？')) {
+            e.target.value = '';
+            return;
+          }
+          var restored = 0;
+          var failed = [];
+          BACKUP_KEYS.forEach(function (k) {
+            if (data[k] === undefined) return;
+            if (store.write(k, data[k])) restored++; else failed.push(k);
+          });
+          store.write('dataModeAck', true);
+          refresh();
+          renderDataMode();
+          if (failed.length) {
+            /* 延后到统一失败提示之后，保证用户看到具体的未写入清单 */
+            setTimeout(function () {
+              S.toast('导入未全部成功：本机存储空间不足，' + failed.length + ' 类数据未写入，已恢复 ' + restored + ' 类');
+            }, 0);
+          } else {
+            S.toast('导入成功，已恢复 ' + restored + ' 类数据');
+          }
+          e.target.value = '';
+        };
+        reader.readAsText(file);
+      });
+      renderBackupState();
+    })();
+  </script>
+</body>
+</html>
