@@ -131,6 +131,22 @@
     <nav class="hidden items-center gap-8 text-sm text-neutral-600 md:flex">
       <a href="erp/login.html" class="transition hover:text-ink">个人ERP客户管理系统</a>
       <a href="zhangben/login.html" class="transition hover:text-ink">装修小账本</a>
+      <div class="relative group">
+        <button id="caicaiEntry" class="flex items-center gap-1 transition hover:text-ink">
+          装修选材
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform group-hover:rotate-180"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="absolute left-1/2 top-full z-50 mt-2 w-44 -translate-x-1/2 overflow-hidden rounded-sm border border-line bg-white py-1 text-[13px] text-neutral-700 shadow-lg opacity-0 invisible translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0" role="menu">
+          <a href="/h5/#/login" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 transition hover:bg-neutral-50 hover:text-ink">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+            手机端 · H5
+          </a>
+          <a href="/" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 transition hover:bg-neutral-50 hover:text-ink">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            管理后台 · PC
+          </a>
+        </div>
+      </div>
       <a href="#home" class="transition hover:text-ink">首页</a>
       <a href="#works" class="transition hover:text-ink">作品</a>
       <a href="#about" class="transition hover:text-ink">关于我</a>
@@ -149,6 +165,11 @@
     <nav class="mx-auto flex max-w-6xl flex-col px-5 py-2 text-sm text-neutral-700">
       <a href="erp/login.html" class="py-3">个人ERP客户管理系统</a>
       <a href="zhangben/login.html" class="py-3">装修小账本</a>
+      <div class="border-t border-line/60">
+        <div class="py-3 font-medium text-ink">装修选材</div>
+        <a href="/h5/#/login" target="_blank" rel="noopener" class="block py-2 pl-4 text-neutral-600">↳ 手机端 · H5</a>
+        <a href="/" target="_blank" rel="noopener" class="block py-2 pl-4 text-neutral-600">↳ 管理后台 · PC</a>
+      </div>
       <a href="#home" class="py-3">首页</a>
       <a href="#works" class="py-3">作品</a>
       <a href="#about" class="py-3">关于我</a>
