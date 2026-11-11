@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>管理后台登录 - 主材选材系统</title>
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.register-form { display: none; }
+.register-form.active { display: block; }
+.switch-row { text-align: center; font-size: 13px; color: #888; margin-top: 14px; }
+.switch-row .link { color: #4a90d9; cursor: pointer; font-weight: 500; }
+.switch-row .link:hover { text-decoration: underline; }
+.tip-ok { color: #27ae60; font-size: 13px; margin-top: 10px; text-align: center; }
+.tip-hint { color: #999; font-size: 12px; margin-top: 6px; text-align: center; }
+</style>
+</head>
+<body class="login-body">
+  <div class="login-box">
+    <h1>主材选材系统 · 管理后台</h1>
+    <p class="subtitle">设计师团队主材选材归档与PDF确认单系统</p>
+
+    <!-- 登录 -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>管理员账号</label>
+        <input type="text" id="username" placeholder="admin" />
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <div class="pwd-wrap">
+          <input type="password" id="password" placeholder="请输入密码" />
+          <span class="pwd-toggle" id="pwdToggle" title="显示/隐藏密码">👁</span>
+        </div>
+      </div>
+      <div id="errorMsg" class="login-error"></div>
+      <button class="btn-primary" id="loginBtn">登 录</button>
+      <div class="switch-row">没有管理员账号？<span class="link" onclick="switchToRegister()">注册设计师账号</span></div>
+      <p class="tip-hint">设计师注册后请从 <a href="/h5/#/login" target="_blank" style="color:#4a90d9">手机端 H5</a> 登录</p>
+    </div>
+
+    <!-- 注册 -->
+    <div id="registerForm" class="register-form">
+      <h3 style="text-align:center;font-size:17px;color:#333;margin:0 0 14px;">设计师注册</h3>
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" id="regUsername" placeholder="至少 3 位" />
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <div class="pwd-wrap">
+          <input type="password" id="regPassword" placeholder="至少 6 位" />
+          <span class="pwd-toggle" id="regPwdToggle" title="显示/隐藏密码">👁</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>确认密码</label>
+        <input type="password" id="regPassword2" placeholder="再次输入密码" />
+      </div>
+      <div class="form-group">
+        <label>姓名（可选）</label>
+        <input type="text" id="regName" placeholder="真实姓名" />
+      </div>
+      <div class="form-group">
+        <label>手机号（可选）</label>
+        <input type="text" id="regPhone" placeholder="用于找回密码" />
+      </div>
+      <div id="regError" class="login-error"></div>
+      <div id="regOk" class="tip-ok" style="display:none;"></div>
+      <button class="btn-primary" id="registerBtn">注 册</button>
+      <div class="switch-row">已有账号？<span class="link" onclick="switchToLogin()">返回管理员登录</span></div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    let loginLoading = false, regLoading = false;
+
+    function showLoginError(msg) {
+      const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block';
+    }
+    function showRegError(msg) {
+      const el = document.getElementById('regError'); el.textContent = msg; el.style.display = 'block';
+      document.getElementById('regOk').style.display = 'none';
+    }
+    function showRegOk(msg) {
+      const el = document.getElementById('regOk'); el.textContent = msg; el.style.display = 'block';
+      document.getElementById('regError').style.display = 'none';
+    }
+    function switchToRegister() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').classList.add('active');
+      document.getElementById('regUsername').focus();
+    }
+    function switchToLogin() {
+      document.getElementById('registerForm').classList.remove('active');
+      document.getElementById('loginForm').style.display = 'block';
+      ['regUsername','regPassword','regPassword2','regName','regPhone'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('regError').style.display = 'none';
+      document.getElementById('regOk').style.display = 'none';
+    }
+
+    // 登录密码显示
+    document.getElementById('pwdToggle').onclick = () => {
+      const input = document.getElementById('password'), icon = document.getElementById('pwdToggle');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      icon.textContent = input.type === 'password' ? '👁' : '🙈';
+    };
+    document.getElementById('regPwdToggle').onclick = () => {
+      const input = document.getElementById('regPassword'), icon = document.getElementById('regPwdToggle');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      icon.textContent = input.type === 'password' ? '👁' : '🙈';
+    };
+
+    // 登录
+    document.getElementById('loginBtn').onclick = async () => {
+      if (loginLoading) return;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      document.getElementById('errorMsg').style.display = 'none';
+      if (!username || !password) { showLoginError('请输入账号密码'); return; }
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.textContent = '登录中...'; loginLoading = true;
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const json = await res.json();
+        if (json.code !== 0) { showLoginError(json.message || '登录失败'); return; }
+        const data = json.data;
+        if (data.user.role !== 'admin') { showLoginError('该账号无管理员权限，请从手机端 H5 登录'); return; }
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userInfo', JSON.stringify(data.user));
+        location.href = 'index.html';
+      } catch (e) { showLoginError('网络异常，请重试'); }
+      finally { btn.disabled = false; btn.textContent = '登 录'; loginLoading = false; }
+    };
+
+    // 注册
+    document.getElementById('registerBtn').onclick = async () => {
+      if (regLoading) return;
+      const f = {
+        username: document.getElementById('regUsername').value.trim(),
+        password: document.getElementById('regPassword').value,
+        password2: document.getElementById('regPassword2').value,
+        name: document.getElementById('regName').value.trim(),
+        phone: document.getElementById('regPhone').value.trim()
+      };
+      if (!f.username || f.username.length < 3) { showRegError('用户名至少 3 位'); return; }
+      if (!f.password || f.password.length < 6) { showRegError('密码至少 6 位'); return; }
+      if (f.password !== f.password2) { showRegError('两次密码不一致'); return; }
+      regLoading = true;
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true; btn.textContent = '注册中...';
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: f.username, password: f.password, name: f.name, phone: f.phone })
+        });
+        const json = await res.json();
+        if (json.code !== 0) { showRegError(json.message || '注册失败'); return; }
+        showRegOk('注册成功！请打开手机端 H5 登录： /h5/#/login');
+        ['regPassword','regPassword2'].forEach(id => document.getElementById(id).value = '');
+      } catch (e) { showRegError('网络异常，请重试'); }
+      finally { btn.disabled = false; btn.textContent = '注 册'; regLoading = false; }
+    };
+
+    // Enter 触发
+    ['username','password'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+    });
+    ['regUsername','regPassword','regPassword2','regName','regPhone'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('registerBtn').click(); });
+    });
+  </script>
+</body>
+</html>

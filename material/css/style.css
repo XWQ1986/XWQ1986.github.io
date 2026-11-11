@@ -1,0 +1,72 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #333; }
+
+/* 登录页 */
+.login-body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #2E6DB4, #1a4f8a); }
+.login-box { background: #fff; padding: 48px; border-radius: 12px; width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+.login-box h1 { font-size: 22px; color: #2E6DB4; text-align: center; margin-bottom: 8px; }
+.login-box .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 32px; }
+.login-box .tip { text-align: center; color: #aaa; font-size: 12px; margin-top: 16px; }
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 40px; }
+.pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; user-select: none; }
+.login-error { color: #e74c3c; font-size: 13px; margin: -8px 0 12px; display: none; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+.form-group input:focus { outline: none; border-color: #2E6DB4; }
+.btn-primary { background: #2E6DB4; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-primary:hover { background: #275a96; }
+.btn-ghost { background: #fff; color: #2E6DB4; border: 1px solid #2E6DB4; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.btn-ghost:hover { background: #f0f6fd; }
+.btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.btn-danger:hover { background: #fef0ef; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* 主布局 */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: #1f2d3d; color: #fff; padding-top: 20px; }
+.sidebar .logo { padding: 0 20px 20px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #2c3e50; }
+.sidebar .menu { padding: 12px 0; }
+.sidebar .menu-item { padding: 12px 20px; cursor: pointer; font-size: 14px; color: #c0c8d1; }
+.sidebar .menu-item:hover { background: #2c3e50; color: #fff; }
+.sidebar .menu-item.active { background: #2E6DB4; color: #fff; }
+.main { flex: 1; overflow: auto; }
+.header { background: #fff; padding: 14px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.header .title { font-size: 16px; font-weight: bold; }
+.header .user { color: #666; font-size: 13px; }
+.content { padding: 24px; }
+.card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.card h2 { font-size: 16px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+
+/* 表格 */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table th, table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+table th { background: #fafafa; font-weight: 600; color: #555; }
+table tr:hover { background: #f9fafb; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.tag-green { background: #e8f5e9; color: #2e7d32; }
+.tag-red { background: #fdecea; color: #c62828; }
+.tag-gray { background: #eceff1; color: #546e7a; }
+.tag-blue { background: #e3f2fd; color: #1565c0; }
+
+/* 表单 */
+.form-row { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-end; }
+.form-row .field { flex: 1; }
+.form-row label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+.form-row textarea { min-height: 80px; resize: vertical; }
+
+/* 富文本编辑器 */
+.rich-editor { border: 1px solid #ddd; border-radius: 4px; min-height: 300px; padding: 12px; font-size: 14px; line-height: 1.6; }
+.rich-toolbar { margin-bottom: 8px; }
+.rich-toolbar button { padding: 4px 10px; margin-right: 4px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.rich-toolbar button:hover { background: #f0f0f0; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.modal { background: #fff; border-radius: 8px; padding: 24px; width: 480px; max-width: 90%; }
+.modal h3 { margin-bottom: 16px; }
+.modal-actions { text-align: right; margin-top: 20px; }
+.modal-actions button { margin-left: 8px; }
+
+.empty { text-align: center; color: #999; padding: 60px 0; }
