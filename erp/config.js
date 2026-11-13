@@ -13,8 +13,8 @@ window.HC_CONFIG = {
   /* 附件存储桶（私有）。若控制台建桶时用了别的名字，改这里即可 */
   STORAGE_BUCKET: 'tenant-files',
 
-  /* 单文件上限（MB）：图片会先压缩，DWG/PDF/Office 按此上限校验 */
-  MAX_FILE_MB: 20,
+  /* 单文件上限（MB）：图片会先压缩，视频/ DWG/PDF/Office 按此上限校验 */
+  MAX_FILE_MB: 200,
 
   /* 单次最多选择文件数 */
   MAX_FILES_PER_PICK: 20
