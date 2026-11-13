@@ -2630,7 +2630,7 @@ function renderDrawer(id) {
 
   /* 分阶段资料（不同阶段展示不同填写项与上传项） */
   html += '<div class="card mb-3"><div class="card-head"><div class="flex-1"><div class="card-title">阶段资料</div>'
-    + '<div class="card-sub">按阶段展示对应资料 · 单文件 ≤ ' + MAX_FILE_MB + 'MB · 支持 DWG/DXF</div></div></div>'
+    + '<div class="card-sub">按阶段展示对应资料 · 单文件 ≤ ' + MAX_FILE_MB + 'MB · 支持图片/视频/DWG/DXF</div></div></div>'
     + '<div class="card-body">' + renderStageForms(c, attBlock) + '</div></div>';
 
   /* P3-9 跟进记录置顶 · 严格按更新时间倒序 */
@@ -3262,12 +3262,12 @@ function render(noScroll) {
   hydrateAttUrls();
   if (!noScroll) window.scrollTo(0, 0);
 }
-function toast(msg) {
+function toast(msg, dur) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._t);
-  t._t = setTimeout(function () { t.classList.remove('show'); }, 1900);
+  t._t = setTimeout(function () { t.classList.remove('show'); }, dur || 1900);
 }
 function copyText(text) {
   try {
@@ -3870,7 +3870,7 @@ function uploadAttachments(cid, stage, cat, input) {
   if (files.length > MAX_FILES_PER_PICK) { toast('单次最多 ' + MAX_FILES_PER_PICK + ' 个文件，请分批上传'); return; }
   const tenantId = ACTIVE_TENANT || (ME && ME.tenant_id);
   const limit = MAX_FILE_MB * 1024 * 1024;
-  let done = 0, ok = 0, fail = 0;
+  let done = 0, ok = 0, fail = 0, lastErr = '';
   showUploadBar('准备上传 ' + files.length + ' 个文件…', 0);
   const finish = function () {
     done++;
@@ -3883,7 +3883,9 @@ function uploadAttachments(cid, stage, cat, input) {
     delete ATT_CACHE[cid];
     loadAttachments(cid, function () {
       render();
-      toast('上传完成：成功 ' + ok + '，失败 ' + fail);
+      toast(fail > 0 && lastErr
+        ? '上传完成：成功 ' + ok + '，失败 ' + fail + '（' + lastErr + '）'
+        : '上传完成：成功 ' + ok + '，失败 ' + fail, fail > 0 ? 4500 : 1900);
       hideUploadBar(1600);
       if (ok > 0) auditWrite(cid, 'attachment_upload', { stage: stage, category: cat, count: ok });
     });
@@ -3891,6 +3893,7 @@ function uploadAttachments(cid, stage, cat, input) {
   files.forEach(function (file) {
     if (file.size > limit) {
       fail++;
+      lastErr = '单文件上限 ' + MAX_FILE_MB + 'MB';
       toast(file.name + ' 超过 ' + MAX_FILE_MB + 'MB，已跳过');
       finish();
       return;
@@ -3901,7 +3904,16 @@ function uploadAttachments(cid, stage, cat, input) {
       const mime = blob.type || file.type || 'application/octet-stream';
       HC_SB.storage.from(BUCKET).upload(path, blob, { contentType: mime, upsert: false })
         .then(function (r) {
-          if (r && r.error) { fail++; console.warn('[上传失败]', r.error.message); finish(); return; }
+          if (r && r.error) {
+            fail++;
+            const msg = String(r.error.message || '');
+            const tooLarge = /maximum allowed size|Payload too large|EntityTooLarge|exceeded/i.test(msg);
+            lastErr = tooLarge ? '超过云端单文件上限 ' + MAX_FILE_MB + 'MB，请压缩后再传' : msg.slice(0, 30);
+            console.warn('[上传失败]', msg);
+            toast(file.name + '：' + lastErr, 4200);
+            finish();
+            return;
+          }
           HC_SB.from('attachments').insert({
             tenant_id: tenantId,
             customer_id: cid,
