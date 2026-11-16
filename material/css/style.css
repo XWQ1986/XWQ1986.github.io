@@ -70,3 +70,20 @@ table tr:hover { background: #f9fafb; }
 .modal-actions button { margin-left: 8px; }
 
 .empty { text-align: center; color: #999; padding: 60px 0; }
+
+/* 修改密码弹窗 */
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.modal-header h3 { margin: 0; font-size: 18px; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; line-height: 1; }
+.modal-close:hover { color: #333; }
+.modal-body { padding: 0; }
+.modal-footer { text-align: right; margin-top: 20px; }
+.modal-footer button { margin-left: 8px; }
+.btn-outline { padding: 8px 20px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-outline:hover { background: #f5f5f5; }
+.btn-primary { padding: 8px 20px; background: #2E6DB4; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-primary:hover { background: #255a96; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.tip { font-size: 13px; margin-top: 12px; text-align: center; }
+.tip-error { color: #e74c3c; }
+.tip-ok { color: #27ae60; }

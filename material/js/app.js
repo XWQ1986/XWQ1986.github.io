@@ -26,6 +26,53 @@ function logout() {
   location.href = 'login.html';
 }
 
+// 修改密码
+function openPwdModal() {
+  document.getElementById('oldPwd').value = '';
+  document.getElementById('newPwd').value = '';
+  document.getElementById('newPwd2').value = '';
+  const tip = document.getElementById('pwdTip');
+  tip.style.display = 'none';
+  tip.className = 'tip';
+  document.getElementById('pwdModal').style.display = 'flex';
+}
+
+function closePwdModal() {
+  document.getElementById('pwdModal').style.display = 'none';
+}
+
+async function doChangePwd() {
+  const oldPwd = document.getElementById('oldPwd').value.trim();
+  const newPwd = document.getElementById('newPwd').value.trim();
+  const newPwd2 = document.getElementById('newPwd2').value.trim();
+  const tip = document.getElementById('pwdTip');
+  const btn = document.getElementById('pwdSubmitBtn');
+
+  if (!oldPwd) { showPwdTip('请输入当前密码', 'error'); return; }
+  if (!newPwd || newPwd.length < 6) { showPwdTip('新密码至少6位', 'error'); return; }
+  if (newPwd !== newPwd2) { showPwdTip('两次密码不一致', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '提交中...';
+  try {
+    await api.put('/api/auth/password', { old_password: oldPwd, new_password: newPwd });
+    showPwdTip('密码修改成功，请重新登录', 'ok');
+    setTimeout(() => { logout(); }, 1200);
+  } catch (e) {
+    showPwdTip(e.message || '修改失败', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '确认修改';
+  }
+}
+
+function showPwdTip(msg, type) {
+  const tip = document.getElementById('pwdTip');
+  tip.textContent = msg;
+  tip.style.display = 'block';
+  tip.className = 'tip ' + (type === 'ok' ? 'tip-ok' : 'tip-error');
+}
+
 function switchPage(page) {
   currentPage = page;
   document.getElementById('pageTitle').textContent = pageTitles[page];
@@ -196,8 +243,32 @@ async function saveFooter() {
 // ========== 系统配置 ==========
 async function renderConfig() {
   const cfg = await api.get('/api/admin/config');
+  let categoryPrices = {};
+  try { categoryPrices = JSON.parse(cfg.category_prices || '{}'); } catch (e) {}
+  const cats = await api.get('/api/categories');
+  const catList = (cats.data || []).map(c => c.name);
+  // 确保所有品类都有价格项
+  catList.forEach(c => { if (categoryPrices[c] === undefined) categoryPrices[c] = 0; });
+
+  const priceRows = catList.map(c => `
+    <div class="field" style="display:flex;align-items:center;gap:8px;">
+      <label style="width:80px;flex-shrink:0;">${c}</label>
+      <input id="catprice_${c}" value="${categoryPrices[c] || 0}" style="flex:1;" type="number" min="0" step="0.01" placeholder="默认单价（元）" />
+      <span style="color:#999;font-size:12px;">元</span>
+    </div>
+  `).join('');
+
   document.getElementById('content').innerHTML = `
     <div class="card"><h2>系统配置</h2>
+      <h3 style="margin-top:20px;color:#2E6DB4;">导出设置</h3>
+      <div class="form-row"><div class="field"><label>导出文件自动保存目录</label>
+        <input id="cfg_export_save_dir" value="${cfg.export_save_dir || ''}" placeholder="如：D:\\储存\\家装主材选材归档系统（留空则不自动保存）" />
+      </div>
+        <div class="field"><label>&nbsp;</label><div style="padding:8px 0;font-size:12px;color:#666;">导出的Excel/PPT/PDF会自动复制到此目录，方便设计师直接取用。</div></div></div>
+      <h3 style="margin-top:20px;color:#2E6DB4;">品类默认价格 <span style="font-size:12px;color:#999;font-weight:normal;">（上传图片时若未填写单价，自动按品类填充）</span></h3>
+      <div class="price-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+        ${priceRows}
+      </div>
       <h3 style="margin-top:20px;color:#2E6DB4;">NAS 同步</h3>
       <div class="form-row"><div class="field"><label>NAS通信地址</label><input id="cfg_nas_url" value="${cfg.nas_url || ''}" /></div>
         <div class="field"><label>NAS鉴权Token</label><input id="cfg_nas_auth_token" value="${cfg.nas_auth_token || ''}" /></div></div>
@@ -226,9 +297,21 @@ async function renderConfig() {
     </div>`;
 }
 async function saveConfig() {
-  const keys = ['nas_url', 'nas_auth_token', 'obsidian_root', 'file_naming_template', 'pdf_header_template', 'pdf_footer_template', 'ocr_engine', 'ocr_api_key', 'ocr_secret_key', 'ocr_api_url'];
+  const keys = ['nas_url', 'nas_auth_token', 'obsidian_root', 'file_naming_template', 'pdf_header_template', 'pdf_footer_template', 'ocr_engine', 'ocr_api_key', 'ocr_secret_key', 'ocr_api_url', 'export_save_dir'];
   const cfg = {};
-  keys.forEach(k => cfg[k] = document.getElementById('cfg_' + k).value);
+  keys.forEach(k => {
+    const el = document.getElementById('cfg_' + k);
+    if (el) cfg[k] = el.value;
+  });
+  // 品类默认价格
+  const cats = await api.get('/api/categories');
+  const catList = (cats.data || []).map(c => c.name);
+  const prices = {};
+  catList.forEach(c => {
+    const el = document.getElementById('catprice_' + c);
+    prices[c] = el ? (parseFloat(el.value) || 0) : 0;
+  });
+  cfg.category_prices = JSON.stringify(prices);
   await api.put('/api/admin/config', cfg);
   alert('保存成功');
 }

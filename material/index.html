@@ -23,10 +23,39 @@
   <main class="main">
     <header class="header">
       <div class="title" id="pageTitle">用户管理</div>
-      <div class="user"><span id="userName">-</span> | <a href="#" onclick="logout()">退出</a></div>
+      <div class="user"><span id="userName">-</span> | <a href="#" onclick="openPwdModal()">修改密码</a> | <a href="#" onclick="logout()">退出</a></div>
     </header>
     <div class="content" id="content"></div>
   </main>
+</div>
+
+<!-- 修改密码弹窗 -->
+<div id="pwdModal" class="modal-mask" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>修改密码</h3>
+      <button class="modal-close" onclick="closePwdModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>当前密码</label>
+        <input type="password" id="oldPwd" placeholder="请输入当前密码" />
+      </div>
+      <div class="form-group">
+        <label>新密码</label>
+        <input type="password" id="newPwd" placeholder="至少6位" />
+      </div>
+      <div class="form-group">
+        <label>确认新密码</label>
+        <input type="password" id="newPwd2" placeholder="再次输入新密码" />
+      </div>
+      <div id="pwdTip" class="tip" style="display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePwdModal()">取消</button>
+      <button class="btn btn-primary" id="pwdSubmitBtn" onclick="doChangePwd()">确认修改</button>
+    </div>
+  </div>
 </div>
 <script src="js/api.js"></script>
 <script src="js/app.js"></script>
